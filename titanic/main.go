@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/santiaago/caltechx.go/linreg"
 )
 
 var (
@@ -18,7 +20,7 @@ func main() {
 	flag.Parse()
 
 	// train
-	if csvfile, err := os.Open(*test); err != nil {
+	if csvfile, err := os.Open(*train); err != nil {
 		log.Fatalln(err)
 	} else {
 		reader := csv.NewReader(csvfile)
@@ -31,15 +33,36 @@ func trainModel(r *csv.Reader) {
 	if rawData, err := r.ReadAll(); err != nil {
 		log.Fatalln(err)
 	} else {
-		//passengers := []passenger{}
+		passengers := []passenger{}
 		for i := 1; i < len(rawData); i++ {
-			p := passengerFromLine(rawData[i])
-			fmt.Printf("%+v\n", p)
+			p := passengerFromTrainLine(rawData[i])
+			passengers = append(passengers, p)
 		}
+		var data [][]float64
+		for i := 0; i < len(passengers); i++ {
+			p := passengers[i]
+			var survived float64
+			if p.Survived {
+				survived = float64(1)
+			}
+
+			var sex float64
+			if p.Sex == "female" {
+				sex = float64(1)
+			}
+			d := []float64{sex, float64(p.Age), survived}
+			data = append(data, d)
+		}
+		linreg := linreg.NewLinearRegression()
+		linreg.InitializeFromData(data)
+		linreg.Learn()
+		fmt.Printf("number of passengers: %d\n", len(passengers))
+		fmt.Printf("EIn = %f\n", linreg.Ein())
 	}
 }
 
-func passengerFromLine(line []string) passenger {
+func passengerFromTrainLine(line []string) passenger {
+
 	survived, err := strconv.ParseBool(line[1])
 	if err != nil {
 		survived = false
