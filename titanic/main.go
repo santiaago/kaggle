@@ -49,9 +49,9 @@ func trainModel(r *csv.Reader) *linreg.LinearRegression {
 		p := passengerFromTrainLine(rawData[i])
 		passengers = append(passengers, p)
 	}
-	return linregSexAge(passengers)
-	//linregPClassAge(passengers)
-	//linregPClassSex(passengers)
+	//return linregSexAge(passengers)
+	//return linregPClassAge(passengers)
+	return linregPClassSex(passengers)
 
 }
 
@@ -66,12 +66,15 @@ func testModel(r *csv.Reader, linreg *linreg.LinearRegression) {
 		p := passengerFromTestLine(rawData[i])
 		passengers = append(passengers, p)
 	}
-	linregTestSexAge(linreg, &passengers)
-	writeTestModelSexAge(passengers)
+	linregTest(linreg, &passengers)
+
+	//writeTestModel(passengers, "data/testModel-SexAge.csv")
+	//writeTestModel(passengers, "data/testModel-PClassAge.csv")
+	writeTestModel(passengers, "data/testModel-PClassSex.csv")
 }
 
-func writeTestModelSexAge(passengers []passenger) {
-	if csvfile, err := os.Create("data/testModel-SexAge.csv"); err != nil {
+func writeTestModel(passengers []passenger, title string) {
+	if csvfile, err := os.Create(title); err != nil {
 		log.Fatalln(err)
 	} else {
 		writer := csv.NewWriter(csvfile)
@@ -92,7 +95,8 @@ func writeTestModelSexAge(passengers []passenger) {
 		writer.Flush()
 	}
 }
-func linregTestSexAge(linreg *linreg.LinearRegression, passengers *[]passenger) {
+
+func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger) {
 	var data [][]float64
 	for i := 0; i < len(*passengers); i++ {
 		p := (*passengers)[i]
