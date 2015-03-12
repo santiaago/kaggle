@@ -67,8 +67,31 @@ func testModel(r *csv.Reader, linreg *linreg.LinearRegression) {
 		passengers = append(passengers, p)
 	}
 	linregTestSexAge(linreg, &passengers)
+	writeTestModelSexAge(passengers)
 }
 
+func writeTestModelSexAge(passengers []passenger) {
+	if csvfile, err := os.Create("data/testModel-SexAge.csv"); err != nil {
+		log.Fatalln(err)
+	} else {
+		writer := csv.NewWriter(csvfile)
+		// headers
+		if err := writer.Write([]string{"PassengerId", "Survived"}); err != nil {
+			log.Fatalln(err)
+		}
+		// data
+		for _, passenger := range passengers {
+			p := []string{passenger.ID, "0"}
+			if passenger.Survived {
+				p[1] = "1"
+			}
+			if err := writer.Write(p); err != nil {
+				log.Fatalln(err)
+			}
+		}
+		writer.Flush()
+	}
+}
 func linregTestSexAge(linreg *linreg.LinearRegression, passengers *[]passenger) {
 	var data [][]float64
 	for i := 0; i < len(*passengers); i++ {
