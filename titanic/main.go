@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -27,5 +28,13 @@ func main() {
 }
 
 func trainModel(r *strings.Reader) {
-	fmt.Println("train")
+	s := bufio.NewScanner(r)
+	s.Split(bufio.ScanLines)
+
+	s.Scan() // skip first line
+	count := 0
+	for s.Scan() {
+		count++
+	}
+	fmt.Println(count)
 }
