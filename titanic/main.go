@@ -38,27 +38,32 @@ func trainModel(r *csv.Reader) {
 			p := passengerFromTrainLine(rawData[i])
 			passengers = append(passengers, p)
 		}
-		var data [][]float64
-		for i := 0; i < len(passengers); i++ {
-			p := passengers[i]
-			var survived float64
-			if p.Survived {
-				survived = float64(1)
-			}
-
-			var sex float64
-			if p.Sex == "female" {
-				sex = float64(1)
-			}
-			d := []float64{sex, float64(p.Age), survived}
-			data = append(data, d)
-		}
-		linreg := linreg.NewLinearRegression()
-		linreg.InitializeFromData(data)
-		linreg.Learn()
-		fmt.Printf("number of passengers: %d\n", len(passengers))
-		fmt.Printf("EIn = %f\n", linreg.Ein())
+		linearRegressionSexAge(passengers)
 	}
+}
+
+func linearRegressionSexAge(passengers []passenger) *linreg.LinearRegression {
+	var data [][]float64
+	for i := 0; i < len(passengers); i++ {
+		p := passengers[i]
+		var survived float64
+		if p.Survived {
+			survived = float64(1)
+		}
+
+		var sex float64
+		if p.Sex == "female" {
+			sex = float64(1)
+		}
+		d := []float64{sex, float64(p.Age), survived}
+		data = append(data, d)
+	}
+	linreg := linreg.NewLinearRegression()
+	linreg.InitializeFromData(data)
+	linreg.Learn()
+	fmt.Printf("number of passengers: %d\n", len(passengers))
+	fmt.Printf("EIn = %f\n", linreg.Ein())
+	return linreg
 }
 
 func passengerFromTrainLine(line []string) passenger {
