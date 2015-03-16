@@ -55,7 +55,7 @@ func main() {
 	}
 
 	// test models ...
-	testModels(*test, linregs, linregsNames)
+	//testModels(*test, linregs, linregsNames)
 }
 
 func testModels(file string, linregs []*linreg.LinearRegression, linregsNames []string) {
