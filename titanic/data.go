@@ -10,7 +10,22 @@ func passengerFromTrainLine(line []string) passenger {
 	}
 	age, err := strconv.ParseInt(line[5], 10, 32)
 	if err != nil {
-		age = 33
+		age = 25
+	}
+
+	sibsp, err := strconv.ParseInt(line[6], 10, 32)
+	if err != nil {
+		sibsp = 0
+	}
+
+	parch, err := strconv.ParseInt(line[7], 10, 32)
+	if err != nil {
+		parch = 0
+	}
+
+	fare, err := strconv.ParseInt(line[9], 10, 32)
+	if err != nil {
+		fare = 0
 	}
 
 	var embarked string
@@ -25,10 +40,10 @@ func passengerFromTrainLine(line []string) passenger {
 		line[3],
 		line[4],
 		int(age),
-		line[6],
-		line[7],
+		int(sibsp),
+		int(parch),
 		line[8],
-		line[9],
+		int(fare),
 		line[10],
 		embarked,
 	}
@@ -44,10 +59,20 @@ func passengerFromTestLine(line []string) passenger {
 	if err != nil {
 		age = 33
 	}
-	sibsp := line[5]
-	parch := line[6]
+	sibsp, err := strconv.ParseInt(line[5], 10, 32)
+	if err != nil {
+		sibsp = 0
+	}
+	parch, err := strconv.ParseInt(line[6], 10, 32)
+	if err != nil {
+		parch = 0
+	}
 	ticket := line[7]
-	fare := line[8]
+	fare, err := strconv.ParseInt(line[8], 10, 32)
+	if err != nil {
+		fare = 0
+	}
+
 	cabin := line[9]
 	var embarked string
 	if len(line) > 10 {
@@ -61,10 +86,10 @@ func passengerFromTestLine(line []string) passenger {
 		name,
 		sex,
 		int(age),
-		sibsp,
-		parch,
+		int(sibsp),
+		int(parch),
 		ticket,
-		fare,
+		int(fare),
 		cabin,
 		embarked,
 	}

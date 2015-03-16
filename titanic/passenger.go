@@ -9,10 +9,10 @@ type passenger struct {
 	Name     string
 	Sex      string
 	Age      int
-	SibSp    string
-	Parch    string
+	SibSp    int
+	Parch    int
 	Ticket   string
-	Fare     string
+	Fare     int
 	Cabin    string
 	Embarked string
 }
