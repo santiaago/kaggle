@@ -18,27 +18,37 @@ func main() {
 	flag.Parse()
 
 	var linregs []*linreg.LinearRegression
-	// train
+	var linregsNames []string
+
+	// train model
 	if csvfile, err := os.Open(*train); err != nil {
 		log.Fatalln(err)
 	} else {
 		reader := csv.NewReader(csvfile)
-		var linregFuncs []func(passengers []passenger) *linreg.LinearRegression
 
-		linregFuncs = append(linregFuncs, linregSexAge)
-		linregFuncs = append(linregFuncs, linregPClassAge)
-		linregFuncs = append(linregFuncs, linregPClassSex)
+		linregFuncs := []func(passengers []passenger) *linreg.LinearRegression{
+			linregSexAge,
+			linregPClassAge,
+			linregPClassSex,
+		}
+
+		linregsNames = []string{
+			"data/testModel-SexAge.csv",
+			"data/testModel-PClassAge.csv",
+			"data/testModel-PClassSex.csv",
+		}
 
 		linregs = trainModel(reader, linregFuncs)
 	}
+
 	// test models ...
-	if csvfile, err := os.Open(*test); err != nil {
-		log.Fatalln(err)
-	} else {
-		//"data/testModel-SexAge.csv"
-		//"data/testModel-PClassAge.csv"
-		//"data/testModel-PClassSex.csv"
-		reader := csv.NewReader(csvfile)
-		testModel(reader, linregs[0], "foo")
+	for i := 0; i < len(linregs); i++ {
+		if csvfile, err := os.Open(*test); err != nil {
+			log.Fatalln(err)
+		} else {
+			reader := csv.NewReader(csvfile)
+			testModel(reader, linregs[i], linregsNames[i])
+
+		}
 	}
 }
