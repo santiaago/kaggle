@@ -48,9 +48,11 @@ func combinations(iterable []int, r int) (results [][]int) {
 		for ; i < len(indices); i += 1 {
 			result[i] = pool[indices[i]]
 		}
-		results = append(results, result)
+		newRes := make([]int, r)
+		copy(newRes, result)
+		results = append(results, newRes)
 	}
-
+	return
 }
 
 func permutations(iterable []int, r int) {
