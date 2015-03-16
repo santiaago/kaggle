@@ -7,7 +7,7 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
-func trainModel(r *csv.Reader) *linreg.LinearRegression {
+func trainModel(r *csv.Reader) []*linreg.LinearRegression {
 	var rawData [][]string
 	var err error
 	if rawData, err = r.ReadAll(); err != nil {
@@ -19,8 +19,10 @@ func trainModel(r *csv.Reader) *linreg.LinearRegression {
 		p := passengerFromTrainLine(rawData[i])
 		passengers = append(passengers, p)
 	}
-	//return linregSexAge(passengers)
-	//return linregPClassAge(passengers)
-	return linregPClassSex(passengers)
+	var linregs []*linreg.LinearRegression
+	linregs = append(linregs, linregSexAge(passengers))
+	linregs = append(linregs, linregPClassAge(passengers))
+	linregs = append(linregs, linregPClassSex(passengers))
+	return linregs
 
 }

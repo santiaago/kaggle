@@ -17,19 +17,22 @@ var (
 func main() {
 	flag.Parse()
 
-	var linreg *linreg.LinearRegression
+	var linregs []*linreg.LinearRegression
 	// train
 	if csvfile, err := os.Open(*train); err != nil {
 		log.Fatalln(err)
 	} else {
 		reader := csv.NewReader(csvfile)
-		linreg = trainModel(reader)
+		linregs = trainModel(reader)
 	}
-	// test ...
+	// test models ...
 	if csvfile, err := os.Open(*test); err != nil {
 		log.Fatalln(err)
 	} else {
+		//"data/testModel-SexAge.csv"
+		//"data/testModel-PClassAge.csv"
+		//"data/testModel-PClassSex.csv"
 		reader := csv.NewReader(csvfile)
-		testModel(reader, linreg)
+		testModel(reader, linregs[0], "foo")
 	}
 }

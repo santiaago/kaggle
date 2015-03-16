@@ -8,7 +8,7 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
-func testModel(r *csv.Reader, linreg *linreg.LinearRegression) {
+func testModel(r *csv.Reader, linreg *linreg.LinearRegression, file string) {
 	var rawData [][]string
 	var err error
 	if rawData, err = r.ReadAll(); err != nil {
@@ -20,10 +20,7 @@ func testModel(r *csv.Reader, linreg *linreg.LinearRegression) {
 		passengers = append(passengers, p)
 	}
 	linregTest(linreg, &passengers)
-
-	//writeTestModel(passengers, "data/testModel-SexAge.csv")
-	//writeTestModel(passengers, "data/testModel-PClassAge.csv")
-	writeTestModel(passengers, "data/testModel-PClassSex.csv")
+	writeTestModel(passengers, file)
 }
 
 func writeTestModel(passengers []passenger, title string) {
