@@ -23,7 +23,13 @@ func main() {
 		log.Fatalln(err)
 	} else {
 		reader := csv.NewReader(csvfile)
-		linregs = trainModel(reader)
+		var linregFuncs []func(passengers []passenger) *linreg.LinearRegression
+
+		linregFuncs = append(linregFuncs, linregSexAge)
+		linregFuncs = append(linregFuncs, linregPClassAge)
+		linregFuncs = append(linregFuncs, linregPClassSex)
+
+		linregs = trainModel(reader, linregFuncs)
 	}
 	// test models ...
 	if csvfile, err := os.Open(*test); err != nil {
