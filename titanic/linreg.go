@@ -8,6 +8,10 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
+//
+// PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+//
+
 func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger) {
 	var data [][]float64
 	for i := 0; i < len(*passengers); i++ {

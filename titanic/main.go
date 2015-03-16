@@ -38,12 +38,16 @@ func main() {
 			"data/testModel-PClassSex.csv",
 		}
 
-		linregs = trainModel(reader, linregFuncs)
+		linregs = trainModels(reader, linregFuncs)
 	}
 
 	// test models ...
+	testModels(*test, linregs, linregsNames)
+}
+
+func testModels(file string, linregs []*linreg.LinearRegression, linregsNames []string) {
 	for i := 0; i < len(linregs); i++ {
-		if csvfile, err := os.Open(*test); err != nil {
+		if csvfile, err := os.Open(file); err != nil {
 			log.Fatalln(err)
 		} else {
 			reader := csv.NewReader(csvfile)

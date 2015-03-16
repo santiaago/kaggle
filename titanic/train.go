@@ -7,7 +7,7 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
-func trainModel(r *csv.Reader, linregFuncs []func(passengers []passenger) *linreg.LinearRegression) []*linreg.LinearRegression {
+func trainModels(r *csv.Reader, linregFuncs []func(passengers []passenger) *linreg.LinearRegression) []*linreg.LinearRegression {
 	var rawData [][]string
 	var err error
 	if rawData, err = r.ReadAll(); err != nil {
