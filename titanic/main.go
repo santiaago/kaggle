@@ -32,10 +32,10 @@ func main() {
 			linregSexAgePClass,
 		}
 		linregsNames = []string{
-			"data/testModel-SexAge.csv",
-			"data/testModel-PClassAge.csv",
-			"data/testModel-PClassSex.csv",
-			"data/testModel-SexAgePClass.csv",
+			"data/temp/testModel-SexAge.csv",
+			"data/temp/testModel-PClassAge.csv",
+			"data/temp/testModel-PClassSex.csv",
+			"data/temp/testModel-SexAgePClass.csv",
 		}
 		linregs = trainModels(csv.NewReader(csvfile), linregFuncs)
 	}
@@ -44,14 +44,19 @@ func main() {
 		log.Fatalln(err)
 	} else {
 		metaLinregFuncs := []func(passengers []passenger) []*linreg.LinearRegression{
-			linregVectorsOf3,
+			//linregVectorsOf2,
+			//linregVectorsOf3,
+			//linregVectorsOf4,
+			//linregVectorsOf5,
+			//linregVectorsOf6,
+			linregVectorsOf7,
 		}
-		linregsV3 := trainModelsMeta(csv.NewReader(csvfile), metaLinregFuncs)
-		for i := 0; i < len(linregsV3); i++ {
-			name := fmt.Sprintf("data/testModel-V3-%d", i)
+		linregsOf := trainModelsMeta(csv.NewReader(csvfile), metaLinregFuncs)
+		for i := 0; i < len(linregsOf); i++ {
+			name := fmt.Sprintf("data/temp/testModel-V-%d", i)
 			linregsNames = append(linregsNames, name)
 		}
-		linregs = append(linregs, linregsV3...)
+		linregs = append(linregs, linregsOf...)
 	}
 
 	// test models ...

@@ -40,9 +40,33 @@ func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger) {
 	}
 }
 
+func linregVectorsOf2(passengers []passenger) []*linreg.LinearRegression {
+	return linregVectors(passengers, 2)
+}
+
+func linregVectorsOf3(passengers []passenger) []*linreg.LinearRegression {
+	return linregVectors(passengers, 3)
+}
+
+func linregVectorsOf4(passengers []passenger) []*linreg.LinearRegression {
+	return linregVectors(passengers, 4)
+}
+
+func linregVectorsOf5(passengers []passenger) []*linreg.LinearRegression {
+	return linregVectors(passengers, 5)
+}
+
+func linregVectorsOf6(passengers []passenger) []*linreg.LinearRegression {
+	return linregVectors(passengers, 6)
+}
+
+func linregVectorsOf7(passengers []passenger) []*linreg.LinearRegression {
+	return linregVectors(passengers, 7)
+}
+
 // creates a linear regression model for each combination of
 // vector of 3 features and returns an array of linear regressions.
-func linregVectorsOf3(passengers []passenger) []*linreg.LinearRegression {
+func linregVectors(passengers []passenger, size int) []*linreg.LinearRegression {
 	var data [][]float64
 	for i := 0; i < len(passengers); i++ {
 		p := passengers[i]
@@ -87,14 +111,13 @@ func linregVectorsOf3(passengers []passenger) []*linreg.LinearRegression {
 		data = append(data, d)
 	}
 	var linregs []*linreg.LinearRegression
-	combs := combinations([]int{0, 1, 2, 3, 4, 5, 6}, 3)
+	combs := combinations([]int{0, 1, 2, 3, 4, 5, 6}, size)
 	for _, comb := range combs {
 		filteredData := filter(data, comb)
 		linreg := linreg.NewLinearRegression()
 		linreg.InitializeFromData(filteredData)
 		linreg.Learn()
-		fmt.Println("using combination", comb)
-		fmt.Printf("EIn = %f\n", linreg.Ein())
+		fmt.Printf("EIn = %f \t using combination %v\n", linreg.Ein(), comb)
 
 		linregs = append(linregs, linreg)
 	}
@@ -220,7 +243,6 @@ func linregPClassSex(passengers []passenger) *linreg.LinearRegression {
 	linreg := linreg.NewLinearRegression()
 	linreg.InitializeFromData(data)
 	linreg.Learn()
-	fmt.Printf("number of passengers: %d\n", len(passengers))
 	fmt.Printf("EIn = %f\n", linreg.Ein())
 	return linreg
 }
