@@ -40,28 +40,28 @@ func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger) {
 	}
 }
 
-func linregVectorsOf2(passengers []passenger) []*linreg.LinearRegression {
-	return linregVectors(passengers, 2)
-}
-
-func linregVectorsOf3(passengers []passenger) []*linreg.LinearRegression {
-	return linregVectors(passengers, 3)
-}
-
-func linregVectorsOf4(passengers []passenger) []*linreg.LinearRegression {
-	return linregVectors(passengers, 4)
-}
-
-func linregVectorsOf5(passengers []passenger) []*linreg.LinearRegression {
-	return linregVectors(passengers, 5)
-}
-
-func linregVectorsOf6(passengers []passenger) []*linreg.LinearRegression {
-	return linregVectors(passengers, 6)
-}
-
-func linregVectorsOf7(passengers []passenger) []*linreg.LinearRegression {
-	return linregVectors(passengers, 7)
+func linregVectorsOfInterval() (funcs []func([]passenger) []*linreg.LinearRegression) {
+	funcs = []func(ps []passenger) []*linreg.LinearRegression{
+		func(ps []passenger) []*linreg.LinearRegression {
+			return linregVectors(ps, 2)
+		},
+		func(ps []passenger) []*linreg.LinearRegression {
+			return linregVectors(ps, 3)
+		},
+		func(ps []passenger) []*linreg.LinearRegression {
+			return linregVectors(ps, 4)
+		},
+		func(ps []passenger) []*linreg.LinearRegression {
+			return linregVectors(ps, 5)
+		},
+		func(ps []passenger) []*linreg.LinearRegression {
+			return linregVectors(ps, 6)
+		},
+		func(ps []passenger) []*linreg.LinearRegression {
+			return linregVectors(ps, 7)
+		},
+	}
+	return
 }
 
 // creates a linear regression model for each combination of

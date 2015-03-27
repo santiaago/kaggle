@@ -65,15 +65,7 @@ func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegre
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
-		funcs := []func(passengers []passenger) []*linreg.LinearRegression{
-			linregVectorsOf2,
-			linregVectorsOf3,
-			linregVectorsOf4,
-			linregVectorsOf5,
-			linregVectorsOf6,
-			linregVectorsOf7,
-		}
-
+		funcs := linregVectorsOfInterval()
 		linregsOf := trainModelsByMetaFuncs(csv.NewReader(csvfile), funcs)
 		for i := 0; i < len(linregsOf); i++ {
 			name := fmt.Sprintf("data/temp/testModel-V-%d", i)
@@ -126,7 +118,9 @@ func trainModelsByMetaFuncs(r *csv.Reader, metaLinregFuncs []func(passengers []p
 	}
 	var linregs []*linreg.LinearRegression
 	for _, f := range metaLinregFuncs {
+		fmt.Println(len(f(passengers)))
 		linregs = append(linregs, f(passengers)...)
 	}
+	fmt.Println(len(linregs))
 	return linregs
 }
