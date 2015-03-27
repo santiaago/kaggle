@@ -2,11 +2,25 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/santiaago/caltechx.go/linreg"
 )
+
+func testModels(file string, linregs []*linreg.LinearRegression, linregsNames []string) {
+	for i := 0; i < len(linregs); i++ {
+		if csvfile, err := os.Open(file); err != nil {
+			log.Fatalln(err)
+		} else {
+			reader := csv.NewReader(csvfile)
+			fmt.Println(linregs[i].Wn)
+			testModel(reader, linregs[i], linregsNames[i])
+
+		}
+	}
+}
 
 func testModel(r *csv.Reader, linreg *linreg.LinearRegression, file string) {
 	var rawData [][]string
