@@ -9,7 +9,87 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
-func trainModels(r *csv.Reader, linregFuncs []func(passengers []passenger) *linreg.LinearRegression) []*linreg.LinearRegression {
+// trainModels using the file passed as param as training data.
+// trains multiple models using different techniques.
+// We return an array of all the linear regression models trained
+// and the respective names.
+func trainModels(file string) (linregs []*linreg.LinearRegression, names []string) {
+
+	linregs, names = trainSpecificModels(file)
+
+	linregsByComb, namesByComb := trainModelsByFeatureCombination(*train)
+	linregs = append(linregs, linregsByComb...)
+	names = append(names, namesByComb...)
+
+	return linregs, names
+}
+
+// trainSpecificModels trains the following models:
+// * linregSexAge
+// * linregPClassAge
+// * linregPClassSex
+// * linregSexAgePClass
+// We return an array of all the linear regression models trained
+// and the respective names.
+func trainSpecificModels(file string) (linregs []*linreg.LinearRegression, names []string) {
+
+	funcs := []func(passengers []passenger) *linreg.LinearRegression{
+		linregSexAge,
+		linregPClassAge,
+		linregPClassSex,
+		linregSexAgePClass,
+	}
+
+	names = []string{
+		"data/temp/testModel-SexAge.csv",
+		"data/temp/testModel-PClassAge.csv",
+		"data/temp/testModel-PClassSex.csv",
+		"data/temp/testModel-SexAgePClass.csv",
+	}
+
+	if csvfile, err := os.Open(file); err != nil {
+		log.Fatalln(err)
+	} else {
+		linregs = trainModelsByFuncs(csv.NewReader(csvfile), funcs)
+	}
+
+	return linregs, names
+}
+
+// trainModelsByFeatureCombination makes a model for all combinations of
+// features present in the data.
+// We return an array of all the linear regression models trained
+// and the respective names.
+func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegression, names []string) {
+
+	if csvfile, err := os.Open(file); err != nil {
+		log.Fatalln(err)
+	} else {
+		funcs := []func(passengers []passenger) []*linreg.LinearRegression{
+			linregVectorsOf2,
+			linregVectorsOf3,
+			linregVectorsOf4,
+			linregVectorsOf5,
+			linregVectorsOf6,
+			linregVectorsOf7,
+		}
+
+		linregsOf := trainModelsByMetaFuncs(csv.NewReader(csvfile), funcs)
+		for i := 0; i < len(linregsOf); i++ {
+			name := fmt.Sprintf("data/temp/testModel-V-%d", i)
+			names = append(names, name)
+		}
+
+		linregs = append(linregs, linregsOf...)
+	}
+	return
+}
+
+// trainModelsByFuncs creates an array of linear regression models with respect
+// to an array of linear regression functions passed as arguments.
+// Those function takes as argument the passengers data and
+// returns a linear regression model.
+func trainModelsByFuncs(r *csv.Reader, funcs []func(passengers []passenger) *linreg.LinearRegression) []*linreg.LinearRegression {
 	var rawData [][]string
 	var err error
 	if rawData, err = r.ReadAll(); err != nil {
@@ -22,36 +102,17 @@ func trainModels(r *csv.Reader, linregFuncs []func(passengers []passenger) *linr
 		passengers = append(passengers, p)
 	}
 	var linregs []*linreg.LinearRegression
-	for _, f := range linregFuncs {
+	for _, f := range funcs {
 		linregs = append(linregs, f(passengers))
 	}
 	return linregs
 }
 
-func trainMetaModels(file string) (linregs []*linreg.LinearRegression, linregsNames []string) {
-
-	if csvfile, err := os.Open(*train); err != nil {
-		log.Fatalln(err)
-	} else {
-		metaLinregFuncs := []func(passengers []passenger) []*linreg.LinearRegression{
-			linregVectorsOf2,
-			linregVectorsOf3,
-			linregVectorsOf4,
-			linregVectorsOf5,
-			linregVectorsOf6,
-			linregVectorsOf7,
-		}
-		linregsOf := trainModelsMeta(csv.NewReader(csvfile), metaLinregFuncs)
-		for i := 0; i < len(linregsOf); i++ {
-			name := fmt.Sprintf("data/temp/testModel-V-%d", i)
-			linregsNames = append(linregsNames, name)
-		}
-		linregs = append(linregs, linregsOf...)
-	}
-	return
-}
-
-func trainModelsMeta(r *csv.Reader, metaLinregFuncs []func(passengers []passenger) []*linreg.LinearRegression) []*linreg.LinearRegression {
+// trainModelsByMetaFuncs creates an array of linear regression models with respect
+// to an array of linear regression functions passed as arguments.
+// Those functions takes as argument the passengers data and
+// returns an array of linear regression model.
+func trainModelsByMetaFuncs(r *csv.Reader, metaLinregFuncs []func(passengers []passenger) []*linreg.LinearRegression) []*linreg.LinearRegression {
 	var rawData [][]string
 	var err error
 	if rawData, err = r.ReadAll(); err != nil {
