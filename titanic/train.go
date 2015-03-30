@@ -9,8 +9,13 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
-// trainModels using the file passed as param as training data.
-// trains multiple models using different techniques.
+// trainModels returns:
+// * an array of trained LinearRegression models.
+// * an array of names each one corresponds to a linearRegression model.
+// It uses the file passed as param as training data.
+// It trains multiple models using different techniques:
+// * trainSpecificModels
+// * trainModelsByFeatrueCombination
 // We return an array of all the linear regression models trained
 // and the respective names.
 func trainModels(file string) (linregs []*linreg.LinearRegression, names []string) {
@@ -29,8 +34,8 @@ func trainModels(file string) (linregs []*linreg.LinearRegression, names []strin
 // * linregPClassAge
 // * linregPClassSex
 // * linregSexAgePClass
-// We return an array of all the linear regression models trained
-// and the respective names.
+// It returns an array of all the linear regression models trained
+// and an array of the names of each model.
 func trainSpecificModels(file string) (linregs []*linreg.LinearRegression, names []string) {
 
 	funcs := []func(passengers []passenger) *linreg.LinearRegression{
@@ -56,10 +61,11 @@ func trainSpecificModels(file string) (linregs []*linreg.LinearRegression, names
 	return linregs, names
 }
 
-// trainModelsByFeatureCombination makes a model for all combinations of
-// features present in the data.
-// We return an array of all the linear regression models trained
-// and the respective names.
+// trainModelsByFeatureCombination returns:
+// * an array of linearRegression models
+// * an array pf the names of each linearRegression model.
+// It makes a model for every combinations of features present in the data.
+// Each feature corresponds to a column in the data set.
 func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegression, names []string) {
 
 	if csvfile, err := os.Open(file); err != nil {
@@ -77,10 +83,10 @@ func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegre
 	return
 }
 
-// trainModelsByFuncs creates an array of linear regression models with respect
-// to an array of linear regression functions passed as arguments.
-// Those function takes as argument the passengers data and
-// returns a linear regression model.
+// trainModelsByFuncs returns an array of linear regression models with respect
+// to an array of functions passed as arguments.
+// Those function takes as argument the passengers data and return a linear
+// regression model.
 func trainModelsByFuncs(r *csv.Reader, funcs []func(passengers []passenger) *linreg.LinearRegression) []*linreg.LinearRegression {
 	var rawData [][]string
 	var err error
@@ -100,10 +106,10 @@ func trainModelsByFuncs(r *csv.Reader, funcs []func(passengers []passenger) *lin
 	return linregs
 }
 
-// trainModelsByMetaFuncs creates an array of linear regression models with respect
-// to an array of linear regression functions passed as arguments.
+// trainModelsByMetaFuncs returns an array of linear regression models with
+// respect to an array of linear regression functions passed as arguments.
 // Those functions takes as argument the passengers data and
-// returns an array of linear regression model.
+// return an array of linear regression model.
 func trainModelsByMetaFuncs(r *csv.Reader, metaLinregFuncs []func(passengers []passenger) []*linreg.LinearRegression) []*linreg.LinearRegression {
 	var rawData [][]string
 	var err error
