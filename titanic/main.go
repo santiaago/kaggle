@@ -9,6 +9,6 @@ var (
 
 func main() {
 	flag.Parse()
-	linregs, names := trainModels(*train)
-	testModels(*test, linregs, names)
+	linregs := trainModels(*train)
+	testModels(*test, linregs)
 }

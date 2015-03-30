@@ -115,6 +115,7 @@ func linregVectors(passengers []passenger, size int) []*linreg.LinearRegression 
 	for _, comb := range combs {
 		filteredData := filter(data, comb)
 		linreg := linreg.NewLinearRegression()
+		linreg.Name = fmt.Sprintf("LinregModel-V-%d-%v", size, comb)
 		linreg.InitializeFromData(filteredData)
 		linreg.Learn()
 		fmt.Printf("EIn = %f \t using combination %v\n", linreg.Ein(), comb)
@@ -162,6 +163,7 @@ func linregSexAgePClass(passengers []passenger) *linreg.LinearRegression {
 		data = append(data, d)
 	}
 	linreg := linreg.NewLinearRegression()
+	linreg.Name = "Sex Age PClass"
 	linreg.InitializeFromData(data)
 	linreg.Learn()
 	fmt.Printf("EIn = %f\n", linreg.Ein())
@@ -185,6 +187,7 @@ func linregSexAge(passengers []passenger) *linreg.LinearRegression {
 		data = append(data, d)
 	}
 	linreg := linreg.NewLinearRegression()
+	linreg.Name = "Sex Age"
 	linreg.InitializeFromData(data)
 	linreg.Learn()
 	fmt.Printf("EIn = %f\n", linreg.Ein())
@@ -210,6 +213,7 @@ func linregPClassAge(passengers []passenger) *linreg.LinearRegression {
 		data = append(data, d)
 	}
 	linreg := linreg.NewLinearRegression()
+	linreg.Name = "PClass Age"
 	linreg.InitializeFromData(data)
 	linreg.Learn()
 	fmt.Printf("EIn = %f\n", linreg.Ein())
@@ -241,6 +245,7 @@ func linregPClassSex(passengers []passenger) *linreg.LinearRegression {
 		data = append(data, d)
 	}
 	linreg := linreg.NewLinearRegression()
+	linreg.Name = "PClass Sex"
 	linreg.InitializeFromData(data)
 	linreg.Learn()
 	fmt.Printf("EIn = %f\n", linreg.Ein())

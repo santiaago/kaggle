@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 
@@ -16,17 +15,15 @@ import (
 // It trains multiple models using different techniques:
 // * trainSpecificModels
 // * trainModelsByFeatrueCombination
-// We return an array of all the linear regression models trained
-// and the respective names.
-func trainModels(file string) (linregs []*linreg.LinearRegression, names []string) {
+// We return an array of all the linear regression models trained.
+func trainModels(file string) (linregs []*linreg.LinearRegression) {
 
-	linregs, names = trainSpecificModels(file)
+	linregs = trainSpecificModels(file)
 
-	linregsByComb, namesByComb := trainModelsByFeatureCombination(*train)
+	linregsByComb := trainModelsByFeatureCombination(*train)
 	linregs = append(linregs, linregsByComb...)
-	names = append(names, namesByComb...)
 
-	return linregs, names
+	return linregs
 }
 
 // trainSpecificModels trains the following models:
@@ -34,9 +31,8 @@ func trainModels(file string) (linregs []*linreg.LinearRegression, names []strin
 // * linregPClassAge
 // * linregPClassSex
 // * linregSexAgePClass
-// It returns an array of all the linear regression models trained
-// and an array of the names of each model.
-func trainSpecificModels(file string) (linregs []*linreg.LinearRegression, names []string) {
+// It returns an array of all the linear regression models trained.
+func trainSpecificModels(file string) (linregs []*linreg.LinearRegression) {
 
 	funcs := []func(passengers []passenger) *linreg.LinearRegression{
 		linregSexAge,
@@ -45,20 +41,13 @@ func trainSpecificModels(file string) (linregs []*linreg.LinearRegression, names
 		linregSexAgePClass,
 	}
 
-	names = []string{
-		"data/temp/testModel-SexAge.csv",
-		"data/temp/testModel-PClassAge.csv",
-		"data/temp/testModel-PClassSex.csv",
-		"data/temp/testModel-SexAgePClass.csv",
-	}
-
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
 		linregs = trainModelsByFuncs(csv.NewReader(csvfile), funcs)
 	}
 
-	return linregs, names
+	return linregs
 }
 
 // trainModelsByFeatureCombination returns:
@@ -66,17 +55,13 @@ func trainSpecificModels(file string) (linregs []*linreg.LinearRegression, names
 // * an array pf the names of each linearRegression model.
 // It makes a model for every combinations of features present in the data.
 // Each feature corresponds to a column in the data set.
-func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegression, names []string) {
+func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegression) {
 
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
 		funcs := linregVectorsOfInterval()
 		linregsOf := trainModelsByMetaFuncs(csv.NewReader(csvfile), funcs)
-		for i := 0; i < len(linregsOf); i++ {
-			name := fmt.Sprintf("data/temp/testModel-V-%d", i)
-			names = append(names, name)
-		}
 
 		linregs = append(linregs, linregsOf...)
 	}
@@ -124,9 +109,8 @@ func trainModelsByMetaFuncs(r *csv.Reader, metaLinregFuncs []func(passengers []p
 	}
 	var linregs []*linreg.LinearRegression
 	for _, f := range metaLinregFuncs {
-		fmt.Println(len(f(passengers)))
 		linregs = append(linregs, f(passengers)...)
 	}
-	fmt.Println(len(linregs))
+
 	return linregs
 }

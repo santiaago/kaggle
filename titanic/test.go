@@ -2,27 +2,24 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
-func testModels(file string, linregs []*linreg.LinearRegression, linregsNames []string) {
+func testModels(file string, linregs []*linreg.LinearRegression) {
 	for i := 0; i < len(linregs); i++ {
 		if csvfile, err := os.Open(file); err != nil {
 			log.Fatalln(err)
 		} else {
 			reader := csv.NewReader(csvfile)
-			fmt.Println(linregs[i].Wn)
-			testModel(reader, linregs[i], linregsNames[i])
-
+			testModel(reader, linregs[i])
 		}
 	}
 }
 
-func testModel(r *csv.Reader, linreg *linreg.LinearRegression, file string) {
+func testModel(r *csv.Reader, linreg *linreg.LinearRegression) {
 	var rawData [][]string
 	var err error
 	if rawData, err = r.ReadAll(); err != nil {
@@ -34,11 +31,11 @@ func testModel(r *csv.Reader, linreg *linreg.LinearRegression, file string) {
 		passengers = append(passengers, p)
 	}
 	linregTest(linreg, &passengers)
-	writeTestModel(passengers, file)
+	writeTestModel(passengers, linreg.Name)
 }
 
-func writeTestModel(passengers []passenger, title string) {
-	if csvfile, err := os.Create(title); err != nil {
+func writeTestModel(passengers []passenger, name string) {
+	if csvfile, err := os.Create("data/temp/" + name); err != nil {
 		log.Fatalln(err)
 	} else {
 		writer := csv.NewWriter(csvfile)
