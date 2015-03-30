@@ -19,11 +19,10 @@ import (
 func trainModels(file string) (linregs []*linreg.LinearRegression) {
 
 	linregs = trainSpecificModels(file)
+	linregsByComb := trainModelsByFeatureCombination(file)
 
-	linregsByComb := trainModelsByFeatureCombination(*train)
 	linregs = append(linregs, linregsByComb...)
-
-	return linregs
+	return
 }
 
 // trainSpecificModels trains the following models:
@@ -46,8 +45,7 @@ func trainSpecificModels(file string) (linregs []*linreg.LinearRegression) {
 	} else {
 		linregs = trainModelsByFuncs(csv.NewReader(csvfile), funcs)
 	}
-
-	return linregs
+	return
 }
 
 // trainModelsByFeatureCombination returns:
