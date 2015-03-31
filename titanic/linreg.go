@@ -125,7 +125,7 @@ func linregSexAgePClass(passengers []passenger) *linreg.LinearRegression {
 	linreg.Name = "Sex Age PClass"
 	linreg.InitializeFromData(data)
 	linreg.Learn()
-	fmt.Printf("EIn = %f\n", linreg.Ein())
+	fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
 	return linreg
 }
 
@@ -149,7 +149,7 @@ func linregSexAge(passengers []passenger) *linreg.LinearRegression {
 	linreg.Name = "Sex Age"
 	linreg.InitializeFromData(data)
 	linreg.Learn()
-	fmt.Printf("EIn = %f\n", linreg.Ein())
+	fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
 	return linreg
 }
 
@@ -175,7 +175,7 @@ func linregPClassAge(passengers []passenger) *linreg.LinearRegression {
 	linreg.Name = "PClass Age"
 	linreg.InitializeFromData(data)
 	linreg.Learn()
-	fmt.Printf("EIn = %f\n", linreg.Ein())
+	fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
 	return linreg
 }
 
@@ -207,6 +207,6 @@ func linregPClassSex(passengers []passenger) *linreg.LinearRegression {
 	linreg.Name = "PClass Sex"
 	linreg.InitializeFromData(data)
 	linreg.Learn()
-	fmt.Printf("EIn = %f\n", linreg.Ein())
+	fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
 	return linreg
 }
