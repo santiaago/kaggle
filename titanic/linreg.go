@@ -10,28 +10,25 @@ import (
 //
 // PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
 //
-func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger) {
-	var data [][]float64
-	for i := 0; i < len(*passengers); i++ {
-		p := (*passengers)[i]
 
-		var sex float64
-		if p.Sex == "female" {
-			sex = float64(1)
-		}
-		d := []float64{sex, float64(p.Age), float64(0)}
-		data = append(data, d)
-	}
+// linregTest sets the Survived field in each passenger of the passenger array
+// with respect to the linear regression 'linreg' passed as argument.
+func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep []int) {
 
-	for i := 0; i < len(data); i++ {
-		oX := data[i][:1]
+	data := prepareData(*passengers)
+	filteredData := filter(data, keep)
+	fmt.Println(data[0])
+	fmt.Println(filteredData[0])
+
+	for i := 0; i < len(filteredData); i++ {
+		oX := filteredData[i]
 		gi := float64(0)
 		for j := 0; j < len(oX); j++ {
 			gi += oX[j] * linreg.Wn[j]
 		}
 
 		if linear.Sign(gi) > 0 {
-			data[i][2] = 1
+			data[i][passengerIndexSurvived] = 1 // do we need this?
 			(*passengers)[i].Survived = true
 		}
 	}
@@ -81,12 +78,12 @@ func linregVectors(passengers []passenger, size int) []*linreg.LinearRegression 
 	return linregs
 }
 
-func filter(data [][]float64, combination []int) [][]float64 {
+func filter(data [][]float64, keep []int) [][]float64 {
 	var filtered [][]float64
 	for i := 0; i < len(data); i++ {
 		var df []float64
-		for j := 0; j < len(combination); j++ {
-			df = append(df, data[i][combination[j]])
+		for j := 0; j < len(keep); j++ {
+			df = append(df, data[i][keep[j]])
 		}
 		df = append(df, data[i][len(data[i])-1])
 		filtered = append(filtered, df)
@@ -94,48 +91,52 @@ func filter(data [][]float64, combination []int) [][]float64 {
 	return filtered
 }
 
-func linregSexAgePClass(passengers []passenger) *linreg.LinearRegression {
+func linregSexAgePClass(passengers []passenger) (lr *linreg.LinearRegression, usedFeatures []int) {
 
 	data := prepareData(passengers)
-	filteredData := filter(data, []int{passengerIndexSex, passengerIndexAge, passengerIndexPclass})
-	linreg := linreg.NewLinearRegression()
-	linreg.Name = "Sex Age PClass"
-	linreg.InitializeFromData(filteredData)
-	linreg.Learn()
-	fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
-	return linreg
+	usedFeatures = []int{passengerIndexSex, passengerIndexAge, passengerIndexPclass}
+	filteredData := filter(data, usedFeatures)
+	lr = linreg.NewLinearRegression()
+	lr.Name = "Sex Age PClass"
+	lr.InitializeFromData(filteredData)
+	lr.Learn()
+	fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, usedFeatures)
+	return lr, usedFeatures
 }
 
-func linregSexAge(passengers []passenger) *linreg.LinearRegression {
+func linregSexAge(passengers []passenger) (lr *linreg.LinearRegression, usedFeatures []int) {
 	data := prepareData(passengers)
-	filteredData := filter(data, []int{passengerIndexSex, passengerIndexAge})
-	linreg := linreg.NewLinearRegression()
-	linreg.Name = "Sex Age"
-	linreg.InitializeFromData(filteredData)
-	linreg.Learn()
-	fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
-	return linreg
+	usedFeatures = []int{passengerIndexSex, passengerIndexAge}
+	filteredData := filter(data, usedFeatures)
+	lr = linreg.NewLinearRegression()
+	lr.Name = "Sex Age"
+	lr.InitializeFromData(filteredData)
+	lr.Learn()
+	fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, usedFeatures)
+	return lr, usedFeatures
 }
 
-func linregPClassAge(passengers []passenger) *linreg.LinearRegression {
+func linregPClassAge(passengers []passenger) (lr *linreg.LinearRegression, usedFeatures []int) {
 	data := prepareData(passengers)
-	filteredData := filter(data, []int{passengerIndexAge, passengerIndexPclass})
-	linreg := linreg.NewLinearRegression()
-	linreg.Name = "PClass Age"
-	linreg.InitializeFromData(filteredData)
-	linreg.Learn()
-	fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
-	return linreg
+	usedFeatures = []int{passengerIndexAge, passengerIndexPclass}
+	filteredData := filter(data, usedFeatures)
+	lr = linreg.NewLinearRegression()
+	lr.Name = "PClass Age"
+	lr.InitializeFromData(filteredData)
+	lr.Learn()
+	fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, usedFeatures)
+	return lr, usedFeatures
 }
 
-func linregPClassSex(passengers []passenger) *linreg.LinearRegression {
+func linregPClassSex(passengers []passenger) (lr *linreg.LinearRegression, usedFeatures []int) {
 	data := prepareData(passengers)
-	filteredData := filter(data, []int{passengerIndexSex, passengerIndexPclass})
+	usedFeatures = []int{passengerIndexSex, passengerIndexPclass}
+	filteredData := filter(data, usedFeatures)
 
-	linreg := linreg.NewLinearRegression()
-	linreg.Name = "PClass Sex"
-	linreg.InitializeFromData(filteredData)
-	linreg.Learn()
-	fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
-	return linreg
+	lr = linreg.NewLinearRegression()
+	lr.Name = "PClass Sex"
+	lr.InitializeFromData(filteredData)
+	lr.Learn()
+	fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, usedFeatures)
+	return lr, usedFeatures
 }

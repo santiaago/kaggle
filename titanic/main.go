@@ -9,6 +9,11 @@ var (
 
 func main() {
 	flag.Parse()
-	linregs := trainModels(*train)
-	testModels(*test, linregs)
+	linregs, usedFeaturesPerModel := trainModels(*train)
+
+	mapUsedFeatures := make(map[string][]int)
+	for i := 0; i < len(linregs); i++ {
+		mapUsedFeatures[linregs[i].Name] = usedFeaturesPerModel[i]
+	}
+	testModels(*test, linregs, mapUsedFeatures)
 }

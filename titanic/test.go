@@ -8,18 +8,18 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
-func testModels(file string, linregs []*linreg.LinearRegression) {
+func testModels(file string, linregs []*linreg.LinearRegression, mapUsedFeatures map[string][]int) {
 	for i := 0; i < len(linregs); i++ {
 		if csvfile, err := os.Open(file); err != nil {
 			log.Fatalln(err)
 		} else {
 			reader := csv.NewReader(csvfile)
-			testModel(reader, linregs[i])
+			testModel(reader, linregs[i], mapUsedFeatures[linregs[i].Name])
 		}
 	}
 }
 
-func testModel(r *csv.Reader, linreg *linreg.LinearRegression) {
+func testModel(r *csv.Reader, linreg *linreg.LinearRegression, keep []int) {
 	var rawData [][]string
 	var err error
 	if rawData, err = r.ReadAll(); err != nil {
@@ -30,7 +30,7 @@ func testModel(r *csv.Reader, linreg *linreg.LinearRegression) {
 		p := passengerFromTestLine(rawData[i])
 		passengers = append(passengers, p)
 	}
-	linregTest(linreg, &passengers)
+	linregTest(linreg, &passengers, keep)
 	writeTestModel(passengers, linreg.Name)
 }
 
