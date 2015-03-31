@@ -5,6 +5,21 @@ import (
 	"strconv"
 )
 
+const (
+	passengerIndexID int = iota
+	passengerIndexSurvived
+	passengerIndexPclass
+	passengerIndexName
+	passengerIndexSex
+	passengerIndexAge
+	passengerIndexSibSp
+	passengerIndexParch
+	passengerIndexTicket
+	passengerIndexFare
+	passengerIndexCabin
+	passengerIndexEmbarked
+)
+
 type passenger struct {
 	ID       string
 	Survived bool
