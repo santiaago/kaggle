@@ -67,49 +67,8 @@ func linregVectorsOfInterval() (funcs []func([]passenger) []*linreg.LinearRegres
 // creates a linear regression model for each combination of
 // vector of 3 features and returns an array of linear regressions.
 func linregVectors(passengers []passenger, size int) []*linreg.LinearRegression {
-	var data [][]float64
-	for i := 0; i < len(passengers); i++ {
-		p := passengers[i]
 
-		var survived float64
-		if p.Survived {
-			survived = float64(1)
-		}
-
-		var pclass float64
-		if pc, err := strconv.ParseInt(p.Pclass, 10, 32); err != nil {
-			pclass = float64(3)
-		} else {
-			pclass = float64(pc)
-		}
-
-		var sex float64
-		if p.Sex == "female" {
-			sex = float64(1)
-		}
-
-		var age = float64(p.Age)
-
-		var sibsp = float64(p.SibSp)
-		var parch = float64(p.Parch)
-		//var ticket = float64(p.Ticket)
-		var fare = float64(p.Fare)
-		//var cabin = float64(p.Cabin)
-
-		var embarked float64
-		if len(p.Embarked) == 0 {
-			embarked = float64(0)
-		} else if p.Embarked == "C" {
-			embarked = float64(0)
-		} else if p.Embarked == "Q" {
-			embarked = float64(1)
-		} else if p.Embarked == "S" {
-			embarked = float64(2)
-		}
-
-		d := []float64{sex, pclass, age, sibsp, parch, fare, embarked, survived}
-		data = append(data, d)
-	}
+	data := prepareData(passengers)
 	var linregs []*linreg.LinearRegression
 	combs := combinations([]int{0, 1, 2, 3, 4, 5, 6}, size)
 	for _, comb := range combs {
