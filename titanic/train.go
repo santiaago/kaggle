@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 
@@ -19,8 +20,10 @@ func trainModels(file string) (linregs []*linreg.LinearRegression) {
 
 	linregs = trainSpecificModels(file)
 	linregsByComb := trainModelsByFeatureCombination(file)
+	linregsWithTransform := trainModelsWithTransform(file)
 
 	linregs = append(linregs, linregsByComb...)
+	linregs = append(linregs, linregsWithTransform...)
 	return
 }
 
@@ -60,6 +63,70 @@ func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegre
 		linregsOf := trainModelsByMetaFuncs(csv.NewReader(csvfile), funcs)
 
 		linregs = append(linregs, linregsOf...)
+	}
+	return
+}
+
+// trainModelsWithTransform returns:
+// * an array of linearRegression models
+// It makes a model with the following transformations:
+// * todo
+func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression) {
+	//func linregSexAgePClass(passengers []passenger) *linreg.LinearRegression {
+	if csvfile, err := os.Open(file); err != nil {
+		log.Fatalln(err)
+	} else {
+		r := csv.NewReader(csvfile)
+
+		var rawData [][]string
+		var err error
+		if rawData, err = r.ReadAll(); err != nil {
+			log.Fatalln(err)
+			return nil
+		}
+		passengers := []passenger{}
+		for i := 1; i < len(rawData); i++ {
+			p := passengerFromTrainLine(rawData[i])
+			passengers = append(passengers, p)
+		}
+
+		var data [][]float64
+		for i := 0; i < len(passengers); i++ {
+			p := passengers[i]
+			var survived float64
+			if p.Survived {
+				survived = float64(1)
+			}
+
+			var sex float64
+			if p.Sex == "female" {
+				sex = float64(1)
+			}
+			d := []float64{sex, float64(p.Age), survived}
+			data = append(data, d)
+		}
+
+		funcs := []func([]float64) []float64{
+			nonLinearFeature1,
+			nonLinearFeature2,
+			nonLinearFeature3,
+			nonLinearFeature4,
+			nonLinearFeature5,
+			nonLinearFeature6,
+			nonLinearFeature7,
+		}
+		index := 0
+		for _, f := range funcs {
+			linreg := linreg.NewLinearRegression()
+			linreg.Name = fmt.Sprintf("Sex Age transformed %d", index)
+			linreg.InitializeFromData(data)
+			linreg.TransformFunction = f
+			linreg.ApplyTransformation()
+			linreg.Learn()
+			fmt.Printf("EIn = %f\n", linreg.Ein())
+			linregs = append(linregs, linreg)
+			index++
+		}
 	}
 	return
 }
