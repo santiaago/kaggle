@@ -10,7 +10,6 @@ import (
 
 // trainModels returns:
 // * an array of trained LinearRegression models.
-// * an array of names each one corresponds to a linearRegression model.
 // It uses the file passed as param as training data.
 // It trains multiple models using different techniques:
 // * trainSpecificModels
@@ -50,7 +49,6 @@ func trainSpecificModels(file string) (linregs []*linreg.LinearRegression) {
 
 // trainModelsByFeatureCombination returns:
 // * an array of linearRegression models
-// * an array pf the names of each linearRegression model.
 // It makes a model for every combinations of features present in the data.
 // Each feature corresponds to a column in the data set.
 func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegression) {
