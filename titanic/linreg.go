@@ -34,24 +34,24 @@ func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep [
 	}
 }
 
-func linregVectorsOfInterval() (funcs []func([]passenger) []*linreg.LinearRegression) {
-	funcs = []func(ps []passenger) []*linreg.LinearRegression{
-		func(ps []passenger) []*linreg.LinearRegression {
+func linregVectorsOfInterval() (funcs []func([]passenger) ([]*linreg.LinearRegression, [][]int)) {
+	funcs = []func(ps []passenger) ([]*linreg.LinearRegression, [][]int){
+		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
 			return linregVectors(ps, 2)
 		},
-		func(ps []passenger) []*linreg.LinearRegression {
+		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
 			return linregVectors(ps, 3)
 		},
-		func(ps []passenger) []*linreg.LinearRegression {
+		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
 			return linregVectors(ps, 4)
 		},
-		func(ps []passenger) []*linreg.LinearRegression {
+		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
 			return linregVectors(ps, 5)
 		},
-		func(ps []passenger) []*linreg.LinearRegression {
+		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
 			return linregVectors(ps, 6)
 		},
-		func(ps []passenger) []*linreg.LinearRegression {
+		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
 			return linregVectors(ps, 7)
 		},
 	}
@@ -60,10 +60,10 @@ func linregVectorsOfInterval() (funcs []func([]passenger) []*linreg.LinearRegres
 
 // creates a linear regression model for each combination of
 // vector of 3 features and returns an array of linear regressions.
-func linregVectors(passengers []passenger, size int) []*linreg.LinearRegression {
+func linregVectors(passengers []passenger, size int) (linregs []*linreg.LinearRegression, usedFeatures [][]int) {
 
 	data := prepareData(passengers)
-	var linregs []*linreg.LinearRegression
+
 	combs := combinations([]int{0, 1, 2, 3, 4, 5, 6}, size)
 	for _, comb := range combs {
 		filteredData := filter(data, comb)
@@ -73,9 +73,10 @@ func linregVectors(passengers []passenger, size int) []*linreg.LinearRegression 
 		linreg.Learn()
 		fmt.Printf("EIn = %f \t using combination %v\n", linreg.Ein(), comb)
 
+		usedFeatures = append(usedFeatures, comb)
 		linregs = append(linregs, linreg)
 	}
-	return linregs
+	return
 }
 
 func filter(data [][]float64, keep []int) [][]float64 {
