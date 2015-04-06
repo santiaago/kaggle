@@ -127,10 +127,11 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 			linreg.InitializeFromData(data)
 			linreg.TransformFunction = f
 			linreg.ApplyTransformation()
-			linreg.Learn()
-			fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
-			linregs = append(linregs, linreg)
-			index++
+			if err := linreg.Learn(); err == nil {
+				fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
+				linregs = append(linregs, linreg)
+				index++
+			}
 		}
 	}
 	return

@@ -107,8 +107,7 @@ func prepareData(passengers []passenger) (data [][]float64) {
 		} else if p.Embarked == "S" {
 			embarked = float64(2)
 		}
-
-		d := []float64{sex, pclass, age, sibsp, parch, fare, embarked, survived}
+		d := []float64{0, survived, pclass, 0, sex, age, sibsp, parch, 0, fare, 0, embarked}
 		data = append(data, d)
 	}
 	return
