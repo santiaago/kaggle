@@ -117,12 +117,10 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 		}
 		data := prepareData(passengers)
 
-		usedFeaturesInternal := []int{
-			passengerIndexSex,
-			passengerIndexAge,
-		}
-		usedFeatures := usedFeaturesInternal[:2]
-		filteredData := filter(data, usedFeaturesInternal)
+		// usedFeaturesInternal := []int{
+		// 	passengerIndexSex,
+		// 	passengerIndexAge,
+		// }
 
 		funcs := []func([]float64) []float64{
 			nonLinearFeature1,
@@ -134,18 +132,37 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 			nonLinearFeature7,
 		}
 
-		index := 0
-		for _, f := range funcs {
-			linreg := linreg.NewLinearRegression()
-			linreg.Name = fmt.Sprintf("Sex Age transformed %d", index)
-			linreg.InitializeFromData(filteredData)
-			linreg.TransformFunction = f
-			linreg.ApplyTransformation()
-			if err := linreg.Learn(); err == nil {
-				fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
-				linregs = append(linregs, linreg)
-				usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeatures)
-				index++
+		toTry := []int{
+			passengerIndexPclass,
+			passengerIndexSex,
+			passengerIndexAge,
+			passengerIndexSibSp,
+			passengerIndexParch,
+			passengerIndexTicket,
+			passengerIndexFare,
+			passengerIndexCabin,
+			passengerIndexEmbarked,
+		}
+
+		combs := combinations(toTry, 2)
+		for _, comb := range combs {
+
+			// usedFeatures := usedFeaturesInternal[:2]
+			filteredData := filter(data, comb)
+
+			index := 0
+			for _, f := range funcs {
+				linreg := linreg.NewLinearRegression()
+				linreg.Name = fmt.Sprintf("%v transformed %d", comb, index)
+				linreg.InitializeFromData(filteredData)
+				linreg.TransformFunction = f
+				linreg.ApplyTransformation()
+				if err := linreg.Learn(); err == nil {
+					fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
+					linregs = append(linregs, linreg)
+					usedFeaturesPerModel = append(usedFeaturesPerModel, comb)
+					index++
+				}
 			}
 		}
 	}

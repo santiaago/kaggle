@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"sort"
 )
 
 var (
@@ -18,15 +19,15 @@ func main() {
 	flag.Parse()
 	linregs, usedFeaturesPerModel := trainModels(*train)
 
-	// var rgs regressions = linregs
-	// sort.Sort(rgs)
-	// log.Println()
-	// rgs.Print(20)
-
 	mapUsedFeatures := make(map[string][]int)
 	for i := 0; i < len(linregs); i++ {
 		mapUsedFeatures[linregs[i].Name] = usedFeaturesPerModel[i]
 	}
 
 	testModels(*test, linregs, mapUsedFeatures)
+
+	var rgs regressions = linregs
+	sort.Sort(rgs)
+	log.Printf("\n\n\n")
+	rgs.Print(50)
 }
