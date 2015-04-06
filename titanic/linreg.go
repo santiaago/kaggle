@@ -17,8 +17,6 @@ func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep [
 
 	data := prepareData(*passengers)
 	filteredData := filter(data, keep)
-	fmt.Println(data[0])
-	fmt.Println(filteredData[0])
 
 	for i := 0; i < len(filteredData); i++ {
 		oX := filteredData[i]
