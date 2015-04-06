@@ -16,7 +16,9 @@ func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep [
 	for i := 0; i < len(filteredData); i++ {
 		oX := []float64{1}
 		oX = append(oX, filteredData[i][:len(filteredData[i])-1]...)
-
+		if linreg.UsesTranformFunction {
+			oX = linreg.TransformFunction(oX)
+		}
 		gi := float64(0)
 		for j := 0; j < len(oX); j++ {
 			gi += oX[j] * linreg.Wn[j]
@@ -107,7 +109,6 @@ func linregSexAgePClass(passengers []passenger) (lr *linreg.LinearRegression, us
 		passengerIndexSex,
 		passengerIndexAge,
 		passengerIndexPclass,
-		passengerIndexSurvived,
 	}
 	usedFeatures = usedFeaturesInternal[:3]
 	filteredData := filter(data, usedFeaturesInternal)
@@ -127,7 +128,6 @@ func linregSexAge(passengers []passenger) (lr *linreg.LinearRegression, usedFeat
 	usedFeaturesInternal := []int{
 		passengerIndexSex,
 		passengerIndexAge,
-		passengerIndexSurvived,
 	}
 	usedFeatures = usedFeaturesInternal[:2]
 
@@ -148,7 +148,6 @@ func linregPClassAge(passengers []passenger) (lr *linreg.LinearRegression, usedF
 	usedFeaturesInternal := []int{
 		passengerIndexAge,
 		passengerIndexPclass,
-		passengerIndexSurvived,
 	}
 	usedFeatures = usedFeaturesInternal[:2]
 
@@ -169,7 +168,6 @@ func linregPClassSex(passengers []passenger) (lr *linreg.LinearRegression, usedF
 	usedFeaturesInternal := []int{
 		passengerIndexSex,
 		passengerIndexPclass,
-		passengerIndexSurvived,
 	}
 	usedFeatures = usedFeaturesInternal[:2]
 

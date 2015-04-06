@@ -41,14 +41,14 @@ func trainModels(file string) (linregs []*linreg.LinearRegression, usedFeaturesP
 
 	linregs, usedFeaturesSpecific := trainSpecificModels(file)
 	linregsByComb, usedFeaturesByComb := trainModelsByFeatureCombination(file)
-	//linregsWithTransform, usedFeaturesWithTransform := trainModelsWithTransform(file)
+	linregsWithTransform, usedFeaturesWithTransform := trainModelsWithTransform(file)
 
 	usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeaturesSpecific...)
 	usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeaturesByComb...)
-	//usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeaturesWithTransform...)
+	usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeaturesWithTransform...)
 
 	linregs = append(linregs, linregsByComb...)
-	// linregs = append(linregs, linregsWithTransform...)
+	linregs = append(linregs, linregsWithTransform...)
 	return
 }
 
@@ -98,7 +98,7 @@ func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegre
 // It makes a model with the following transformations:
 // * todo
 func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
-	//func linregSexAgePClass(passengers []passenger) *linreg.LinearRegression {
+
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
@@ -115,22 +115,14 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 			p := passengerFromTrainLine(rawData[i])
 			passengers = append(passengers, p)
 		}
+		data := prepareData(passengers)
 
-		var data [][]float64
-		for i := 0; i < len(passengers); i++ {
-			p := passengers[i]
-			var survived float64
-			if p.Survived {
-				survived = float64(1)
-			}
-
-			var sex float64
-			if p.Sex == "female" {
-				sex = float64(1)
-			}
-			d := []float64{sex, float64(p.Age), survived}
-			data = append(data, d)
+		usedFeaturesInternal := []int{
+			passengerIndexSex,
+			passengerIndexAge,
 		}
+		usedFeatures := usedFeaturesInternal[:2]
+		filteredData := filter(data, usedFeaturesInternal)
 
 		funcs := []func([]float64) []float64{
 			nonLinearFeature1,
@@ -141,16 +133,18 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 			nonLinearFeature6,
 			nonLinearFeature7,
 		}
+
 		index := 0
 		for _, f := range funcs {
 			linreg := linreg.NewLinearRegression()
 			linreg.Name = fmt.Sprintf("Sex Age transformed %d", index)
-			linreg.InitializeFromData(data)
+			linreg.InitializeFromData(filteredData)
 			linreg.TransformFunction = f
 			linreg.ApplyTransformation()
 			if err := linreg.Learn(); err == nil {
 				fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
 				linregs = append(linregs, linreg)
+				usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeatures)
 				index++
 			}
 		}
