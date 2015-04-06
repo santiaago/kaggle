@@ -35,7 +35,14 @@ func testModel(r *csv.Reader, linreg *linreg.LinearRegression, keep []int) {
 }
 
 func writeTestModel(passengers []passenger, name string) {
-	if csvfile, err := os.Create("data/temp/" + name); err != nil {
+	temp := "data/temp/"
+	if _, err := os.Stat(temp); os.IsNotExist(err) {
+		if err = os.Mkdir(temp, 0777); err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	if csvfile, err := os.Create(temp + name); err != nil {
 		log.Fatalln(err)
 	} else {
 		writer := csv.NewWriter(csvfile)

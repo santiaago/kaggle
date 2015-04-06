@@ -1,11 +1,18 @@
 package main
 
-import "flag"
+import (
+	"flag"
+	"log"
+)
 
 var (
 	test  = flag.String("test", "data/test.csv", "testing set")
 	train = flag.String("train", "data/train.csv", "training set")
 )
+
+func init() {
+	log.SetFlags(log.Ltime | log.Ldate | log.Lshortfile)
+}
 
 func main() {
 	flag.Parse()
