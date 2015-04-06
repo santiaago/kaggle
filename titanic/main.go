@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"sort"
 )
 
 var (
@@ -22,5 +23,11 @@ func main() {
 	for i := 0; i < len(linregs); i++ {
 		mapUsedFeatures[linregs[i].Name] = usedFeaturesPerModel[i]
 	}
+
+	var rgs regressions = linregs
+	sort.Sort(rgs)
+	rgs.Print(20)
+
 	testModels(*test, linregs, mapUsedFeatures)
+
 }

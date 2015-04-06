@@ -9,6 +9,27 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
+type regressions []*linreg.LinearRegression
+
+func (slice regressions) Len() int {
+	return len(slice)
+}
+
+func (slice regressions) Less(i, j int) bool {
+	return (*slice[i]).Ein() < (*slice[j]).Ein()
+}
+
+func (slice regressions) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
+}
+
+func (slice regressions) Print(top int) {
+	for i := 0; i < top; i++ {
+		lr := slice[i]
+		fmt.Printf("EIn = %f \t%s\n", lr.Ein(), lr.Name)
+	}
+}
+
 // trainModels returns:
 // * an array of trained LinearRegression models.
 // It uses the file passed as param as training data.
@@ -27,7 +48,7 @@ func trainModels(file string) (linregs []*linreg.LinearRegression, usedFeaturesP
 	//usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeaturesWithTransform...)
 
 	linregs = append(linregs, linregsByComb...)
-	//linregs = append(linregs, linregsWithTransform...)
+	// linregs = append(linregs, linregsWithTransform...)
 	return
 }
 
