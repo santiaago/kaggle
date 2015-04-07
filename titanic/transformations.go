@@ -3,7 +3,7 @@ package main
 import "math"
 
 //    (1, x1, x2, |x1+ x2|)
-func nonLinearFeature1(a []float64) []float64 {
+func transform2D1(a []float64) []float64 {
 	if len(a) != 3 {
 		panic(a)
 	}
@@ -17,7 +17,7 @@ func nonLinearFeature1(a []float64) []float64 {
 }
 
 //    (1, x1, x2, |x1 - x2|)
-func nonLinearFeature2(a []float64) []float64 {
+func transform2D2(a []float64) []float64 {
 	if len(a) != 3 {
 		panic(a)
 	}
@@ -31,7 +31,7 @@ func nonLinearFeature2(a []float64) []float64 {
 }
 
 //    (1, x1, x2, x1 * x2)
-func nonLinearFeature3(a []float64) []float64 {
+func transform2D3(a []float64) []float64 {
 	if len(a) != 3 {
 		panic(a)
 	}
@@ -45,7 +45,7 @@ func nonLinearFeature3(a []float64) []float64 {
 }
 
 //    (1, x1, x2, x1 * x2, , |x1+ x2|)
-func nonLinearFeature4(a []float64) []float64 {
+func transform2D4(a []float64) []float64 {
 	if len(a) != 3 {
 		panic(a)
 	}
@@ -60,7 +60,7 @@ func nonLinearFeature4(a []float64) []float64 {
 }
 
 //    (1, x1, x2, x1 * x2, , |x1 - x2|)
-func nonLinearFeature5(a []float64) []float64 {
+func transform2D5(a []float64) []float64 {
 	if len(a) != 3 {
 		panic(a)
 	}
@@ -75,7 +75,7 @@ func nonLinearFeature5(a []float64) []float64 {
 }
 
 //    (1, x1, x2, x1^2 + x2^2)
-func nonLinearFeature6(a []float64) []float64 {
+func transform2D6(a []float64) []float64 {
 	if len(a) != 3 {
 		panic(a)
 	}
@@ -89,7 +89,7 @@ func nonLinearFeature6(a []float64) []float64 {
 }
 
 //    (1, x1, x2, x1 * x2, x1^2 + x2^2)
-func nonLinearFeature7(a []float64) []float64 {
+func transform2D7(a []float64) []float64 {
 	if len(a) != 3 {
 		panic(a)
 	}

@@ -102,13 +102,13 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 		log.Fatalln(err)
 	} else {
 		funcs := []func([]float64) []float64{
-			nonLinearFeature1,
-			nonLinearFeature2,
-			nonLinearFeature3,
-			nonLinearFeature4,
-			nonLinearFeature5,
-			nonLinearFeature6,
-			nonLinearFeature7,
+			transform2D1,
+			transform2D2,
+			transform2D3,
+			transform2D4,
+			transform2D5,
+			transform2D6,
+			transform2D7,
 		}
 
 		toTry := []int{
