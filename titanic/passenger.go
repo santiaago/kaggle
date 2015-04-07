@@ -51,22 +51,6 @@ func (p passenger) Print() {
 	fmt.Println("Embarked", p.Embarked)
 }
 
-/*func prepareTestData(passengers *[]passenger) (data [][]float64) {
-	var data [][]float64
-	for i := 0; i < len(*passengers); i++ {
-		p := (*passengers)[i]
-
-		var sex float64
-		if p.Sex == "female" {
-			sex = float64(1)
-		}
-		survived := float64(0)
-		d := []float64{sex, float64(p.Age)}
-		data = append(data, d)
-	}
-
-}*/
-
 func prepareData(passengers []passenger) (data [][]float64) {
 
 	for i := 0; i < len(passengers); i++ {
@@ -107,7 +91,20 @@ func prepareData(passengers []passenger) (data [][]float64) {
 		} else if p.Embarked == "S" {
 			embarked = float64(2)
 		}
-		d := []float64{0, survived, pclass, 0, sex, age, sibsp, parch, 0, fare, 0, embarked}
+		d := []float64{
+			0,
+			survived,
+			pclass,
+			0,
+			sex,
+			age,
+			sibsp,
+			parch,
+			0,
+			fare,
+			0,
+			embarked,
+		}
 		data = append(data, d)
 	}
 	return
