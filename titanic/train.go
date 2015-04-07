@@ -94,34 +94,13 @@ func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegre
 }
 
 // trainModelsWithTransform returns:
-// * an array of linearRegression models
-// It makes a model with the following transformations:
-// * todo
+//   * an array of linearRegression models
+//   * an array of used features vectors.
 func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
 
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
-		r := csv.NewReader(csvfile)
-
-		var rawData [][]string
-		var err error
-		if rawData, err = r.ReadAll(); err != nil {
-			log.Fatalln(err)
-			return nil, nil
-		}
-		passengers := []passenger{}
-		for i := 1; i < len(rawData); i++ {
-			p := passengerFromTrainLine(rawData[i])
-			passengers = append(passengers, p)
-		}
-		data := prepareData(passengers)
-
-		// usedFeaturesInternal := []int{
-		// 	passengerIndexSex,
-		// 	passengerIndexAge,
-		// }
-
 		funcs := []func([]float64) []float64{
 			nonLinearFeature1,
 			nonLinearFeature2,
@@ -144,25 +123,56 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 			passengerIndexEmbarked,
 		}
 
-		combs := combinations(toTry, 2)
-		for _, comb := range combs {
+		d := 2
+		lrWithTransform, ufWithTransform := trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs, toTry, d)
 
-			// usedFeatures := usedFeaturesInternal[:2]
-			filteredData := filter(data, comb)
+		linregs = append(linregs, lrWithTransform...)
+		usedFeaturesPerModel = append(usedFeaturesPerModel, ufWithTransform...)
+	}
+	return
+}
 
-			index := 0
-			for _, f := range funcs {
-				linreg := linreg.NewLinearRegression()
-				linreg.Name = fmt.Sprintf("%v transformed %d", comb, index)
-				linreg.InitializeFromData(filteredData)
-				linreg.TransformFunction = f
-				linreg.ApplyTransformation()
-				if err := linreg.Learn(); err == nil {
-					fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
-					linregs = append(linregs, linreg)
-					usedFeaturesPerModel = append(usedFeaturesPerModel, comb)
-					index++
-				}
+// trainModelsWithNDTransformFuncs returns
+//   * an array of linearRegression models
+//   * an array of used features vectors
+// Models are created as follows:
+// Data is filtered with respect to the 'candidateFeatures' vector and the 'dimention' param.
+// We generate a vector of combinations of the candidateFeatures vector.
+// Each combination has the size of the size of 'dimention'.
+// Each (combination, transform function) pair is a specific model.
+func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []float64, candidateFeatures []int, dimention int) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
+
+	var rawData [][]string
+	var err error
+	if rawData, err = r.ReadAll(); err != nil {
+		log.Fatalln(err)
+		return nil, nil
+	}
+
+	passengers := []passenger{}
+	for i := 1; i < len(rawData); i++ {
+		p := passengerFromTrainLine(rawData[i])
+		passengers = append(passengers, p)
+	}
+	data := prepareData(passengers)
+
+	combs := combinations(candidateFeatures, dimention)
+	for _, comb := range combs {
+
+		filteredData := filter(data, comb)
+
+		index := 0
+		for _, f := range funcs {
+			linreg := linreg.NewLinearRegression()
+			linreg.Name = fmt.Sprintf("%dD %v transformed %d", dimention, comb, index)
+			linreg.InitializeFromData(filteredData)
+			linreg.TransformFunction = f
+			linreg.ApplyTransformation()
+			if err := linreg.Learn(); err == nil {
+				fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
+				linregs = append(linregs, linreg)
+				usedFeaturesPerModel = append(usedFeaturesPerModel, comb)
+				index++
 			}
 		}
 	}
