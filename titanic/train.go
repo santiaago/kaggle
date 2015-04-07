@@ -98,10 +98,22 @@ func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegre
 //   * an array of used features vectors.
 func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
 
+	toTry := []int{
+		passengerIndexPclass,
+		passengerIndexSex,
+		passengerIndexAge,
+		passengerIndexSibSp,
+		passengerIndexParch,
+		passengerIndexTicket,
+		passengerIndexFare,
+		passengerIndexCabin,
+		passengerIndexEmbarked,
+	}
+
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
-		funcs := []func([]float64) []float64{
+		funcs2D := []func([]float64) []float64{
 			transform2D1,
 			transform2D2,
 			transform2D3,
@@ -111,23 +123,30 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 			transform2D7,
 		}
 
-		toTry := []int{
-			passengerIndexPclass,
-			passengerIndexSex,
-			passengerIndexAge,
-			passengerIndexSibSp,
-			passengerIndexParch,
-			passengerIndexTicket,
-			passengerIndexFare,
-			passengerIndexCabin,
-			passengerIndexEmbarked,
-		}
-
 		d := 2
-		lrWithTransform, ufWithTransform := trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs, toTry, d)
+		lrWithTransform, ufWithTransform := trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs2D, toTry, d)
 
 		linregs = append(linregs, lrWithTransform...)
 		usedFeaturesPerModel = append(usedFeaturesPerModel, ufWithTransform...)
+	}
+	if csvfile, err := os.Open(file); err != nil {
+		log.Fatalln(err)
+	} else {
+		funcs3D := []func([]float64) []float64{
+			transform3D1,
+			transform3D2,
+			transform3D3,
+			transform3D4,
+			transform3D5,
+			transform3D6,
+			transform3D7,
+		}
+		d := 3
+		lrWithTransform3D, ufWithTransform3D := trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs3D, toTry, d)
+
+		linregs = append(linregs, lrWithTransform3D...)
+		usedFeaturesPerModel = append(usedFeaturesPerModel, ufWithTransform3D...)
+
 	}
 	return
 }
