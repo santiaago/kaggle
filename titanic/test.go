@@ -8,17 +8,21 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
+// testModels run a test file for each linear regression model passed in the linreg array.
 func testModels(file string, linregs []*linreg.LinearRegression, mapUsedFeatures map[string][]int) {
 	for i := 0; i < len(linregs); i++ {
 		if csvfile, err := os.Open(file); err != nil {
 			log.Fatalln(err)
 		} else {
-			reader := csv.NewReader(csvfile)
-			testModel(reader, linregs[i], mapUsedFeatures[linregs[i].Name])
+			testModel(csv.NewReader(csvfile), linregs[i], mapUsedFeatures[linregs[i].Name])
 		}
 	}
 }
 
+// testModel runs a linear regression model on the data passed in the reader.
+// It filters the data with respect to the keep array.
+// Then makes the predictions and write the predicted data to file using the
+// linear regression model name.
 func testModel(r *csv.Reader, linreg *linreg.LinearRegression, keep []int) {
 	var rawData [][]string
 	var err error
@@ -34,6 +38,9 @@ func testModel(r *csv.Reader, linreg *linreg.LinearRegression, keep []int) {
 	writeTestModel(passengers, linreg.Name)
 }
 
+// writeTestModel writes the passengers data to a file with the
+// name passed as param. The data written to file is the PassengerId and
+// Survived column.
 func writeTestModel(passengers []passenger, name string) {
 	temp := "data/temp/"
 	if _, err := os.Stat(temp); os.IsNotExist(err) {

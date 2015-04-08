@@ -2,6 +2,8 @@ package main
 
 import "strconv"
 
+// passengerFromTrainLine creates a passenger object
+// from a train data row.
 func passengerFromTrainLine(line []string) passenger {
 
 	survived, err := strconv.ParseBool(line[1])
@@ -50,6 +52,8 @@ func passengerFromTrainLine(line []string) passenger {
 	return p
 }
 
+// passengerFromTestLine creates a passenger object
+// from a test data row.
 func passengerFromTestLine(line []string) passenger {
 	id := line[0]
 	pclass := line[1]
