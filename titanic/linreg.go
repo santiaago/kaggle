@@ -24,7 +24,7 @@ func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep [
 			gi += oX[j] * linreg.Wn[j]
 		}
 
-		if linear.Sign(gi) > 0 {
+		if linear.Sign(gi) == 1 {
 			(*passengers)[i].Survived = true
 		}
 	}

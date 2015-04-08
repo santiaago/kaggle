@@ -59,6 +59,8 @@ func prepareData(passengers []passenger) (data [][]float64) {
 		var survived float64
 		if p.Survived {
 			survived = float64(1)
+		} else {
+			survived = float64(-1)
 		}
 
 		var pclass float64
