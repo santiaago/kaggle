@@ -89,25 +89,10 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 		passengerIndexEmbarked,
 	}
 
-	if csvfile, err := os.Open(file); err != nil {
-		log.Fatalln(err)
-	} else {
-		funcs2D := []func([]float64) []float64{
-			transform2D1,
-			transform2D2,
-			transform2D3,
-			transform2D4,
-			transform2D5,
-			transform2D6,
-			transform2D7,
-		}
+	lrWith2DTransform, ufWith2DTransform := trainModelsWith2DTransform(file)
+	linregs = append(linregs, lrWith2DTransform...)
+	usedFeaturesPerModel = append(usedFeaturesPerModel, ufWith2DTransform...)
 
-		d := 2
-		lrWithTransform, ufWithTransform := trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs2D, toTry, d)
-
-		linregs = append(linregs, lrWithTransform...)
-		usedFeaturesPerModel = append(usedFeaturesPerModel, ufWithTransform...)
-	}
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
@@ -126,6 +111,40 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 		linregs = append(linregs, lrWithTransform3D...)
 		usedFeaturesPerModel = append(usedFeaturesPerModel, ufWithTransform3D...)
 
+	}
+	return
+}
+
+// trainModelsWith2DTransform
+func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
+
+	features := []int{
+		passengerIndexPclass,
+		passengerIndexSex,
+		passengerIndexAge,
+		passengerIndexSibSp,
+		passengerIndexParch,
+		passengerIndexTicket,
+		passengerIndexFare,
+		passengerIndexCabin,
+		passengerIndexEmbarked,
+	}
+
+	if csvfile, err := os.Open(file); err != nil {
+		log.Fatalln(err)
+	} else {
+		funcs := []func([]float64) []float64{
+			transform2D1,
+			transform2D2,
+			transform2D3,
+			transform2D4,
+			transform2D5,
+			transform2D6,
+			transform2D7,
+		}
+
+		dimention := 2
+		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs, features, dimention)
 	}
 	return
 }
