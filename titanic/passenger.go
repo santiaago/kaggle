@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"log"
 	"strconv"
 )
 
@@ -49,6 +51,21 @@ func (p passenger) Print() {
 	fmt.Println("Fare", p.Fare)
 	fmt.Println("Cabin", p.Cabin)
 	fmt.Println("Embarked", p.Embarked)
+}
+
+func passengersFromTrainingSet(r *csv.Reader) (passengers []passenger) {
+	var rawData [][]string
+	var err error
+	if rawData, err = r.ReadAll(); err != nil {
+		log.Fatalln(err)
+		return nil
+	}
+
+	for i := 1; i < len(rawData); i++ {
+		p := passengerFromTrainLine(rawData[i])
+		passengers = append(passengers, p)
+	}
+	return
 }
 
 func prepareData(passengers []passenger) (data [][]float64) {

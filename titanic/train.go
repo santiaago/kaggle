@@ -88,7 +88,8 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 	return
 }
 
-// trainModelsWith2DTransform
+// trainModelsWith2DTransform returns a list of linear regression models and the corresponding feature used.
+// models learn based on some 2D transformation functions.
 func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
 
 	if csvfile, err := os.Open(file); err != nil {
@@ -122,6 +123,8 @@ func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression
 	return
 }
 
+// trainModelsWith3DTransform returns a list of linear regression models and the corresponding feature used.
+// models learn based on some 3D transformation functions.
 func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
 
 	if csvfile, err := os.Open(file); err != nil {
@@ -164,18 +167,7 @@ func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression
 // Each (combination, transform function) pair is a specific model.
 func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []float64, candidateFeatures []int, dimention int) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
 
-	var rawData [][]string
-	var err error
-	if rawData, err = r.ReadAll(); err != nil {
-		log.Fatalln(err)
-		return nil, nil
-	}
-
-	passengers := []passenger{}
-	for i := 1; i < len(rawData); i++ {
-		p := passengerFromTrainLine(rawData[i])
-		passengers = append(passengers, p)
-	}
+	passengers := passengersFromTrainingSet(r)
 	data := prepareData(passengers)
 
 	combs := combinations(candidateFeatures, dimention)
@@ -206,18 +198,8 @@ func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []fl
 // Those function takes as argument the passengers data and return a linear
 // regression model.
 func trainModelsByFuncs(r *csv.Reader, funcs []func(passengers []passenger) (*linreg.LinearRegression, []int)) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
-	var rawData [][]string
-	var err error
-	if rawData, err = r.ReadAll(); err != nil {
-		log.Fatalln(err)
-		return nil, nil
-	}
-	passengers := []passenger{}
-	for i := 1; i < len(rawData); i++ {
-		p := passengerFromTrainLine(rawData[i])
-		passengers = append(passengers, p)
-	}
 
+	passengers := passengersFromTrainingSet(r)
 	for _, f := range funcs {
 		linreg, usedFeatures := f(passengers)
 		linregs = append(linregs, linreg)
@@ -231,17 +213,7 @@ func trainModelsByFuncs(r *csv.Reader, funcs []func(passengers []passenger) (*li
 // Those functions takes as argument the passengers data and
 // return an array of linear regression model.
 func trainModelsByMetaFuncs(r *csv.Reader, metaLinregFuncs []func(passengers []passenger) ([]*linreg.LinearRegression, [][]int)) ([]*linreg.LinearRegression, [][]int) {
-	var rawData [][]string
-	var err error
-	if rawData, err = r.ReadAll(); err != nil {
-		log.Fatalln(err)
-		return nil, nil
-	}
-	passengers := []passenger{}
-	for i := 1; i < len(rawData); i++ {
-		p := passengerFromTrainLine(rawData[i])
-		passengers = append(passengers, p)
-	}
+	passengers := passengersFromTrainingSet(r)
 	var linregs []*linreg.LinearRegression
 	var usedFeatures [][]int
 	for _, f := range metaLinregFuncs {
