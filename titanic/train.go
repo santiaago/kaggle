@@ -91,21 +91,21 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 // trainModelsWith2DTransform
 func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
 
-	features := []int{
-		passengerIndexPclass,
-		passengerIndexSex,
-		passengerIndexAge,
-		passengerIndexSibSp,
-		passengerIndexParch,
-		passengerIndexTicket,
-		passengerIndexFare,
-		passengerIndexCabin,
-		passengerIndexEmbarked,
-	}
-
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
+		features := []int{
+			passengerIndexPclass,
+			passengerIndexSex,
+			passengerIndexAge,
+			passengerIndexSibSp,
+			passengerIndexParch,
+			passengerIndexTicket,
+			passengerIndexFare,
+			passengerIndexCabin,
+			passengerIndexEmbarked,
+		}
+
 		funcs := []func([]float64) []float64{
 			transform2D1,
 			transform2D2,
@@ -116,29 +116,29 @@ func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression
 			transform2D7,
 		}
 
-		dimention := 2
-		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs, features, dimention)
+		dimension := 2
+		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs, features, dimension)
 	}
 	return
 }
 
 func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
 
-	features := []int{
-		passengerIndexPclass,
-		passengerIndexSex,
-		passengerIndexAge,
-		passengerIndexSibSp,
-		passengerIndexParch,
-		passengerIndexTicket,
-		passengerIndexFare,
-		passengerIndexCabin,
-		passengerIndexEmbarked,
-	}
-
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
+		features := []int{
+			passengerIndexPclass,
+			passengerIndexSex,
+			passengerIndexAge,
+			passengerIndexSibSp,
+			passengerIndexParch,
+			passengerIndexTicket,
+			passengerIndexFare,
+			passengerIndexCabin,
+			passengerIndexEmbarked,
+		}
+
 		funcs := []func([]float64) []float64{
 			transform3D1,
 			transform3D2,
@@ -148,8 +148,8 @@ func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression
 			transform3D6,
 			transform3D7,
 		}
-		dimention := 3
-		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs, features, dimention)
+		dimension := 3
+		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs, features, dimension)
 	}
 	return
 }
