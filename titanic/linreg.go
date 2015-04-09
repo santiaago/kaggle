@@ -30,6 +30,9 @@ func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep [
 	}
 }
 
+// linregVectorsOfInterval returns an array functions.
+// This functions return an array of linear regression and the corresponding features used.
+// todo(santiaago): rename function.
 func linregVectorsOfInterval() (funcs []func([]passenger) ([]*linreg.LinearRegression, [][]int)) {
 	funcs = []func(ps []passenger) ([]*linreg.LinearRegression, [][]int){
 		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
@@ -54,13 +57,13 @@ func linregVectorsOfInterval() (funcs []func([]passenger) ([]*linreg.LinearRegre
 	return
 }
 
-// creates a linear regression model for each combination of
-// vector of 3 features and returns an array of linear regressions.
+// linregVectors creates a linear regression model for each combination of
+// vector of x features and returns an array of linear regressions for each combination.
 func linregVectors(passengers []passenger, size int) (linregs []*linreg.LinearRegression, usedFeatures [][]int) {
 
 	data := prepareData(passengers)
 
-	toTry := []int{
+	features := []int{
 		passengerIndexPclass,
 		passengerIndexName,
 		passengerIndexSex,
@@ -73,7 +76,7 @@ func linregVectors(passengers []passenger, size int) (linregs []*linreg.LinearRe
 		passengerIndexEmbarked,
 	}
 
-	combs := combinations(toTry, size)
+	combs := combinations(features, size)
 	for _, comb := range combs {
 		filteredData := filter(data, comb)
 		linreg := linreg.NewLinearRegression()
@@ -89,8 +92,9 @@ func linregVectors(passengers []passenger, size int) (linregs []*linreg.LinearRe
 	return
 }
 
-func filter(data [][]float64, keep []int) [][]float64 {
-	var filtered [][]float64
+// filter returns the same data passed as param filtered with respect to the keep array.
+// the keep array in an array of the indexes to keep in the data.
+func filter(data [][]float64, keep []int) (filtered [][]float64) {
 	for i := 0; i < len(data); i++ {
 		var df []float64
 		for j := 0; j < len(keep); j++ {
@@ -99,7 +103,7 @@ func filter(data [][]float64, keep []int) [][]float64 {
 		df = append(df, data[i][passengerIndexSurvived])
 		filtered = append(filtered, df)
 	}
-	return filtered
+	return
 }
 
 func linregSexAgePClass(passengers []passenger) (lr *linreg.LinearRegression, usedFeatures []int) {
