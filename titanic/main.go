@@ -17,16 +17,16 @@ func init() {
 
 func main() {
 	flag.Parse()
-	linregs, usedFeaturesPerModel := trainModels(*train)
+	linregs, featuresPerModel := trainModels(*train)
 
 	mapUsedFeatures := make(map[string][]int)
 	for i := 0; i < len(linregs); i++ {
-		mapUsedFeatures[linregs[i].Name] = usedFeaturesPerModel[i]
+		mapUsedFeatures[linregs[i].Name] = featuresPerModel[i]
 	}
 
 	testModels(*test, linregs, mapUsedFeatures)
 
-	var rgs regressions = linregs
+	var rgs = regressions(linregs)
 	sort.Sort(rgs)
 	log.Printf("\n\n\n")
 	rgs.Print(50)

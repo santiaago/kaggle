@@ -71,20 +71,9 @@ func linregVectors(passengers []passenger, size int) (linregs []*linreg.LinearRe
 
 	data := prepareData(passengers)
 
-	features := []int{
-		passengerIndexPclass,
-		passengerIndexName,
-		passengerIndexSex,
-		passengerIndexAge,
-		passengerIndexSibSp,
-		passengerIndexParch,
-		passengerIndexTicket,
-		passengerIndexFare,
-		passengerIndexCabin,
-		passengerIndexEmbarked,
-	}
+	f := passengerFeatures()
+	combs := combinations(f, size)
 
-	combs := combinations(features, size)
 	for _, comb := range combs {
 		filteredData := filter(data, comb)
 		linreg := linreg.NewLinearRegression()
