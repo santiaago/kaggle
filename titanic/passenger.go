@@ -37,6 +37,22 @@ type passenger struct {
 	Embarked string
 }
 
+// passengerFeatures return an array of indexes of the
+// passenger colomns data can be used to learn.
+func passengerFeatures() []int {
+	return []int{
+		passengerIndexPclass,
+		passengerIndexSex,
+		passengerIndexAge,
+		passengerIndexSibSp,
+		passengerIndexParch,
+		passengerIndexTicket,
+		passengerIndexFare,
+		passengerIndexCabin,
+		passengerIndexEmbarked,
+	}
+}
+
 func (p passenger) Print() {
 	fmt.Println("ID", p.ID)
 	fmt.Println("Survived", p.Survived)

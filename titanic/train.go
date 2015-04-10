@@ -81,50 +81,32 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 
 // trainModelsWith2DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 2D transformation functions.
-func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
+func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression, features [][]int) {
 
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
-		features := []int{
-			passengerIndexPclass,
-			passengerIndexSex,
-			passengerIndexAge,
-			passengerIndexSibSp,
-			passengerIndexParch,
-			passengerIndexTicket,
-			passengerIndexFare,
-			passengerIndexCabin,
-			passengerIndexEmbarked,
-		}
-
-		dimension := 2
-		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), transform2DFuncs(), features, dimension)
+		f := passengerFeatures()
+		r := csv.NewReader(csvfile)
+		funcs := transform2DFuncs()
+		d := 2
+		linregs, features = trainModelsWithNDTransformFuncs(r, funcs, f, d)
 	}
 	return
 }
 
 // trainModelsWith3DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 3D transformation functions.
-func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
+func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression, features [][]int) {
 
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
-		features := []int{
-			passengerIndexPclass,
-			passengerIndexSex,
-			passengerIndexAge,
-			passengerIndexSibSp,
-			passengerIndexParch,
-			passengerIndexTicket,
-			passengerIndexFare,
-			passengerIndexCabin,
-			passengerIndexEmbarked,
-		}
-
-		dimension := 3
-		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), transform3DFuncs(), features, dimension)
+		r := csv.NewReader(csvfile)
+		funcs := transform3DFuncs()
+		f := passengerFeatures()
+		d := 3
+		linregs, features = trainModelsWithNDTransformFuncs(r, funcs, f, d)
 	}
 	return
 }
