@@ -7,8 +7,8 @@ import (
 	"github.com/santiaago/caltechx.go/linreg"
 )
 
-// linregTest sets the Survived field in each passenger of the passenger array
-// with respect to the linear regression 'linreg' passed as argument.
+// linregTest sets the Survived field of each passenger in the passenger array
+// with respect to the prediction set by the linear regression 'linreg' passed as argument.
 func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep []int) {
 
 	data := prepareData(*passengers)
@@ -19,10 +19,8 @@ func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep [
 		if linreg.UsesTranformFunction {
 			oX = linreg.TransformFunction(oX)
 		}
-		gi := float64(0)
-		for j := 0; j < len(oX); j++ {
-			gi += oX[j] * linreg.Wn[j]
-		}
+
+		gi := prediction(linreg, oX)
 
 		if linear.Sign(gi) == 1 {
 			(*passengers)[i].Survived = true
@@ -30,8 +28,18 @@ func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep [
 	}
 }
 
+// prediction returns the result of the dot product between the x vector passed as param
+// and the linear regression vector of weights.
+// todo(santiaago): move this to caltechx.go
+func prediction(linreg *linreg.LinearRegression, x []float64) (p float64) {
+	for j := 0; j < len(x); j++ {
+		p += x[j] * linreg.Wn[j]
+	}
+	return
+}
+
 // linregVectorsOfInterval returns an array functions.
-// This functions return an array of linear regression and the corresponding features used.
+// These functions return an array of linear regression and the corresponding features used.
 // todo(santiaago): rename function.
 func linregVectorsOfInterval() (funcs []func([]passenger) ([]*linreg.LinearRegression, [][]int)) {
 	funcs = []func(ps []passenger) ([]*linreg.LinearRegression, [][]int){
