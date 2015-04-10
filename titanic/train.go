@@ -16,11 +16,11 @@ import (
 // * trainSpecificModels
 // * trainModelsByFeatrueCombination
 // We return an array of all the linear regression models trained.
-func trainModels(file string) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
+func trainModels(file string, reader Reader) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 
 	linregs, featuresSpecific := trainSpecificModels(file)
 	linregsByComb, featuresByComb := trainModelsByFeatureCombination(file)
-	linregsWithTransform, featuresWithTransform := trainModelsWithTransform(file)
+	linregsWithTransform, featuresWithTransform := trainModelsWithTransform(reader)
 
 	featuresPerModel = append(featuresPerModel, featuresSpecific...)
 	featuresPerModel = append(featuresPerModel, featuresByComb...)
@@ -70,13 +70,18 @@ func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegre
 // trainModelsWithTransform returns:
 //   * an array of linearRegression models
 //   * an array of used features vectors.
-func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
+func trainModelsWithTransform(reader Reader) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
 
-	lrWith2DTransform, ufWith2DTransform := trainModelsWith2DTransform(file)
+	d, err := reader.Read()
+	if err != nil {
+		log.Println("error when getting data from reader,", err)
+	}
+
+	lrWith2DTransform, ufWith2DTransform := trainModelsWith2DTransform(d)
 	linregs = append(linregs, lrWith2DTransform...)
 	usedFeaturesPerModel = append(usedFeaturesPerModel, ufWith2DTransform...)
 
-	lrWith3DTransform, ufWith3DTransform := trainModelsWith3DTransform(file)
+	lrWith3DTransform, ufWith3DTransform := trainModelsWith3DTransform(d)
 	linregs = append(linregs, lrWith3DTransform...)
 	usedFeaturesPerModel = append(usedFeaturesPerModel, ufWith3DTransform...)
 
@@ -85,34 +90,23 @@ func trainModelsWithTransform(file string) (linregs []*linreg.LinearRegression, 
 
 // trainModelsWith2DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 2D transformation functions.
-func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression, features [][]int) {
+func trainModelsWith2DTransform(d [][]float64) ([]*linreg.LinearRegression, [][]int) {
 
-	if csvfile, err := os.Open(file); err != nil {
-		log.Fatalln(err)
-	} else {
-		r := csv.NewReader(csvfile)
-		funcs := transform2DFuncs()
-		f := passengerFeatures()
-		d := 2
-		linregs, features = trainModelsWithNDTransformFuncs(r, funcs, f, d)
-	}
-	return
+	funcs := transform2DFuncs()
+	f := passengerFeatures()
+	dim := 2
+	return trainModelsWithNDTransformFuncs(d, funcs, f, dim)
 }
 
 // trainModelsWith3DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 3D transformation functions.
-func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression, features [][]int) {
+func trainModelsWith3DTransform(d [][]float64) ([]*linreg.LinearRegression, [][]int) {
 
-	if csvfile, err := os.Open(file); err != nil {
-		log.Fatalln(err)
-	} else {
-		r := csv.NewReader(csvfile)
-		funcs := transform3DFuncs()
-		f := passengerFeatures()
-		d := 3
-		linregs, features = trainModelsWithNDTransformFuncs(r, funcs, f, d)
-	}
-	return
+	funcs := transform3DFuncs()
+	f := passengerFeatures()
+	dim := 3
+
+	return trainModelsWithNDTransformFuncs(d, funcs, f, dim)
 }
 
 // trainModelsWithNDTransformFuncs returns
@@ -123,30 +117,16 @@ func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression
 // We generate a vector of combinations of the candidateFeatures vector.
 // Each combination has the size of the size of 'dimention'.
 // Each (combination, transform function) pair is a specific model.
-func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []float64, candidateFeatures []int, dimension int) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
-
-	// todo(santiaago): this could be changed to
-	// passengerExtractor implements an extract method
-	// to read data from a csv.Reader and generate an
-	// array of passengers.
-	// something like.
-	// passengers := passengerExtractor.Extract(r)
-	passengers := passengersFromTrainingSet(r)
-
-	// todo:(santiaago): this could be changed to
-	// passengerCleaner that implement a clean method
-	// to modify a passenger array into more useful data for a
-	// linreg model.
-	data := prepareData(passengers)
+func trainModelsWithNDTransformFuncs(d [][]float64, funcs []func([]float64) []float64, candidateFeatures []int, dimension int) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 
 	combs := combinations(candidateFeatures, dimension)
 	for _, comb := range combs {
 
-		filteredData := filter(data, comb)
+		fd := filter(d, comb)
 
 		index := 0
 		for _, f := range funcs {
-			if linreg, err := trainModelWithTransform(filteredData, f); err == nil {
+			if linreg, err := trainModelWithTransform(fd, f); err == nil {
 				linreg.Name = fmt.Sprintf("%dD %v transformed %d", dimension, comb, index)
 				fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
 				linregs = append(linregs, linreg)

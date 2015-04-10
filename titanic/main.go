@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/csv"
 	"flag"
 	"log"
+	"os"
 	"sort"
 )
 
@@ -17,7 +19,19 @@ func init() {
 
 func main() {
 	flag.Parse()
-	linregs, featuresPerModel := trainModels(*train)
+
+	var r *csv.Reader
+	if csvfile, err := os.Open(*train); err != nil {
+		log.Fatalln(err)
+	} else {
+		r = csv.NewReader(csvfile)
+	}
+
+	dataReader := Reader{
+		NewPassengerExtractor(r),
+		NewPassengerCleaner(),
+	}
+	linregs, featuresPerModel := trainModels(*train, dataReader)
 
 	mapUsedFeatures := make(map[string][]int)
 	for i := 0; i < len(linregs); i++ {
