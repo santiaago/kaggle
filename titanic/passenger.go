@@ -53,20 +53,21 @@ func passengerFeatures() []int {
 	}
 }
 
-func (p passenger) Print() {
-	fmt.Println("ID", p.ID)
-	fmt.Println("Survived", p.Survived)
-	fmt.Println("Pclass", p.Pclass)
-	fmt.Println("Name", p.Name)
-	fmt.Println("Sex", p.Sex)
-	fmt.Println("Age", p.Age)
-	fmt.Println("SibSp", p.SibSp)
-	fmt.Println("Sex", p.Parch)
-	fmt.Println("Ticket", p.Ticket)
-	fmt.Println("Cabin", p.Cabin)
-	fmt.Println("Fare", p.Fare)
-	fmt.Println("Cabin", p.Cabin)
-	fmt.Println("Embarked", p.Embarked)
+func (p passenger) String() (s string) {
+	s += fmt.Sprintf("ID %v\n", p.ID)
+	s += fmt.Sprintf("Survived %t\n", p.Survived)
+	s += fmt.Sprintf("Pclass %v\n", p.Pclass)
+	s += fmt.Sprintf("Name %v\n", p.Name)
+	s += fmt.Sprintf("Sex %v\n", p.Sex)
+	s += fmt.Sprintf("Age %v\n", p.Age)
+	s += fmt.Sprintf("SibSp %v\n", p.SibSp)
+	s += fmt.Sprintf("Sex %v\n", p.Parch)
+	s += fmt.Sprintf("Ticket %v\n", p.Ticket)
+	s += fmt.Sprintf("Cabin %v\n", p.Cabin)
+	s += fmt.Sprintf("Fare %v\n", p.Fare)
+	s += fmt.Sprintf("Cabin %v\n", p.Cabin)
+	s += fmt.Sprintf("Embarked %v\n", p.Embarked)
+	return
 }
 
 func passengersFromTrainingSet(r *csv.Reader) (passengers []passenger) {

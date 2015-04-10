@@ -10,7 +10,6 @@ import (
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
 func linregTest(linreg *linreg.LinearRegression, passengers *[]passenger, keep []int) {
-
 	data := prepareData(*passengers)
 	filteredData := filter(data, keep)
 	for i := 0; i < len(filteredData); i++ {
