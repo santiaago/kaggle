@@ -2,14 +2,17 @@ package main
 
 import "strconv"
 
-// passengerFromTrainLine creates a passenger object
+// passengerFromTrainingRow creates a passenger object
 // from a train data row.
-func passengerFromTrainLine(line []string) passenger {
+// A training row looks like this:
+//     PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+func passengerFromTrainingRow(line []string) passenger {
 
 	survived, err := strconv.ParseBool(line[1])
 	if err != nil {
 		survived = false
 	}
+
 	age, err := strconv.ParseInt(line[5], 10, 32)
 	if err != nil {
 		age = 25
@@ -52,9 +55,9 @@ func passengerFromTrainLine(line []string) passenger {
 	return p
 }
 
-// passengerFromTestLine creates a passenger object
+// passengerFromTestingRow creates a passenger object
 // from a test data row.
-func passengerFromTestLine(line []string) passenger {
+func passengerFromTestingRow(line []string) passenger {
 	id := line[0]
 	pclass := line[1]
 	name := line[2]

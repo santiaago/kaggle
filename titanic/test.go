@@ -31,7 +31,7 @@ func testModel(r *csv.Reader, linreg *linreg.LinearRegression, keep []int) {
 	}
 	passengers := []passenger{}
 	for i := 1; i < len(rawData); i++ {
-		p := passengerFromTestLine(rawData[i])
+		p := passengerFromTestingRow(rawData[i])
 		passengers = append(passengers, p)
 	}
 	linregTest(linreg, &passengers, keep)

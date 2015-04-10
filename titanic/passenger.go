@@ -62,7 +62,7 @@ func passengersFromTrainingSet(r *csv.Reader) (passengers []passenger) {
 	}
 
 	for i := 1; i < len(rawData); i++ {
-		p := passengerFromTrainLine(rawData[i])
+		p := passengerFromTrainingRow(rawData[i])
 		passengers = append(passengers, p)
 	}
 	return
