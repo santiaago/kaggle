@@ -16,15 +16,15 @@ import (
 // * trainSpecificModels
 // * trainModelsByFeatrueCombination
 // We return an array of all the linear regression models trained.
-func trainModels(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
+func trainModels(file string) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 
-	linregs, usedFeaturesSpecific := trainSpecificModels(file)
-	linregsByComb, usedFeaturesByComb := trainModelsByFeatureCombination(file)
-	linregsWithTransform, usedFeaturesWithTransform := trainModelsWithTransform(file)
+	linregs, featuresSpecific := trainSpecificModels(file)
+	linregsByComb, featuresByComb := trainModelsByFeatureCombination(file)
+	linregsWithTransform, featuresWithTransform := trainModelsWithTransform(file)
 
-	usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeaturesSpecific...)
-	usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeaturesByComb...)
-	usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeaturesWithTransform...)
+	featuresPerModel = append(featuresPerModel, featuresSpecific...)
+	featuresPerModel = append(featuresPerModel, featuresByComb...)
+	featuresPerModel = append(featuresPerModel, featuresWithTransform...)
 
 	linregs = append(linregs, linregsByComb...)
 	linregs = append(linregs, linregsWithTransform...)
@@ -119,7 +119,7 @@ func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression
 // We generate a vector of combinations of the candidateFeatures vector.
 // Each combination has the size of the size of 'dimention'.
 // Each (combination, transform function) pair is a specific model.
-func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []float64, candidateFeatures []int, dimension int) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
+func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []float64, candidateFeatures []int, dimension int) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 
 	passengers := passengersFromTrainingSet(r)
 	data := prepareData(passengers)
@@ -135,7 +135,7 @@ func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []fl
 				linreg.Name = fmt.Sprintf("%dD %v transformed %d", dimension, comb, index)
 				fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
 				linregs = append(linregs, linreg)
-				usedFeaturesPerModel = append(usedFeaturesPerModel, comb)
+				featuresPerModel = append(featuresPerModel, comb)
 				index++
 			}
 		}
@@ -158,13 +158,13 @@ func trainModelWithTransform(data [][]float64, f func([]float64) []float64) (*li
 // to an array of functions passed as arguments.
 // Those function takes as argument the passengers data and return a linear
 // regression model.
-func trainModelsByFuncs(r *csv.Reader, funcs []func(passengers []passenger) (*linreg.LinearRegression, []int)) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
+func trainModelsByFuncs(r *csv.Reader, funcs []func(passengers []passenger) (*linreg.LinearRegression, []int)) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 
 	passengers := passengersFromTrainingSet(r)
 	for _, f := range funcs {
-		linreg, usedFeatures := f(passengers)
+		linreg, features := f(passengers)
 		linregs = append(linregs, linreg)
-		usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeatures)
+		featuresPerModel = append(featuresPerModel, features)
 	}
 	return
 }
@@ -176,12 +176,11 @@ func trainModelsByFuncs(r *csv.Reader, funcs []func(passengers []passenger) (*li
 func trainModelsByMetaFuncs(r *csv.Reader, metaLinregFuncs []func(passengers []passenger) ([]*linreg.LinearRegression, [][]int)) ([]*linreg.LinearRegression, [][]int) {
 	passengers := passengersFromTrainingSet(r)
 	var linregs []*linreg.LinearRegression
-	var usedFeatures [][]int
+	var features [][]int
 	for _, f := range metaLinregFuncs {
-		linreg, usedFeaturesPerModel := f(passengers)
-		usedFeatures = append(usedFeatures, usedFeaturesPerModel...)
+		linreg, featuresPerModel := f(passengers)
+		features = append(features, featuresPerModel...)
 		linregs = append(linregs, linreg...)
 	}
-
-	return linregs, usedFeatures
+	return linregs, features
 }
