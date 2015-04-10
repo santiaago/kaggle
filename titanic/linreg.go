@@ -114,6 +114,15 @@ func filter(data [][]float64, keep []int) (filtered [][]float64) {
 	return
 }
 
+func specificLinregFuncs() []func(passengers []passenger) (*linreg.LinearRegression, []int) {
+	return []func(passengers []passenger) (*linreg.LinearRegression, []int){
+		linregSexAge,
+		linregPClassAge,
+		linregPClassSex,
+		linregSexAgePClass,
+	}
+}
+
 func linregSexAgePClass(passengers []passenger) (lr *linreg.LinearRegression, usedFeatures []int) {
 	data := prepareData(passengers)
 
