@@ -86,9 +86,9 @@ func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
-		f := passengerFeatures()
 		r := csv.NewReader(csvfile)
 		funcs := transform2DFuncs()
+		f := passengerFeatures()
 		d := 2
 		linregs, features = trainModelsWithNDTransformFuncs(r, funcs, f, d)
 	}
@@ -121,7 +121,18 @@ func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression
 // Each (combination, transform function) pair is a specific model.
 func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []float64, candidateFeatures []int, dimension int) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 
+	// todo(santiaago): this could be changed to
+	// passengerExtractor implements an extract method
+	// to read data from a csv.Reader and generate an
+	// array of passengers.
+	// something like.
+	// passengers := passengerExtractor.Extract(r)
 	passengers := passengersFromTrainingSet(r)
+
+	// todo:(santiaago): this could be changed to
+	// passengerCleaner that implement a clean method
+	// to modify a passenger array into more useful data for a
+	// linreg model.
 	data := prepareData(passengers)
 
 	combs := combinations(candidateFeatures, dimension)
