@@ -165,24 +165,20 @@ func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression
 // We generate a vector of combinations of the candidateFeatures vector.
 // Each combination has the size of the size of 'dimention'.
 // Each (combination, transform function) pair is a specific model.
-func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []float64, candidateFeatures []int, dimention int) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
+func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []float64, candidateFeatures []int, dimension int) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
 
 	passengers := passengersFromTrainingSet(r)
 	data := prepareData(passengers)
 
-	combs := combinations(candidateFeatures, dimention)
+	combs := combinations(candidateFeatures, dimension)
 	for _, comb := range combs {
 
 		filteredData := filter(data, comb)
 
 		index := 0
 		for _, f := range funcs {
-			linreg := linreg.NewLinearRegression()
-			linreg.Name = fmt.Sprintf("%dD %v transformed %d", dimention, comb, index)
-			linreg.InitializeFromData(filteredData)
-			linreg.TransformFunction = f
-			linreg.ApplyTransformation()
-			if err := linreg.Learn(); err == nil {
+			if linreg, err := trainModelWithTransform(filteredData, f); err == nil {
+				linreg.Name = fmt.Sprintf("%dD %v transformed %d", dimension, comb, index)
 				fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
 				linregs = append(linregs, linreg)
 				usedFeaturesPerModel = append(usedFeaturesPerModel, comb)
@@ -191,6 +187,17 @@ func trainModelsWithNDTransformFuncs(r *csv.Reader, funcs []func([]float64) []fl
 		}
 	}
 	return
+}
+
+// trainModelWithTransform returns a linear model and an error if it fails to learn.
+// It uses the data passed as param and a transformation function.
+func trainModelWithTransform(data [][]float64, f func([]float64) []float64) (*linreg.LinearRegression, error) {
+	lr := linreg.NewLinearRegression()
+	lr.InitializeFromData(data)
+	lr.TransformFunction = f
+	lr.ApplyTransformation()
+	err := lr.Learn()
+	return lr, err
 }
 
 // trainModelsByFuncs returns an array of linear regression models with respect
