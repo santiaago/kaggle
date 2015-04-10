@@ -55,8 +55,7 @@ func trainModelsByFeatureCombination(file string) (linregs []*linreg.LinearRegre
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
-		funcs := linregVectorsOfInterval()
-		linregsOf, usedFeaturesOf := trainModelsByMetaFuncs(csv.NewReader(csvfile), funcs)
+		linregsOf, usedFeaturesOf := trainModelsByMetaFuncs(csv.NewReader(csvfile), linregVectorsOfInterval())
 
 		linregs = append(linregs, linregsOf...)
 		usedFeaturesPerModel = append(usedFeaturesPerModel, usedFeaturesOf...)
@@ -124,17 +123,8 @@ func trainModelsWith3DTransform(file string) (linregs []*linreg.LinearRegression
 			passengerIndexEmbarked,
 		}
 
-		funcs := []func([]float64) []float64{
-			transform3D1,
-			transform3D2,
-			transform3D3,
-			transform3D4,
-			transform3D5,
-			transform3D6,
-			transform3D7,
-		}
 		dimension := 3
-		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs, features, dimension)
+		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), transform3DFuncs(), features, dimension)
 	}
 	return
 }

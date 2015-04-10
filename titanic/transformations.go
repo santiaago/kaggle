@@ -115,6 +115,18 @@ func transform2D7(a []float64) []float64 {
 	return b
 }
 
+func transform3DFuncs() []func([]float64) []float64 {
+	return []func([]float64) []float64{
+		transform3D1,
+		transform3D2,
+		transform3D3,
+		transform3D4,
+		transform3D5,
+		transform3D6,
+		transform3D7,
+	}
+}
+
 //    (1, x1, x2, x3, |x1 + x2 + x3|)
 func transform3D1(a []float64) []float64 {
 	if len(a) != 4 {
