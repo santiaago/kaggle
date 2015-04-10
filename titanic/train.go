@@ -38,18 +38,10 @@ func trainModels(file string) (linregs []*linreg.LinearRegression, usedFeaturesP
 // * linregSexAgePClass
 // It returns an array of all the linear regression models trained.
 func trainSpecificModels(file string) (linregs []*linreg.LinearRegression, usedFeaturesPerModel [][]int) {
-
-	funcs := []func(passengers []passenger) (*linreg.LinearRegression, []int){
-		linregSexAge,
-		linregPClassAge,
-		linregPClassSex,
-		linregSexAgePClass,
-	}
-
 	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
-		linregs, usedFeaturesPerModel = trainModelsByFuncs(csv.NewReader(csvfile), funcs)
+		linregs, usedFeaturesPerModel = trainModelsByFuncs(csv.NewReader(csvfile), specificLinregFuncs())
 	}
 	return
 }
@@ -107,18 +99,8 @@ func trainModelsWith2DTransform(file string) (linregs []*linreg.LinearRegression
 			passengerIndexEmbarked,
 		}
 
-		funcs := []func([]float64) []float64{
-			transform2D1,
-			transform2D2,
-			transform2D3,
-			transform2D4,
-			transform2D5,
-			transform2D6,
-			transform2D7,
-		}
-
 		dimension := 2
-		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), funcs, features, dimension)
+		linregs, usedFeaturesPerModel = trainModelsWithNDTransformFuncs(csv.NewReader(csvfile), transform2DFuncs(), features, dimension)
 	}
 	return
 }

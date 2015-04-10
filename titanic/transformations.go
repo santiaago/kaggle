@@ -2,6 +2,18 @@ package main
 
 import "math"
 
+func transform2DFuncs() []func([]float64) []float64 {
+	return []func([]float64) []float64{
+		transform2D1,
+		transform2D2,
+		transform2D3,
+		transform2D4,
+		transform2D5,
+		transform2D6,
+		transform2D7,
+	}
+}
+
 //    (1, x1, x2, |x1+ x2|)
 func transform2D1(a []float64) []float64 {
 	if len(a) != 3 {
