@@ -104,12 +104,12 @@ func linregVectors(passengers []passenger, size int) (linregs []*linreg.LinearRe
 // the keep array in an array of the indexes to keep in the data.
 func filter(data [][]float64, keep []int) (filtered [][]float64) {
 	for i := 0; i < len(data); i++ {
-		var df []float64
+		var row []float64
 		for j := 0; j < len(keep); j++ {
-			df = append(df, data[i][keep[j]])
+			row = append(row, data[i][keep[j]])
 		}
-		df = append(df, data[i][passengerIndexSurvived])
-		filtered = append(filtered, df)
+		row = append(row, data[i][passengerIndexSurvived])
+		filtered = append(filtered, row)
 	}
 	return
 }
