@@ -39,34 +39,34 @@ func prediction(linreg *linreg.LinearRegression, x []float64) (p float64) {
 
 // linregVectorsOfInterval returns an array functions.
 // These functions return an array of linear regression and the corresponding features used.
-// todo(santiaago): rename function.
-func linregVectorsOfInterval() (funcs []func([]passenger) ([]*linreg.LinearRegression, [][]int)) {
+func linregAllCombinations() (funcs []func([]passenger) ([]*linreg.LinearRegression, [][]int)) {
 	funcs = []func(ps []passenger) ([]*linreg.LinearRegression, [][]int){
 		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
-			return linregVectors(ps, 2)
+			return linregCombinations(ps, 2)
 		},
 		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
-			return linregVectors(ps, 3)
+			return linregCombinations(ps, 3)
 		},
 		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
-			return linregVectors(ps, 4)
+			return linregCombinations(ps, 4)
 		},
 		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
-			return linregVectors(ps, 5)
+			return linregCombinations(ps, 5)
 		},
 		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
-			return linregVectors(ps, 6)
+			return linregCombinations(ps, 6)
 		},
 		func(ps []passenger) ([]*linreg.LinearRegression, [][]int) {
-			return linregVectors(ps, 7)
+			return linregCombinations(ps, 7)
 		},
 	}
 	return
 }
 
-// linregVectors creates a linear regression model for each combination of
-// vector of x features and returns an array of linear regressions for each combination.
-func linregVectors(passengers []passenger, size int) (linregs []*linreg.LinearRegression, usedFeatures [][]int) {
+// linregCombinations creates a linear regression model for each combination of
+// the feature vector with respect to the size param.
+// It returns an array of linear regressions, one for each combination.
+func linregCombinations(passengers []passenger, size int) (linregs []*linreg.LinearRegression, usedFeatures [][]int) {
 
 	data := prepareData(passengers)
 
