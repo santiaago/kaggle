@@ -6,6 +6,7 @@ import (
 	"github.com/santiaago/caltechx.go/linear"
 	"github.com/santiaago/caltechx.go/linreg"
 	"github.com/santiaago/kaggle/data"
+	"github.com/santiaago/kaggle/itertools"
 )
 
 // linregTest sets the Survived field of each passenger in the passenger array
@@ -73,7 +74,7 @@ func linregAllCombinations() (funcs []func(data.Container) ([]*linreg.LinearRegr
 // It returns an array of linear regressions, one for each combination.
 func linregCombinations(dc data.Container, size int) (lrs []*linreg.LinearRegression, features [][]int) {
 
-	combs := combinations(dc.Features, size)
+	combs := itertools.Combinations(dc.Features, size)
 
 	for _, c := range combs {
 		fd := filter(dc.Data, c)

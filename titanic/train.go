@@ -6,6 +6,7 @@ import (
 
 	"github.com/santiaago/caltechx.go/linreg"
 	"github.com/santiaago/kaggle/data"
+	"github.com/santiaago/kaggle/itertools"
 	"github.com/santiaago/kaggle/transform"
 )
 
@@ -109,7 +110,7 @@ func trainModelsWith3DTransform(dc data.Container) ([]*linreg.LinearRegression, 
 // Each (combination, transform function) pair is a specific model.
 func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 
-	combs := combinations(dc.Features, dimension)
+	combs := itertools.Combinations(dc.Features, dimension)
 	for _, comb := range combs {
 
 		fd := filter(dc.Data, comb)

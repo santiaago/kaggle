@@ -1,11 +1,11 @@
-package main
+package itertools
 
 // combinations returns an 2D array with all the combinations of the iterable
 // array passed as argument with respect to the specified sized 'r'
 // From GitHub: https://github.com/ntns
 // Written by Nuno Antunes, 2012-08-08
 // modified a bit by Santiago Arias
-func combinations(iterable []int, r int) (results [][]int) {
+func Combinations(iterable []int, r int) (results [][]int) {
 	pool := iterable
 	n := len(pool)
 
