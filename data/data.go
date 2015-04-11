@@ -8,7 +8,7 @@ import "encoding/csv"
 // Use it to extract and clean data that you can then pass to a machine learning
 // model.
 type Reader interface {
-	Read() ([][]float64, error)
+	Read() (Container, error)
 }
 
 // Extractor is the interface that wraps the basic extract method.
@@ -21,4 +21,10 @@ type Extractor interface {
 
 type Writer interface {
 	Write(filename string, predictions []int) error
+}
+
+// Container holds the data and features information.
+type Container struct {
+	Data     [][]float64 // array that holds the information to learn or train.
+	Features []int       // array of indexes with the features to use in the Data array.
 }

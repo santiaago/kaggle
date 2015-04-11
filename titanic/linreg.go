@@ -5,12 +5,13 @@ import (
 
 	"github.com/santiaago/caltechx.go/linear"
 	"github.com/santiaago/caltechx.go/linreg"
+	"github.com/santiaago/kaggle/data"
 )
 
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
-func linregTest(lr *linreg.LinearRegression, data [][]float64, keep []int) (predictions []int) {
-	fd := filter(data, keep)
+func linregTest(lr *linreg.LinearRegression, dc data.Container, keep []int) (predictions []int) {
+	fd := filter(dc.Data, keep)
 	for i := 0; i < len(fd); i++ {
 
 		x := []float64{1}
@@ -43,25 +44,25 @@ func prediction(lr *linreg.LinearRegression, x []float64) (p float64) {
 
 // linregVectorsOfInterval returns an array functions.
 // These functions return an array of linear regression and the corresponding features used.
-func linregAllCombinations() (funcs []func([][]float64) ([]*linreg.LinearRegression, [][]int)) {
-	funcs = []func(data [][]float64) ([]*linreg.LinearRegression, [][]int){
-		func(data [][]float64) ([]*linreg.LinearRegression, [][]int) {
-			return linregCombinations(data, 2)
+func linregAllCombinations() (funcs []func(data.Container) ([]*linreg.LinearRegression, [][]int)) {
+	funcs = []func(dc data.Container) ([]*linreg.LinearRegression, [][]int){
+		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+			return linregCombinations(dc, 2)
 		},
-		func(data [][]float64) ([]*linreg.LinearRegression, [][]int) {
-			return linregCombinations(data, 3)
+		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+			return linregCombinations(dc, 3)
 		},
-		func(data [][]float64) ([]*linreg.LinearRegression, [][]int) {
-			return linregCombinations(data, 4)
+		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+			return linregCombinations(dc, 4)
 		},
-		func(data [][]float64) ([]*linreg.LinearRegression, [][]int) {
-			return linregCombinations(data, 5)
+		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+			return linregCombinations(dc, 5)
 		},
-		func(data [][]float64) ([]*linreg.LinearRegression, [][]int) {
-			return linregCombinations(data, 6)
+		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+			return linregCombinations(dc, 6)
 		},
-		func(data [][]float64) ([]*linreg.LinearRegression, [][]int) {
-			return linregCombinations(data, 7)
+		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+			return linregCombinations(dc, 7)
 		},
 	}
 	return
@@ -70,13 +71,12 @@ func linregAllCombinations() (funcs []func([][]float64) ([]*linreg.LinearRegress
 // linregCombinations creates a linear regression model for each combination of
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
-func linregCombinations(data [][]float64, size int) (lrs []*linreg.LinearRegression, features [][]int) {
-	// todo(santiaago): passengerFeatures should be passed in.
-	f := passengerFeatures()
-	combs := combinations(f, size)
+func linregCombinations(dc data.Container, size int) (lrs []*linreg.LinearRegression, features [][]int) {
+
+	combs := combinations(dc.Features, size)
 
 	for _, c := range combs {
-		fd := filter(data, c)
+		fd := filter(dc.Data, c)
 		lr := linreg.NewLinearRegression()
 		lr.InitializeFromData(fd)
 
@@ -107,8 +107,8 @@ func filter(data [][]float64, keep []int) (filtered [][]float64) {
 	return
 }
 
-func specificLinregFuncs() []func(data [][]float64) (*linreg.LinearRegression, []int) {
-	return []func(data [][]float64) (*linreg.LinearRegression, []int){
+func specificLinregFuncs() []func(dc data.Container) (*linreg.LinearRegression, []int) {
+	return []func(dc data.Container) (*linreg.LinearRegression, []int){
 		linregSexAge,
 		linregPClassAge,
 		linregPClassSex,
@@ -116,7 +116,7 @@ func specificLinregFuncs() []func(data [][]float64) (*linreg.LinearRegression, [
 	}
 }
 
-func linregSexAgePClass(data [][]float64) (lr *linreg.LinearRegression, features []int) {
+func linregSexAgePClass(dc data.Container) (lr *linreg.LinearRegression, features []int) {
 	// todo(santiaago): pass this in.
 	featuresInternal := []int{
 		passengerIndexSex,
@@ -125,7 +125,7 @@ func linregSexAgePClass(data [][]float64) (lr *linreg.LinearRegression, features
 	}
 	features = featuresInternal[:3]
 
-	fd := filter(data, featuresInternal)
+	fd := filter(dc.Data, featuresInternal)
 
 	lr = linreg.NewLinearRegression()
 	lr.Name = "Sex Age PClass"
@@ -137,7 +137,7 @@ func linregSexAgePClass(data [][]float64) (lr *linreg.LinearRegression, features
 	return nil, nil
 }
 
-func linregSexAge(data [][]float64) (lr *linreg.LinearRegression, features []int) {
+func linregSexAge(dc data.Container) (lr *linreg.LinearRegression, features []int) {
 
 	featuresInternal := []int{
 		passengerIndexSex,
@@ -145,7 +145,7 @@ func linregSexAge(data [][]float64) (lr *linreg.LinearRegression, features []int
 	}
 	features = featuresInternal[:2]
 
-	fd := filter(data, featuresInternal)
+	fd := filter(dc.Data, featuresInternal)
 
 	lr = linreg.NewLinearRegression()
 	lr.InitializeFromData(fd)
@@ -158,7 +158,7 @@ func linregSexAge(data [][]float64) (lr *linreg.LinearRegression, features []int
 	return nil, nil
 }
 
-func linregPClassAge(data [][]float64) (lr *linreg.LinearRegression, features []int) {
+func linregPClassAge(dc data.Container) (lr *linreg.LinearRegression, features []int) {
 
 	featuresInternal := []int{
 		passengerIndexAge,
@@ -166,7 +166,7 @@ func linregPClassAge(data [][]float64) (lr *linreg.LinearRegression, features []
 	}
 	features = featuresInternal[:2]
 
-	fd := filter(data, featuresInternal)
+	fd := filter(dc.Data, featuresInternal)
 
 	lr = linreg.NewLinearRegression()
 	lr.InitializeFromData(fd)
@@ -179,7 +179,7 @@ func linregPClassAge(data [][]float64) (lr *linreg.LinearRegression, features []
 	return nil, nil
 }
 
-func linregPClassSex(data [][]float64) (lr *linreg.LinearRegression, features []int) {
+func linregPClassSex(dc data.Container) (lr *linreg.LinearRegression, features []int) {
 
 	featuresInternal := []int{
 		passengerIndexSex,
@@ -187,7 +187,7 @@ func linregPClassSex(data [][]float64) (lr *linreg.LinearRegression, features []
 	}
 	features = featuresInternal[:2]
 
-	fd := filter(data, featuresInternal)
+	fd := filter(dc.Data, featuresInternal)
 
 	lr = linreg.NewLinearRegression()
 	lr.InitializeFromData(fd)

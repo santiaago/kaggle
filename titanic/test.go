@@ -13,14 +13,15 @@ import (
 // linear regression model name.
 // testModels run a test file for each linear regression model passed in the linreg array.
 func testModels(r data.Reader, w data.Writer, linregs []*linreg.LinearRegression, mapUsedFeatures map[string][]int) {
-
-	data, err := r.Read()
+	var dc data.Container
+	var err error
+	dc, err = r.Read()
 	if err != nil {
 		log.Println("error when getting data from reader,", err)
 	}
 
 	for i := 0; i < len(linregs); i++ {
-		predictions := linregTest(linregs[i], data, mapUsedFeatures[linregs[i].Name])
+		predictions := linregTest(linregs[i], dc, mapUsedFeatures[linregs[i].Name])
 		w.Write(linregs[i].Name, predictions)
 	}
 }

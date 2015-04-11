@@ -41,12 +41,14 @@ func (pr PassengerReader) Clean(passengers interface{}) ([][]float64, error) {
 // Read reads the data holded in the csv.Reader r
 // by extracting it using the Extract function,
 // then Cleans the data and returns it.
-func (pr PassengerReader) Read() ([][]float64, error) {
+func (pr PassengerReader) Read() (data.Container, error) {
 	d, err := pr.ex.Extract(pr.r)
 	if err != nil {
-		return nil, fmt.Errorf("error when extracting data: %v", err)
+		return data.Container{}, fmt.Errorf("error when extracting data: %v", err)
 	}
-	return pr.Clean(d)
+
+	c, err := pr.Clean(d)
+	return data.Container{c, passengerFeatures()}, err
 }
 
 type PassengerTrainExtractor struct{}
