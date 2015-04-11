@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/santiaago/caltechx.go/linreg"
+	"github.com/santiaago/kaggle/data"
 )
 
 // trainModels returns:
@@ -14,7 +15,7 @@ import (
 // * trainSpecificModels
 // * trainModelsByFeatrueCombination
 // We return an array of all the linear regression models trained.
-func trainModels(reader Reader) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
+func trainModels(reader data.Reader) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 	data, err := reader.Read()
 	if err != nil {
 		log.Println("error when getting data from reader,", err)

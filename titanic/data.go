@@ -6,23 +6,6 @@ import (
 	"strconv"
 )
 
-type Reader struct {
-	ex Extractor
-	cl Cleaner
-}
-
-func (r Reader) Read() ([][]float64, error) {
-	d, err := r.ex.Extract()
-	if err != nil {
-		return nil, fmt.Errorf("error when extracting data: %v", err)
-	}
-	return r.cl.Clean(d)
-}
-
-type Extractor interface {
-	Extract() (interface{}, error)
-}
-
 // A PassengerExtractor extract passenger data from a CVS-encoded file.
 type PassengerExtractor struct {
 	r *csv.Reader
@@ -36,10 +19,6 @@ func NewPassengerExtractor(r *csv.Reader) PassengerExtractor {
 // Extract extracts the  passengers from r.
 func (pex PassengerExtractor) Extract() (interface{}, error) {
 	return passengersFromTrainingSet(pex.r), nil
-}
-
-type Cleaner interface {
-	Clean(interface{}) ([][]float64, error)
 }
 
 type PassengerCleaner struct {

@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"sort"
+
+	"github.com/santiaago/kaggle/data"
 )
 
 var (
@@ -37,7 +39,7 @@ func main() {
 	rgs.Print(50)
 }
 
-func NewReader(file string) Reader {
+func NewReader(file string) data.Reader {
 	var r *csv.Reader
 	if csvfile, err := os.Open(*train); err != nil {
 		log.Fatalln(err)
@@ -45,7 +47,7 @@ func NewReader(file string) Reader {
 		r = csv.NewReader(csvfile)
 	}
 
-	return Reader{
+	return data.Reader{
 		NewPassengerExtractor(r),
 		NewPassengerCleaner(),
 	}
