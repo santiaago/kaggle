@@ -9,9 +9,8 @@ import (
 
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
-func linregTest(lr *linreg.LinearRegression, passengers *[]passenger, keep []int) {
-	d := prepareData(*passengers)
-	fd := filter(d, keep)
+func linregTest(lr *linreg.LinearRegression, data [][]float64, keep []int) (predictions []int) {
+	fd := filter(data, keep)
 	for i := 0; i < len(fd); i++ {
 
 		x := []float64{1}
@@ -24,9 +23,12 @@ func linregTest(lr *linreg.LinearRegression, passengers *[]passenger, keep []int
 		gi := prediction(lr, x)
 
 		if linear.Sign(gi) == 1 {
-			(*passengers)[i].Survived = true
+			predictions = append(predictions, 1)
+		} else {
+			predictions = append(predictions, 0)
 		}
 	}
+	return
 }
 
 // prediction returns the result of the dot product between the x vector passed as param

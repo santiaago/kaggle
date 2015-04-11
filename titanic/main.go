@@ -20,18 +20,21 @@ func init() {
 func main() {
 	flag.Parse()
 
-	var pTrainX PassengerTrainExtractor = NewPassengerTrainExtractor()
-	var dr data.Reader = NewPassengerReader(*train, pTrainX)
+	var xTrain data.Extractor = NewPassengerTrainExtractor()
+	var drTrain data.Reader = NewPassengerReader(*train, xTrain)
 
-	linregs, featuresPerModel := trainModels(dr)
+	linregs, featuresPerModel := trainModels(drTrain)
 
 	mapUsedFeatures := make(map[string][]int)
 	for i := 0; i < len(linregs); i++ {
 		mapUsedFeatures[linregs[i].Name] = featuresPerModel[i]
 	}
 
-	// var testDr data.Reader = NewPassengerReader(*test)
-	testModels(*test, linregs, mapUsedFeatures)
+	var xTest data.Extractor = NewPassengerTestExtractor()
+	var drTest data.Reader = NewPassengerReader(*test, xTest)
+
+	var wTest data.Writer = NewPassengerTestWriter(*test)
+	testModels(drTest, wTest, linregs, mapUsedFeatures)
 
 	var rgs = regressions(linregs)
 	sort.Sort(rgs)
