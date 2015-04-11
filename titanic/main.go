@@ -1,13 +1,9 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"log"
-	"os"
 	"sort"
-
-	"github.com/santiaago/kaggle/data"
 )
 
 var (
@@ -22,7 +18,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	dr := NewReader(*train)
+	dr := NewPassengerReader(*train)
 
 	linregs, featuresPerModel := trainModels(dr)
 
@@ -37,18 +33,4 @@ func main() {
 	sort.Sort(rgs)
 	log.Printf("\n\n\n")
 	rgs.Print(50)
-}
-
-func NewReader(file string) data.Reader {
-	var r *csv.Reader
-	if csvfile, err := os.Open(*train); err != nil {
-		log.Fatalln(err)
-	} else {
-		r = csv.NewReader(csvfile)
-	}
-
-	return data.Reader{
-		NewPassengerExtractor(r),
-		NewPassengerCleaner(),
-	}
 }

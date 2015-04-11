@@ -9,6 +9,11 @@ type Reader struct {
 	Cl Cleaner   // cleans the data
 }
 
+// NewReader returns a new data.Reader that can extract and clean data.
+func NewReader(ex Extractor, cl Cleaner) Reader {
+	return Reader{ex, cl}
+}
+
 // Read reads the data, by extracting it using the Extractor.Extract function,
 // then performs a Cleaner.Clean and returns the cleaned data.
 func (r Reader) Read() ([][]float64, error) {

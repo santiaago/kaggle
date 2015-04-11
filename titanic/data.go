@@ -3,7 +3,11 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"log"
+	"os"
 	"strconv"
+
+	"github.com/santiaago/kaggle/data"
 )
 
 // A PassengerExtractor extract passenger data from a CVS-encoded file.
@@ -34,6 +38,19 @@ func (pc PassengerCleaner) Clean(passengers interface{}) ([][]float64, error) {
 		return prepareData(ps), nil
 	}
 	return nil, fmt.Errorf("unable to clean unknown type.")
+}
+
+// NewPassengerReader returns a new data.Reader that can read from the given file.
+func NewPassengerReader(file string) data.Reader {
+	var r *csv.Reader
+	if csvfile, err := os.Open(*train); err != nil {
+		log.Fatalln(err)
+	} else {
+		r = csv.NewReader(csvfile)
+	}
+	ex := NewPassengerExtractor(r)
+	cl := NewPassengerCleaner()
+	return data.NewReader(ex, cl)
 }
 
 // passengerFromTrainingRow creates a passenger object
