@@ -117,15 +117,13 @@ func specificLinregFuncs() []func(dc data.Container) (*linreg.LinearRegression, 
 }
 
 func linregSexAgePClass(dc data.Container) (lr *linreg.LinearRegression, features []int) {
-	// todo(santiaago): pass this in.
-	featuresInternal := []int{
+	features = []int{
 		passengerIndexSex,
 		passengerIndexAge,
 		passengerIndexPclass,
 	}
-	features = featuresInternal[:3]
 
-	fd := filter(dc.Data, featuresInternal)
+	fd := filter(dc.Data, features)
 
 	lr = linreg.NewLinearRegression()
 	lr.Name = "Sex Age PClass"
@@ -139,13 +137,12 @@ func linregSexAgePClass(dc data.Container) (lr *linreg.LinearRegression, feature
 
 func linregSexAge(dc data.Container) (lr *linreg.LinearRegression, features []int) {
 
-	featuresInternal := []int{
+	features = []int{
 		passengerIndexSex,
 		passengerIndexAge,
 	}
-	features = featuresInternal[:2]
 
-	fd := filter(dc.Data, featuresInternal)
+	fd := filter(dc.Data, features)
 
 	lr = linreg.NewLinearRegression()
 	lr.InitializeFromData(fd)
@@ -160,13 +157,12 @@ func linregSexAge(dc data.Container) (lr *linreg.LinearRegression, features []in
 
 func linregPClassAge(dc data.Container) (lr *linreg.LinearRegression, features []int) {
 
-	featuresInternal := []int{
+	features = []int{
 		passengerIndexAge,
 		passengerIndexPclass,
 	}
-	features = featuresInternal[:2]
 
-	fd := filter(dc.Data, featuresInternal)
+	fd := filter(dc.Data, features)
 
 	lr = linreg.NewLinearRegression()
 	lr.InitializeFromData(fd)
@@ -181,13 +177,12 @@ func linregPClassAge(dc data.Container) (lr *linreg.LinearRegression, features [
 
 func linregPClassSex(dc data.Container) (lr *linreg.LinearRegression, features []int) {
 
-	featuresInternal := []int{
+	features = []int{
 		passengerIndexSex,
 		passengerIndexPclass,
 	}
-	features = featuresInternal[:2]
 
-	fd := filter(dc.Data, featuresInternal)
+	fd := filter(dc.Data, features)
 
 	lr = linreg.NewLinearRegression()
 	lr.InitializeFromData(fd)
