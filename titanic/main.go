@@ -20,18 +20,9 @@ func init() {
 func main() {
 	flag.Parse()
 
-	var r *csv.Reader
-	if csvfile, err := os.Open(*train); err != nil {
-		log.Fatalln(err)
-	} else {
-		r = csv.NewReader(csvfile)
-	}
+	dr := NewReader(*train)
 
-	dataReader := Reader{
-		NewPassengerExtractor(r),
-		NewPassengerCleaner(),
-	}
-	linregs, featuresPerModel := trainModels(*train, dataReader)
+	linregs, featuresPerModel := trainModels(*train, dr)
 
 	mapUsedFeatures := make(map[string][]int)
 	for i := 0; i < len(linregs); i++ {
@@ -44,4 +35,18 @@ func main() {
 	sort.Sort(rgs)
 	log.Printf("\n\n\n")
 	rgs.Print(50)
+}
+
+func NewReader(file string) Reader {
+	var r *csv.Reader
+	if csvfile, err := os.Open(*train); err != nil {
+		log.Fatalln(err)
+	} else {
+		r = csv.NewReader(csvfile)
+	}
+
+	return Reader{
+		NewPassengerExtractor(r),
+		NewPassengerCleaner(),
+	}
 }
