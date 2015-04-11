@@ -10,21 +10,6 @@ import (
 	"github.com/santiaago/kaggle/data"
 )
 
-const (
-	passengerIndexID int = iota
-	passengerIndexSurvived
-	passengerIndexPclass
-	passengerIndexName
-	passengerIndexSex
-	passengerIndexAge
-	passengerIndexSibSp
-	passengerIndexParch
-	passengerIndexTicket
-	passengerIndexFare
-	passengerIndexCabin
-	passengerIndexEmbarked
-)
-
 type passenger struct {
 	ID       string
 	Survived bool
@@ -39,6 +24,21 @@ type passenger struct {
 	Cabin    string
 	Embarked string
 }
+
+const (
+	passengerIndexID int = iota
+	passengerIndexSurvived
+	passengerIndexPclass
+	passengerIndexName
+	passengerIndexSex
+	passengerIndexAge
+	passengerIndexSibSp
+	passengerIndexParch
+	passengerIndexTicket
+	passengerIndexFare
+	passengerIndexCabin
+	passengerIndexEmbarked
+)
 
 // passengerFeatures return an array of indexes of the
 // passenger colomns data can be used to learn.
@@ -71,6 +71,48 @@ func (p passenger) String() (s string) {
 	s += fmt.Sprintf("Cabin %v\n", p.Cabin)
 	s += fmt.Sprintf("Embarked %v\n", p.Embarked)
 	return
+}
+
+// A PassengerReader extract passenger data from a CVS-encoded file using a data.Extractor.
+// It implements the data.Reader interface.
+type PassengerReader struct {
+	r  *csv.Reader // a CSV encoded reader.
+	ex data.Extractor
+}
+
+// NewPassengerReader returns a new data.Reader that can read from a given file.
+// It uses a data.Extractor to extract the data from the file.
+func NewPassengerReader(file string, ex data.Extractor) PassengerReader {
+	var r *csv.Reader
+	if csvfile, err := os.Open(file); err != nil {
+		log.Fatalln(err)
+	} else {
+		r = csv.NewReader(csvfile)
+	}
+	return PassengerReader{r, ex}
+}
+
+// clean cleans an array of passengers returning the
+// data in the form of 2 dimentional array of float64
+func (pr PassengerReader) clean(passengers interface{}) ([][]float64, error) {
+
+	if ps, ok := passengers.([]passenger); ok {
+		return prepareData(ps), nil
+	}
+	return nil, fmt.Errorf("unable to clean unknown type.")
+}
+
+// Read reads the data holded in the csv.Reader
+// by extracting it using the Extract function,
+// then cleans the data and returns it.
+func (pr PassengerReader) Read() (data.Container, error) {
+	d, err := pr.ex.Extract(pr.r)
+	if err != nil {
+		return data.Container{}, fmt.Errorf("error when extracting data: %v", err)
+	}
+
+	c, err := pr.clean(d)
+	return data.Container{c, passengerFeatures()}, err
 }
 
 func prepareData(passengers []passenger) (data [][]float64) {
@@ -131,45 +173,4 @@ func prepareData(passengers []passenger) (data [][]float64) {
 		data = append(data, d)
 	}
 	return
-}
-
-// A PassengerReader extract passenger data from a CVS-encoded file.
-// It implements the data.Reader interface.
-type PassengerReader struct {
-	r  *csv.Reader // a CSV encoded reader.
-	ex data.Extractor
-}
-
-// NewPassengerReader returns a new data.Reader that can read from a given file.
-func NewPassengerReader(file string, ex data.Extractor) PassengerReader {
-	var r *csv.Reader
-	if csvfile, err := os.Open(file); err != nil {
-		log.Fatalln(err)
-	} else {
-		r = csv.NewReader(csvfile)
-	}
-	return PassengerReader{r, ex}
-}
-
-// Clean cleans an array of passengers returning the
-// data in the form of 2 dimentional array of float64
-func (pr PassengerReader) Clean(passengers interface{}) ([][]float64, error) {
-
-	if ps, ok := passengers.([]passenger); ok {
-		return prepareData(ps), nil
-	}
-	return nil, fmt.Errorf("unable to clean unknown type.")
-}
-
-// Read reads the data holded in the csv.Reader r
-// by extracting it using the Extract function,
-// then Cleans the data and returns it.
-func (pr PassengerReader) Read() (data.Container, error) {
-	d, err := pr.ex.Extract(pr.r)
-	if err != nil {
-		return data.Container{}, fmt.Errorf("error when extracting data: %v", err)
-	}
-
-	c, err := pr.Clean(d)
-	return data.Container{c, passengerFeatures()}, err
 }

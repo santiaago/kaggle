@@ -9,6 +9,27 @@ import (
 	"github.com/santiaago/kaggle/itertools"
 )
 
+type regressions []*linreg.LinearRegression
+
+func (slice regressions) Len() int {
+	return len(slice)
+}
+
+func (slice regressions) Less(i, j int) bool {
+	return (*slice[i]).Ein() < (*slice[j]).Ein()
+}
+
+func (slice regressions) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
+}
+
+func (slice regressions) Print(top int) {
+	for i := 0; i < top; i++ {
+		lr := slice[i]
+		fmt.Printf("EIn = %f \t%s\n", lr.Ein(), lr.Name)
+	}
+}
+
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
 func linregTest(lr *linreg.LinearRegression, dc data.Container, keep []int) (predictions []int) {

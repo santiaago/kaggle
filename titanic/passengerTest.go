@@ -77,7 +77,6 @@ func (ptw PassengerTestWriter) Write(name string, predictions []int) error {
 		}
 	}
 	writer.Flush()
-
 	return nil
 }
 
