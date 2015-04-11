@@ -20,7 +20,7 @@ type PassengerReader struct {
 // NewPassengerReader returns a new data.Reader that can read from a given file.
 func NewPassengerReader(file string, ex data.Extractor) PassengerReader {
 	var r *csv.Reader
-	if csvfile, err := os.Open(*train); err != nil {
+	if csvfile, err := os.Open(file); err != nil {
 		log.Fatalln(err)
 	} else {
 		r = csv.NewReader(csvfile)
@@ -56,7 +56,18 @@ func NewPassengerTrainExtractor() PassengerTrainExtractor {
 }
 
 func (pex PassengerTrainExtractor) Extract(r *csv.Reader) (interface{}, error) {
-	return passengersFromTrainingSet(r), nil
+	var rawData [][]string
+	var err error
+	if rawData, err = r.ReadAll(); err != nil {
+		log.Fatalln(err)
+		return nil
+	}
+
+	for i := 1; i < len(rawData); i++ {
+		p := passengerFromTrainingRow(rawData[i])
+		passengers = append(passengers, p)
+	}
+	return passengers, nil
 }
 
 type PassengerTestExtractor struct{}
@@ -66,7 +77,71 @@ func NewPassengerTestExtractor() PassengerTestExtractor {
 }
 
 func (pex PassengerTestExtractor) Extract(r *csv.Reader) (interface{}, error) {
-	return passengersFromTrainingSet(r), nil
+	var rawData [][]string
+	var err error
+	if rawData, err = r.ReadAll(); err != nil {
+		log.Fatalln(err)
+	}
+	passengers := []passenger{}
+	for i := 1; i < len(rawData); i++ {
+		p := passengerFromTestingRow(rawData[i])
+		passengers = append(passengers, p)
+	}
+	return passengers, nil
+}
+
+type PassengerTestWriter struct {
+	passengers []passenger
+	ex         PassengerTestExtractor
+}
+
+func NewPassengerTestWriter(file string) PassengerTestWriter {
+	ptw := PassengerTestWriter{}
+	reader := NewPassengerReader(file, NewPassengerTestExtractor())
+
+	if data, err := reader.ex.Extract(reader.r); err == nil {
+		if ps, ok := data.([]passenger); ok {
+			ptw.passengers = ps
+		}
+	} else {
+		log.Println(err)
+	}
+	return ptw
+}
+
+func (ptw PassengerTestWriter) Write(name string, predictions []int) error {
+	temp := "data/temp/"
+	if _, err := os.Stat(temp); os.IsNotExist(err) {
+		if err = os.Mkdir(temp, 0777); err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	csvfile, err := os.Create(temp + name)
+	defer csvfile.Close()
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	writer := csv.NewWriter(csvfile)
+	// headers
+	if err := writer.Write([]string{"PassengerId", "Survived"}); err != nil {
+		log.Fatalln(err)
+	}
+	// data
+	for i, passenger := range ptw.passengers {
+		p := []string{passenger.ID, "0"}
+		if predictions[i] == 1 {
+			p[1] = "1"
+		}
+		if err := writer.Write(p); err != nil {
+			log.Fatalln(err)
+		}
+	}
+	writer.Flush()
+
+	return nil
 }
 
 // passengerFromTrainingRow creates a passenger object
