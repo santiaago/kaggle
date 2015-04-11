@@ -22,7 +22,7 @@ func main() {
 
 	dr := NewReader(*train)
 
-	linregs, featuresPerModel := trainModels(*train, dr)
+	linregs, featuresPerModel := trainModels(dr)
 
 	mapUsedFeatures := make(map[string][]int)
 	for i := 0; i < len(linregs); i++ {
