@@ -6,33 +6,33 @@ import (
 	"log"
 	"os"
 	"strconv"
-
-	"github.com/santiaago/kaggle/data"
 )
 
-// A PassengerExtractor extract passenger data from a CVS-encoded file.
-type PassengerExtractor struct {
-	r *csv.Reader
+// A PassengerReader extract passenger data from a CVS-encoded file.
+// It implements the data.Reader interface.
+type PassengerReader struct {
+	r *csv.Reader // a CSV encoded reader.
 }
 
-// NewPassengerExtractor returns a nez PassengerExtractor that extracts from r.
-func NewPassengerExtractor(r *csv.Reader) PassengerExtractor {
-	return PassengerExtractor{r}
+// NewPassengerReader returns a new data.Reader that can read from a given file.
+func NewPassengerReader(file string) PassengerReader {
+	var r *csv.Reader
+	if csvfile, err := os.Open(*train); err != nil {
+		log.Fatalln(err)
+	} else {
+		r = csv.NewReader(csvfile)
+	}
+	return PassengerReader{r}
 }
 
-// Extract extracts the  passengers from r.
-func (pex PassengerExtractor) Extract() (interface{}, error) {
-	return passengersFromTrainingSet(pex.r), nil
+// Extract extracts an array of passengers from r.
+func (pr PassengerReader) Extract() ([]passenger, error) {
+	return passengersFromTrainingSet(pr.r), nil
 }
 
-type PassengerCleaner struct {
-}
-
-func NewPassengerCleaner() PassengerCleaner {
-	return PassengerCleaner{}
-}
-
-func (pc PassengerCleaner) Clean(passengers interface{}) ([][]float64, error) {
+// Clean cleans an array of passengers returning the
+// data in the form of 2 dimentional array of float64
+func (pr PassengerReader) Clean(passengers interface{}) ([][]float64, error) {
 
 	if ps, ok := passengers.([]passenger); ok {
 		return prepareData(ps), nil
@@ -40,17 +40,15 @@ func (pc PassengerCleaner) Clean(passengers interface{}) ([][]float64, error) {
 	return nil, fmt.Errorf("unable to clean unknown type.")
 }
 
-// NewPassengerReader returns a new data.Reader that can read from the given file.
-func NewPassengerReader(file string) data.Reader {
-	var r *csv.Reader
-	if csvfile, err := os.Open(*train); err != nil {
-		log.Fatalln(err)
-	} else {
-		r = csv.NewReader(csvfile)
+// Read reads the data holded in the csv.Reader r
+// by extracting it using the Extract function,
+// then Cleans the data and returns it.
+func (pr PassengerReader) Read() ([][]float64, error) {
+	d, err := pr.Extract()
+	if err != nil {
+		return nil, fmt.Errorf("error when extracting data: %v", err)
 	}
-	ex := NewPassengerExtractor(r)
-	cl := NewPassengerCleaner()
-	return data.NewReader(ex, cl)
+	return pr.Clean(d)
 }
 
 // passengerFromTrainingRow creates a passenger object

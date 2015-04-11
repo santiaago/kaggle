@@ -4,6 +4,8 @@ import (
 	"flag"
 	"log"
 	"sort"
+
+	"github.com/santiaago/kaggle/data"
 )
 
 var (
@@ -18,7 +20,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	dr := NewPassengerReader(*train)
+	var dr data.Reader = NewPassengerReader(*train)
 
 	linregs, featuresPerModel := trainModels(dr)
 
