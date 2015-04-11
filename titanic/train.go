@@ -6,6 +6,7 @@ import (
 
 	"github.com/santiaago/caltechx.go/linreg"
 	"github.com/santiaago/kaggle/data"
+	"github.com/santiaago/kaggle/transform"
 )
 
 // trainModels returns:
@@ -83,7 +84,7 @@ func trainModelsWithTransform(dc data.Container) (linregs []*linreg.LinearRegres
 // models learn based on some 2D transformation functions.
 func trainModelsWith2DTransform(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
 
-	funcs := transform2DFuncs()
+	funcs := transform.Funcs2D()
 	dim := 2
 	return trainModelsWithNDTransformFuncs(dc, funcs, dim)
 }
@@ -92,7 +93,7 @@ func trainModelsWith2DTransform(dc data.Container) ([]*linreg.LinearRegression, 
 // models learn based on some 3D transformation functions.
 func trainModelsWith3DTransform(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
 
-	funcs := transform3DFuncs()
+	funcs := transform.Funcs3D()
 	dim := 3
 
 	return trainModelsWithNDTransformFuncs(dc, funcs, dim)

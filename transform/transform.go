@@ -1,8 +1,8 @@
-package main
+package transform
 
 import "math"
 
-func transform2DFuncs() []func([]float64) []float64 {
+func Funcs2D() []func([]float64) []float64 {
 	return []func([]float64) []float64{
 		transform2D1,
 		transform2D2,
@@ -115,7 +115,7 @@ func transform2D7(a []float64) []float64 {
 	return b
 }
 
-func transform3DFuncs() []func([]float64) []float64 {
+func Funcs3D() []func([]float64) []float64 {
 	return []func([]float64) []float64{
 		transform3D1,
 		transform3D2,
