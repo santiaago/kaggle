@@ -73,11 +73,9 @@ func prepareData(passengers []passenger) (data [][]float64) {
 	for i := 0; i < len(passengers); i++ {
 		p := passengers[i]
 
-		var survived float64
+		var survived float64 = -1
 		if p.Survived {
 			survived = float64(1)
-		} else {
-			survived = float64(-1)
 		}
 
 		var pclass float64
@@ -110,6 +108,7 @@ func prepareData(passengers []passenger) (data [][]float64) {
 		} else if p.Embarked == "S" {
 			embarked = float64(2)
 		}
+
 		d := []float64{
 			0,
 			survived,

@@ -60,9 +60,9 @@ func (pex PassengerTrainExtractor) Extract(r *csv.Reader) (interface{}, error) {
 	var err error
 	if rawData, err = r.ReadAll(); err != nil {
 		log.Fatalln(err)
-		return nil
+		return nil, nil
 	}
-
+	passengers := []passenger{}
 	for i := 1; i < len(rawData); i++ {
 		p := passengerFromTrainingRow(rawData[i])
 		passengers = append(passengers, p)
