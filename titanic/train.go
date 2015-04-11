@@ -10,11 +10,11 @@ import (
 
 // trainModels returns:
 // * an array of trained LinearRegression models.
-// It uses the file passed as param as training data.
+// It uses the reader passed as param to read the data.
 // It trains multiple models using different techniques:
 // * trainSpecificModels
 // * trainModelsByFeatrueCombination
-// We return an array of all the linear regression models trained.
+// * trainModelsWithTransform
 func trainModels(reader data.Reader) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 	data, err := reader.Read()
 	if err != nil {
@@ -82,6 +82,7 @@ func trainModelsWithTransform(data [][]float64) (linregs []*linreg.LinearRegress
 func trainModelsWith2DTransform(data [][]float64) ([]*linreg.LinearRegression, [][]int) {
 
 	funcs := transform2DFuncs()
+	// todo(santiaago): this should be extracted.
 	f := passengerFeatures()
 	dim := 2
 	return trainModelsWithNDTransformFuncs(data, funcs, f, dim)
@@ -92,6 +93,7 @@ func trainModelsWith2DTransform(data [][]float64) ([]*linreg.LinearRegression, [
 func trainModelsWith3DTransform(data [][]float64) ([]*linreg.LinearRegression, [][]int) {
 
 	funcs := transform3DFuncs()
+	// todo(santiaago): this should be extracted.
 	f := passengerFeatures()
 	dim := 3
 
@@ -102,7 +104,7 @@ func trainModelsWith3DTransform(data [][]float64) ([]*linreg.LinearRegression, [
 //   * an array of linearRegression models
 //   * an array of used features vectors
 // Models are created as follows:
-// Data is filtered with respect to the 'candidateFeatures' vector and the 'dimention' param.
+// Data is filtered with respect to the 'candidateFeatures' vector and the 'dimension' param.
 // We generate a vector of combinations of the candidateFeatures vector.
 // Each combination has the size of the size of 'dimention'.
 // Each (combination, transform function) pair is a specific model.
@@ -140,7 +142,7 @@ func trainModelWithTransform(data [][]float64, f func([]float64) []float64) (*li
 
 // trainModelsByFuncs returns an array of linear regression models with respect
 // to an array of functions passed as arguments.
-// Those function takes as argument the passengers data and return a linear
+// Those function takes as argument a 2 dimensional data array and return a linear
 // regression model.
 func trainModelsByFuncs(data [][]float64, funcs []func([][]float64) (*linreg.LinearRegression, []int)) (linregs []*linreg.LinearRegression, featuresPerModel [][]int) {
 
@@ -154,7 +156,7 @@ func trainModelsByFuncs(data [][]float64, funcs []func([][]float64) (*linreg.Lin
 
 // trainModelsByMetaFuncs returns an array of linear regression models with
 // respect to an array of linear regression functions passed as arguments.
-// Those functions takes as argument the passengers data and
+// Those functions takes as argument a 2 dimensional array of data and
 // return an array of linear regression model.
 func trainModelsByMetaFuncs(data [][]float64, metaLinregFuncs []func([][]float64) ([]*linreg.LinearRegression, [][]int)) ([]*linreg.LinearRegression, [][]int) {
 	var linregs []*linreg.LinearRegression
