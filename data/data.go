@@ -18,3 +18,7 @@ type Reader interface {
 type Extractor interface {
 	Extract(r *csv.Reader) (interface{}, error)
 }
+
+type Writer interface {
+	Write(filename string, predictions []int) error
+}
