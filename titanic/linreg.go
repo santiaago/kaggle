@@ -66,24 +66,24 @@ func prediction(lr *linreg.LinearRegression, x []float64) (p float64) {
 
 // linregVectorsOfInterval returns an array functions.
 // These functions return an array of linear regression and the corresponding features used.
-func linregAllCombinations() (funcs []func(data.Container) ([]*linreg.LinearRegression, [][]int)) {
-	funcs = []func(dc data.Container) ([]*linreg.LinearRegression, [][]int){
-		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+func linregAllCombinations() (funcs []func(data.Container) (regressions, [][]int)) {
+	funcs = []func(dc data.Container) (regressions, [][]int){
+		func(dc data.Container) (regressions, [][]int) {
 			return linregCombinations(dc, 2)
 		},
-		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+		func(dc data.Container) (regressions, [][]int) {
 			return linregCombinations(dc, 3)
 		},
-		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+		func(dc data.Container) (regressions, [][]int) {
 			return linregCombinations(dc, 4)
 		},
-		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+		func(dc data.Container) (regressions, [][]int) {
 			return linregCombinations(dc, 5)
 		},
-		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+		func(dc data.Container) (regressions, [][]int) {
 			return linregCombinations(dc, 6)
 		},
-		func(dc data.Container) ([]*linreg.LinearRegression, [][]int) {
+		func(dc data.Container) (regressions, [][]int) {
 			return linregCombinations(dc, 7)
 		},
 	}
@@ -93,7 +93,7 @@ func linregAllCombinations() (funcs []func(data.Container) ([]*linreg.LinearRegr
 // linregCombinations creates a linear regression model for each combination of
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
-func linregCombinations(dc data.Container, size int) (lrs []*linreg.LinearRegression, features [][]int) {
+func linregCombinations(dc data.Container, size int) (lrs regressions, features [][]int) {
 
 	combs := itertools.Combinations(dc.Features, size)
 

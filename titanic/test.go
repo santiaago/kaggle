@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/santiaago/caltechx.go/linreg"
 	"github.com/santiaago/kaggle/data"
 )
 
@@ -12,7 +11,7 @@ import (
 // Then makes the predictions and write the predicted data to file using the
 // linear regression model name.
 // testModels run a test file for each linear regression model passed in the linreg array.
-func testModels(r data.Reader, w data.Writer, linregs []*linreg.LinearRegression, mapUsedFeatures map[string][]int) {
+func testModels(r data.Reader, w data.Writer, linregs regressions, mapUsedFeatures map[string][]int) {
 	var dc data.Container
 	var err error
 	dc, err = r.Read()
