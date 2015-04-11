@@ -20,7 +20,8 @@ func init() {
 func main() {
 	flag.Parse()
 
-	var dr data.Reader = NewPassengerReader(*train)
+	var pTrainX PassengerTrainExtractor = NewPassengerTrainExtractor()
+	var dr data.Reader = NewPassengerReader(*train, pTrainX)
 
 	linregs, featuresPerModel := trainModels(dr)
 
@@ -29,6 +30,7 @@ func main() {
 		mapUsedFeatures[linregs[i].Name] = featuresPerModel[i]
 	}
 
+	// var testDr data.Reader = NewPassengerReader(*test)
 	testModels(*test, linregs, mapUsedFeatures)
 
 	var rgs = regressions(linregs)

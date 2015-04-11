@@ -6,28 +6,26 @@ import (
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/santiaago/kaggle/data"
 )
 
 // A PassengerReader extract passenger data from a CVS-encoded file.
 // It implements the data.Reader interface.
 type PassengerReader struct {
-	r *csv.Reader // a CSV encoded reader.
+	r  *csv.Reader // a CSV encoded reader.
+	ex data.Extractor
 }
 
 // NewPassengerReader returns a new data.Reader that can read from a given file.
-func NewPassengerReader(file string) PassengerReader {
+func NewPassengerReader(file string, ex data.Extractor) PassengerReader {
 	var r *csv.Reader
 	if csvfile, err := os.Open(*train); err != nil {
 		log.Fatalln(err)
 	} else {
 		r = csv.NewReader(csvfile)
 	}
-	return PassengerReader{r}
-}
-
-// Extract extracts an array of passengers from r.
-func (pr PassengerReader) Extract() ([]passenger, error) {
-	return passengersFromTrainingSet(pr.r), nil
+	return PassengerReader{r, ex}
 }
 
 // Clean cleans an array of passengers returning the
@@ -44,11 +42,31 @@ func (pr PassengerReader) Clean(passengers interface{}) ([][]float64, error) {
 // by extracting it using the Extract function,
 // then Cleans the data and returns it.
 func (pr PassengerReader) Read() ([][]float64, error) {
-	d, err := pr.Extract()
+	d, err := pr.ex.Extract(pr.r)
 	if err != nil {
 		return nil, fmt.Errorf("error when extracting data: %v", err)
 	}
 	return pr.Clean(d)
+}
+
+type PassengerTrainExtractor struct{}
+
+func NewPassengerTrainExtractor() PassengerTrainExtractor {
+	return PassengerTrainExtractor{}
+}
+
+func (pex PassengerTrainExtractor) Extract(r *csv.Reader) (interface{}, error) {
+	return passengersFromTrainingSet(r), nil
+}
+
+type PassengerTestExtractor struct{}
+
+func NewPassengerTestExtractor() PassengerTestExtractor {
+	return PassengerTestExtractor{}
+}
+
+func (pex PassengerTestExtractor) Extract(r *csv.Reader) (interface{}, error) {
+	return passengersFromTrainingSet(r), nil
 }
 
 // passengerFromTrainingRow creates a passenger object
