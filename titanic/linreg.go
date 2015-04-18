@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/santiaago/caltechx.go/linear"
 	"github.com/santiaago/caltechx.go/linreg"
 	"github.com/santiaago/kaggle/data"
 	"github.com/santiaago/kaggle/itertools"
+	"github.com/santiaago/ml"
 )
 
 type regressions []*linreg.LinearRegression
@@ -45,7 +45,7 @@ func linregTest(lr *linreg.LinearRegression, dc data.Container, keep []int) (pre
 
 		gi := prediction(lr, x)
 
-		if linear.Sign(gi) == 1 {
+		if ml.Sign(gi) == float64(1) {
 			predictions = append(predictions, 1)
 		} else {
 			predictions = append(predictions, 0)
