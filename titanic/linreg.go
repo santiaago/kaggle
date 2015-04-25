@@ -9,27 +9,6 @@ import (
 	"github.com/santiaago/ml/linreg"
 )
 
-type regressions []*linreg.LinearRegression
-
-func (slice regressions) Len() int {
-	return len(slice)
-}
-
-func (slice regressions) Less(i, j int) bool {
-	return (*slice[i]).Ein() < (*slice[j]).Ein()
-}
-
-func (slice regressions) Swap(i, j int) {
-	slice[i], slice[j] = slice[j], slice[i]
-}
-
-func (slice regressions) Print(top int) {
-	for i := 0; i < top; i++ {
-		lr := slice[i]
-		fmt.Printf("EIn = %f \t%s\n", lr.Ein(), lr.Name)
-	}
-}
-
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
 func linregTest(lr *linreg.LinearRegression, dc data.Container, keep []int) (predictions []int) {
@@ -60,24 +39,24 @@ func linregTest(lr *linreg.LinearRegression, dc data.Container, keep []int) (pre
 
 // linregVectorsOfInterval returns an array functions.
 // These functions return an array of linear regression and the corresponding features used.
-func linregAllCombinations() (funcs []func(data.Container) (regressions, [][]int)) {
-	funcs = []func(dc data.Container) (regressions, [][]int){
-		func(dc data.Container) (regressions, [][]int) {
+func linregAllCombinations() (funcs []func(data.Container) (linreg.Regressions, [][]int)) {
+	funcs = []func(dc data.Container) (linreg.Regressions, [][]int){
+		func(dc data.Container) (linreg.Regressions, [][]int) {
 			return linregCombinations(dc, 2)
 		},
-		func(dc data.Container) (regressions, [][]int) {
+		func(dc data.Container) (linreg.Regressions, [][]int) {
 			return linregCombinations(dc, 3)
 		},
-		func(dc data.Container) (regressions, [][]int) {
+		func(dc data.Container) (linreg.Regressions, [][]int) {
 			return linregCombinations(dc, 4)
 		},
-		func(dc data.Container) (regressions, [][]int) {
+		func(dc data.Container) (linreg.Regressions, [][]int) {
 			return linregCombinations(dc, 5)
 		},
-		func(dc data.Container) (regressions, [][]int) {
+		func(dc data.Container) (linreg.Regressions, [][]int) {
 			return linregCombinations(dc, 6)
 		},
-		func(dc data.Container) (regressions, [][]int) {
+		func(dc data.Container) (linreg.Regressions, [][]int) {
 			return linregCombinations(dc, 7)
 		},
 	}
@@ -87,7 +66,7 @@ func linregAllCombinations() (funcs []func(data.Container) (regressions, [][]int
 // linregCombinations creates a linear regression model for each combination of
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
-func linregCombinations(dc data.Container, size int) (lrs regressions, features [][]int) {
+func linregCombinations(dc data.Container, size int) (lrs linreg.Regressions, features [][]int) {
 
 	combs := itertools.Combinations(dc.Features, size)
 

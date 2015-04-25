@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/santiaago/kaggle/data"
+	"github.com/santiaago/ml/linreg"
 )
 
 var (
@@ -23,20 +24,20 @@ func main() {
 	var xTrain data.Extractor = NewPassengerTrainExtractor()
 	var drTrain data.Reader = NewPassengerReader(*train, xTrain)
 
-	linregs, featuresPerModel := trainModels(drTrain)
+	lrs, featuresPerModel := trainModels(drTrain)
 
 	mapUsedFeatures := make(map[string][]int)
-	for i := 0; i < len(linregs); i++ {
-		mapUsedFeatures[linregs[i].Name] = featuresPerModel[i]
+	for i := 0; i < len(lrs); i++ {
+		mapUsedFeatures[lrs[i].Name] = featuresPerModel[i]
 	}
 
 	var xTest data.Extractor = NewPassengerTestExtractor()
 	var drTest data.Reader = NewPassengerReader(*test, xTest)
 
 	var wTest data.Writer = NewPassengerTestWriter(*test)
-	testModels(drTest, wTest, linregs, mapUsedFeatures)
+	testModels(drTest, wTest, lrs, mapUsedFeatures)
 
-	var rgs = regressions(linregs)
+	var rgs = linreg.Regressions(lrs)
 	sort.Sort(rgs)
 	log.Printf("best 50 models:\n\n")
 	rgs.Print(50)
