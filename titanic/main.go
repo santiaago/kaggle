@@ -38,6 +38,6 @@ func main() {
 
 	var rgs = regressions(linregs)
 	sort.Sort(rgs)
-	log.Printf("\n\n\n")
+	log.Printf("best 50 models:\n\n")
 	rgs.Print(50)
 }
