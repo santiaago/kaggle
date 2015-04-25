@@ -43,23 +43,17 @@ func linregTest(lr *linreg.LinearRegression, dc data.Container, keep []int) (pre
 			x = lr.TransformFunction(x)
 		}
 
-		gi := prediction(lr, x)
+		gi, err := lr.Predict(x)
+		if err != nil {
+			predictions = append(predictions, 0)
+			continue
+		}
 
 		if ml.Sign(gi) == float64(1) {
 			predictions = append(predictions, 1)
 		} else {
 			predictions = append(predictions, 0)
 		}
-	}
-	return
-}
-
-// prediction returns the result of the dot product between the x vector passed as param
-// and the linear regression vector of weights.
-// todo(santiaago): move this to caltechx.go
-func prediction(lr *linreg.LinearRegression, x []float64) (p float64) {
-	for j := 0; j < len(x); j++ {
-		p += x[j] * lr.Wn[j]
 	}
 	return
 }

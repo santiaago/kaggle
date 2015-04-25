@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	// "github.com/santiaago/caltechx.go/linreg"
 	"github.com/santiaago/kaggle/data"
 	"github.com/santiaago/kaggle/itertools"
 	"github.com/santiaago/kaggle/transform"
