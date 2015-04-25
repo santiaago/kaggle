@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/santiaago/caltechx.go/linreg"
 	"github.com/santiaago/kaggle/data"
 	"github.com/santiaago/kaggle/itertools"
 	"github.com/santiaago/ml"
+	"github.com/santiaago/ml/linreg"
 )
 
 type regressions []*linreg.LinearRegression
@@ -39,7 +39,7 @@ func linregTest(lr *linreg.LinearRegression, dc data.Container, keep []int) (pre
 		x := []float64{1}
 		x = append(x, fd[i][:len(fd[i])-1]...)
 
-		if lr.UsesTranformFunction {
+		if lr.HasTransform {
 			x = lr.TransformFunction(x)
 		}
 
@@ -105,8 +105,8 @@ func linregCombinations(dc data.Container, size int) (lrs regressions, features 
 		lr.Name = fmt.Sprintf("LinregModel-V-%d-%v", size, c)
 
 		if err := lr.Learn(); err == nil {
-			fmt.Printf("EIn = %f \t using combination %v\n", lr.Ein(), c)
-
+			// for debug
+			// fmt.Printf("EIn = %f \t using combination %v\n", lr.Ein(), c)
 			features = append(features, c)
 			lrs = append(lrs, lr)
 		}
@@ -151,7 +151,7 @@ func linregSexAgePClass(dc data.Container) (lr *linreg.LinearRegression, feature
 	lr.Name = "Sex Age PClass"
 	lr.InitializeFromData(fd)
 	if err := lr.Learn(); err == nil {
-		fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
+		// fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
 		return
 	}
 	return nil, nil
@@ -171,7 +171,7 @@ func linregSexAge(dc data.Container) (lr *linreg.LinearRegression, features []in
 
 	lr.Name = "Sex Age"
 	if err := lr.Learn(); err == nil {
-		fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
+		// fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
 		return
 	}
 	return nil, nil
@@ -191,7 +191,7 @@ func linregPClassAge(dc data.Container) (lr *linreg.LinearRegression, features [
 
 	lr.Name = "PClass Age"
 	if err := lr.Learn(); err == nil {
-		fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
+		// fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
 		return
 	}
 	return nil, nil
@@ -211,7 +211,7 @@ func linregPClassSex(dc data.Container) (lr *linreg.LinearRegression, features [
 
 	lr.Name = "PClass Sex"
 	if err := lr.Learn(); err == nil {
-		fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
+		// fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
 		return
 	}
 	return nil, nil

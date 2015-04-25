@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/santiaago/caltechx.go/linreg"
+	// "github.com/santiaago/caltechx.go/linreg"
 	"github.com/santiaago/kaggle/data"
 	"github.com/santiaago/kaggle/itertools"
 	"github.com/santiaago/kaggle/transform"
+	"github.com/santiaago/ml/linreg"
 )
 
 // trainModels returns:
@@ -17,7 +18,7 @@ import (
 // * trainSpecificModels
 // * trainModelsByFeatrueCombination
 // * trainModelsWithTransform
-func trainModels(reader data.Reader) (linregs regressions, featuresPerModel [][]int) {
+func trainModels(reader data.Reader) (lrs regressions, featuresPerModel [][]int) {
 	var dc data.Container
 	var err error
 	dc, err = reader.Read()
@@ -25,16 +26,16 @@ func trainModels(reader data.Reader) (linregs regressions, featuresPerModel [][]
 		log.Println("error when getting the data.container from the reader,", err)
 	}
 
-	linregs, featuresSpecific := trainSpecificModels(dc)
-	linregsByComb, featuresByComb := trainModelsByFeatureCombination(dc)
-	linregsWithTransform, featuresWithTransform := trainModelsWithTransform(dc)
+	lrs, featuresSpecific := trainSpecificModels(dc)
+	lrsByComb, featuresByComb := trainModelsByFeatureCombination(dc)
+	lrsWithTransform, featuresWithTransform := trainModelsWithTransform(dc)
 
 	featuresPerModel = append(featuresPerModel, featuresSpecific...)
 	featuresPerModel = append(featuresPerModel, featuresByComb...)
 	featuresPerModel = append(featuresPerModel, featuresWithTransform...)
 
-	linregs = append(linregs, linregsByComb...)
-	linregs = append(linregs, linregsWithTransform...)
+	lrs = append(lrs, lrsByComb...)
+	lrs = append(lrs, lrsWithTransform...)
 	return
 }
 
@@ -44,10 +45,9 @@ func trainModels(reader data.Reader) (linregs regressions, featuresPerModel [][]
 // * linregPClassSex
 // * linregSexAgePClass
 // It returns an array of all the linear regression models trained.
-func trainSpecificModels(dc data.Container) (linregs regressions, featuresPerModel [][]int) {
+func trainSpecificModels(dc data.Container) (lrs regressions, featuresPerModel [][]int) {
 
-	slrf := specificLinregFuncs()
-	linregs, featuresPerModel = trainModelsByFuncs(dc, slrf)
+	lrs, featuresPerModel = trainModelsByFuncs(dc, specificLinregFuncs())
 	return
 }
 
@@ -55,12 +55,12 @@ func trainSpecificModels(dc data.Container) (linregs regressions, featuresPerMod
 // * an array of linearRegression models
 // It makes a model for every combinations of features present in the data.
 // Each feature corresponds to a column in the data set.
-func trainModelsByFeatureCombination(dc data.Container) (linregs regressions, featuresPerModel [][]int) {
+func trainModelsByFeatureCombination(dc data.Container) (lrs regressions, featuresPerModel [][]int) {
 
 	lrac := linregAllCombinations()
-	linregsM, featuresM := trainModelsByMetaFuncs(dc, lrac)
+	lrsM, featuresM := trainModelsByMetaFuncs(dc, lrac)
 
-	linregs = append(linregs, linregsM...)
+	lrs = append(lrs, lrsM...)
 	featuresPerModel = append(featuresPerModel, featuresM...)
 	return
 }
@@ -68,14 +68,14 @@ func trainModelsByFeatureCombination(dc data.Container) (linregs regressions, fe
 // trainModelsWithTransform returns:
 //   * an array of linearRegression models
 //   * an array of used features vectors.
-func trainModelsWithTransform(dc data.Container) (linregs regressions, usedFeaturesPerModel [][]int) {
+func trainModelsWithTransform(dc data.Container) (lrs regressions, usedFeaturesPerModel [][]int) {
 
 	lrWith2DTransform, ufWith2DTransform := trainModelsWith2DTransform(dc)
-	linregs = append(linregs, lrWith2DTransform...)
+	lrs = append(lrs, lrWith2DTransform...)
 	usedFeaturesPerModel = append(usedFeaturesPerModel, ufWith2DTransform...)
 
 	lrWith3DTransform, ufWith3DTransform := trainModelsWith3DTransform(dc)
-	linregs = append(linregs, lrWith3DTransform...)
+	lrs = append(lrs, lrWith3DTransform...)
 	usedFeaturesPerModel = append(usedFeaturesPerModel, ufWith3DTransform...)
 
 	return
@@ -108,7 +108,7 @@ func trainModelsWith3DTransform(dc data.Container) (regressions, [][]int) {
 // We generate a vector of combinations of the candidateFeatures vector.
 // Each combination has the size of the size of 'dimention'.
 // Each (combination, transform function) pair is a specific model.
-func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (linregs regressions, featuresPerModel [][]int) {
+func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (lrs regressions, featuresPerModel [][]int) {
 
 	combs := itertools.Combinations(dc.Features, dimension)
 	for _, comb := range combs {
@@ -116,10 +116,10 @@ func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) 
 		fd := filter(dc.Data, comb)
 		index := 0
 		for _, f := range funcs {
-			if linreg, err := trainModelWithTransform(fd, f); err == nil {
-				linreg.Name = fmt.Sprintf("%dD %v transformed %d", dimension, comb, index)
-				fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), linreg.Name)
-				linregs = append(linregs, linreg)
+			if lr, err := trainModelWithTransform(fd, f); err == nil {
+				lr.Name = fmt.Sprintf("%dD %v transformed %d", dimension, comb, index)
+				// fmt.Printf("EIn = %f \t%s\n", linreg.Ein(), lr.Name)
+				lrs = append(lrs, lr)
 				featuresPerModel = append(featuresPerModel, comb)
 				index++
 			}
@@ -143,11 +143,11 @@ func trainModelWithTransform(data [][]float64, f func([]float64) []float64) (*li
 // to an array of functions passed as arguments.
 // Those function takes as argument a 2 dimensional data array and return a linear
 // regression model.
-func trainModelsByFuncs(dc data.Container, funcs []func(data.Container) (*linreg.LinearRegression, []int)) (linregs regressions, featuresPerModel [][]int) {
+func trainModelsByFuncs(dc data.Container, funcs []func(data.Container) (*linreg.LinearRegression, []int)) (lrs regressions, featuresPerModel [][]int) {
 
 	for _, f := range funcs {
-		linreg, features := f(dc)
-		linregs = append(linregs, linreg)
+		lr, features := f(dc)
+		lrs = append(lrs, lr)
 		featuresPerModel = append(featuresPerModel, features)
 	}
 	return
@@ -158,12 +158,12 @@ func trainModelsByFuncs(dc data.Container, funcs []func(data.Container) (*linreg
 // Those functions takes as argument a 2 dimensional array of data and
 // return an array of linear regression model.
 func trainModelsByMetaFuncs(dc data.Container, metaLinregFuncs []func(data.Container) (regressions, [][]int)) (regressions, [][]int) {
-	var linregs regressions
+	var lrs regressions
 	var features [][]int
 	for _, f := range metaLinregFuncs {
-		linreg, featuresPerModel := f(dc)
+		lr, featuresPerModel := f(dc)
 		features = append(features, featuresPerModel...)
-		linregs = append(linregs, linreg...)
+		lrs = append(lrs, lr...)
 	}
-	return linregs, features
+	return lrs, features
 }
