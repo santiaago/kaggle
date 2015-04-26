@@ -7,12 +7,17 @@ import (
 	"strconv"
 )
 
+// PassengerTestExtractor type defines how to extract the test data
+// and create a passenger type from it.
 type PassengerTestExtractor struct{}
 
+// NewPassengerTestExtractor creates a passenger extractor type.
 func NewPassengerTestExtractor() PassengerTestExtractor {
 	return PassengerTestExtractor{}
 }
 
+// Extract returns an array of passengers.
+// It extracts them by reading the reader 'r' passed in.
 func (pex PassengerTestExtractor) Extract(r *csv.Reader) (interface{}, error) {
 	var rawData [][]string
 	var err error
@@ -27,11 +32,15 @@ func (pex PassengerTestExtractor) Extract(r *csv.Reader) (interface{}, error) {
 	return passengers, nil
 }
 
+// PassengerTextWriter type defines how to write the passenger
+// data into a file.
 type PassengerTestWriter struct {
 	passengers []passenger
 	ex         PassengerTestExtractor
 }
 
+// NewPassengerTestWriter returns a PassengerTestWriter after
+// it extracts the file passed in.
 func NewPassengerTestWriter(file string) PassengerTestWriter {
 	ptw := PassengerTestWriter{}
 	reader := NewPassengerReader(file, NewPassengerTestExtractor())
@@ -46,6 +55,10 @@ func NewPassengerTestWriter(file string) PassengerTestWriter {
 	return ptw
 }
 
+// Write will write to a file with the name and the predictions passed in
+// the passengers data in the following format:
+// PassengerId,Survived
+// 889,1
 func (ptw PassengerTestWriter) Write(name string, predictions []int) error {
 	temp := "data/temp/"
 	if _, err := os.Stat(temp); os.IsNotExist(err) {
@@ -62,11 +75,11 @@ func (ptw PassengerTestWriter) Write(name string, predictions []int) error {
 	}
 
 	writer := csv.NewWriter(csvfile)
-	// headers
+
 	if err := writer.Write([]string{"PassengerId", "Survived"}); err != nil {
 		log.Fatalln(err)
 	}
-	// data
+
 	for i, passenger := range ptw.passengers {
 		p := []string{passenger.ID, "0"}
 		if predictions[i] == 1 {

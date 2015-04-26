@@ -30,5 +30,5 @@ func main() {
 	var wTest data.Writer = NewPassengerTestWriter(*test)
 	testModels(drTest, wTest, models)
 
-	modelContainers(models).PrintTop(50)
+	models.PrintTop(50)
 }
