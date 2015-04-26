@@ -27,4 +27,25 @@ type Writer interface {
 type Container struct {
 	Data     [][]float64 // array that holds the information to learn or train.
 	Features []int       // array of indexes with the features to use in the Data array.
+	Predict  int         // index of the data array that tells how to classify.
+}
+
+// Filter returns a 2D array of floats filtered with the params passed in.
+// It appends the defined Predict column 'Y' coordinate at the end of each row.
+// Like so:
+// x1 x2 x3 y
+// x1 x2 x3 y
+func (c Container) Filter(keep []int) (filtered [][]float64) {
+
+	for i := 0; i < len(c.Data); i++ {
+		var row []float64
+		for j := 0; j < len(keep); j++ {
+			row = append(row, c.Data[i][keep[j]])
+		}
+
+		// append Y coordinate
+		row = append(row, c.Data[i][c.Predict])
+		filtered = append(filtered, row)
+	}
+	return
 }

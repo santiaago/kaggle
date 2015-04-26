@@ -7,7 +7,6 @@ import (
 )
 
 // testModel runs a linear regression model on the data passed in the reader.
-// It filters the data with respect to the keep array.
 // Then makes the predictions and write the predicted data to file using the
 // linear regression model name.
 // testModels run a test file for each linear regression model passed in the linreg array.

@@ -8,13 +8,13 @@ import (
 )
 
 type modelContainer struct {
-	Model  *linreg.LinearRegression
-	Name   string
-	Filter []int
+	Model    *linreg.LinearRegression
+	Name     string
+	Features []int
 }
 
-func NewModelContainer(m *linreg.LinearRegression, n string, filter []int) *modelContainer {
-	return &modelContainer{m, n, filter}
+func NewModelContainer(m *linreg.LinearRegression, n string, features []int) *modelContainer {
+	return &modelContainer{m, n, features}
 }
 
 type modelContainers []*modelContainer

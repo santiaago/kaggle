@@ -112,7 +112,7 @@ func (pr PassengerReader) Read() (data.Container, error) {
 	}
 
 	c, err := pr.clean(d)
-	return data.Container{c, passengerFeatures()}, err
+	return data.Container{c, passengerFeatures(), passengerIndexSurvived}, err
 }
 
 func prepareData(passengers []passenger) (data [][]float64) {
