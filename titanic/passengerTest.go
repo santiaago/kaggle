@@ -59,7 +59,7 @@ func NewPassengerTestWriter(file string) PassengerTestWriter {
 // the passengers data in the following format:
 // PassengerId,Survived
 // 889,1
-func (ptw PassengerTestWriter) Write(name string, predictions []int) error {
+func (ptw PassengerTestWriter) Write(name string, predictions []float64) error {
 	temp := "data/temp/"
 	if _, err := os.Stat(temp); os.IsNotExist(err) {
 		if err = os.Mkdir(temp, 0777); err != nil {

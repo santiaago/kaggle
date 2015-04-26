@@ -107,7 +107,7 @@ func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) 
 	combs := itertools.Combinations(dc.Features, dimension)
 	for _, c := range combs {
 
-		fd := dc.Filter(c)
+		fd := dc.FilterWithPredict(c)
 		index := 0
 		for _, f := range funcs {
 			if lr, err := trainModelWithTransform(fd, f); err == nil {

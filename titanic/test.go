@@ -19,7 +19,9 @@ func testModels(r data.Reader, w data.Writer, models modelContainers) {
 	}
 
 	for _, m := range models {
-		predictions := linregTest(m, dc)
-		w.Write(m.Name, predictions)
+		predictions, err := linregTest(m, dc)
+		if err == nil {
+			w.Write(m.Name, predictions)
+		}
 	}
 }

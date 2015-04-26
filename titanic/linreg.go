@@ -5,38 +5,17 @@ import (
 
 	"github.com/santiaago/kaggle/data"
 	"github.com/santiaago/kaggle/itertools"
-	"github.com/santiaago/ml"
 	"github.com/santiaago/ml/linreg"
 )
 
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
-func linregTest(model *modelContainer, dc data.Container) (predictions []int) {
+// todo(santiaago): move to ml
+func linregTest(model *modelContainer, dc data.Container) ([]float64, error) {
 
 	fd := dc.Filter(model.Features)
 
-	for i := 0; i < len(fd); i++ {
-
-		x := []float64{1}
-		x = append(x, fd[i][:len(fd[i])-1]...)
-
-		if model.Model.HasTransform {
-			x = model.Model.TransformFunction(x)
-		}
-
-		gi, err := model.Model.Predict(x)
-		if err != nil {
-			predictions = append(predictions, 0)
-			continue
-		}
-
-		if ml.Sign(gi) == float64(1) {
-			predictions = append(predictions, 1)
-		} else {
-			predictions = append(predictions, 0)
-		}
-	}
-	return
+	return model.Model.Predictions(fd)
 }
 
 // linregVectorsOfInterval returns an array functions.
@@ -68,12 +47,13 @@ func linregAllCombinations() (funcs []func(data.Container) modelContainers) {
 // linregCombinations creates a linear regression model for each combination of
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
+// todo(santiaago): move to ml
 func linregCombinations(dc data.Container, size int) (models modelContainers) {
 
 	combs := itertools.Combinations(dc.Features, size)
 
 	for _, c := range combs {
-		fd := dc.Filter(c)
+		fd := dc.FilterWithPredict(c)
 		lr := linreg.NewLinearRegression()
 		lr.InitializeFromData(fd)
 
@@ -102,7 +82,7 @@ func linregSexAgePClass(dc data.Container) (*modelContainer, error) {
 	lr := linreg.NewLinearRegression()
 
 	features := []int{passengerIndexSex, passengerIndexAge, passengerIndexPclass}
-	fd := dc.Filter(features)
+	fd := dc.FilterWithPredict(features)
 	lr.InitializeFromData(fd)
 	name := "Sex Age PClass"
 
@@ -117,7 +97,7 @@ func linregSexAge(dc data.Container) (*modelContainer, error) {
 	lr := linreg.NewLinearRegression()
 
 	features := []int{passengerIndexSex, passengerIndexAge}
-	fd := dc.Filter(features)
+	fd := dc.FilterWithPredict(features)
 	lr.InitializeFromData(fd)
 	name := "Sex Age"
 
@@ -132,7 +112,7 @@ func linregPClassAge(dc data.Container) (*modelContainer, error) {
 	lr := linreg.NewLinearRegression()
 
 	features := []int{passengerIndexAge, passengerIndexPclass}
-	fd := dc.Filter(features)
+	fd := dc.FilterWithPredict(features)
 	lr.InitializeFromData(fd)
 	name := "PClass Age"
 
@@ -147,7 +127,7 @@ func linregPClassSex(dc data.Container) (*modelContainer, error) {
 	lr := linreg.NewLinearRegression()
 
 	features := []int{passengerIndexSex, passengerIndexPclass}
-	fd := dc.Filter(features)
+	fd := dc.FilterWithPredict(features)
 	lr.InitializeFromData(fd)
 	name := "PClass Sex"
 	if err := lr.Learn(); err != nil {

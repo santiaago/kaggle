@@ -20,7 +20,7 @@ type Extractor interface {
 }
 
 type Writer interface {
-	Write(filename string, predictions []int) error
+	Write(filename string, predictions []float64) error
 }
 
 // Container holds the data and features information.
@@ -33,8 +33,8 @@ type Container struct {
 // Filter returns a 2D array of floats filtered with the params passed in.
 // It appends the defined Predict column 'Y' coordinate at the end of each row.
 // Like so:
-// x1 x2 x3 y
-// x1 x2 x3 y
+// x1 x2 x3
+// x1 x2 x3
 func (c Container) Filter(keep []int) (filtered [][]float64) {
 
 	for i := 0; i < len(c.Data); i++ {
@@ -42,8 +42,24 @@ func (c Container) Filter(keep []int) (filtered [][]float64) {
 		for j := 0; j < len(keep); j++ {
 			row = append(row, c.Data[i][keep[j]])
 		}
+		filtered = append(filtered, row)
+	}
+	return
+}
 
-		// append Y coordinate
+// Filter returns a 2D array of floats filtered with the params passed in.
+// It appends the defined Predict column 'Y' coordinate at the end of each row.
+// Like so:
+// x1 x2 x3 y
+// x1 x2 x3 y
+func (c Container) FilterWithPredict(keep []int) (filtered [][]float64) {
+
+	for i := 0; i < len(c.Data); i++ {
+		var row []float64
+		for j := 0; j < len(keep); j++ {
+			row = append(row, c.Data[i][keep[j]])
+		}
+
 		row = append(row, c.Data[i][c.Predict])
 		filtered = append(filtered, row)
 	}

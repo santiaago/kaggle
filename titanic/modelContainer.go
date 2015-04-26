@@ -7,6 +7,7 @@ import (
 	"github.com/santiaago/ml/linreg"
 )
 
+// todo(santiaago): move to ml
 type modelContainer struct {
 	Model    *linreg.LinearRegression
 	Name     string
