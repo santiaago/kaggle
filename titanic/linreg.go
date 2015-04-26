@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/santiaago/kaggle/itertools"
+
 	"github.com/santiaago/ml"
 	"github.com/santiaago/ml/data"
 	"github.com/santiaago/ml/linreg"
@@ -11,6 +12,7 @@ import (
 
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
+
 func linregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) {
 
 	fd := dc.Filter(model.Features)
@@ -49,6 +51,7 @@ func linregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
 // todo(santiaago): move to ml
+
 func linregCombinations(dc data.Container, size int) (models ml.ModelContainers) {
 
 	combs := itertools.Combinations(dc.Features, size)
