@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/santiaago/kaggle/data"
-	"github.com/santiaago/ml/linreg"
 )
 
 // testModel runs a linear regression model on the data passed in the reader.
@@ -12,7 +11,7 @@ import (
 // Then makes the predictions and write the predicted data to file using the
 // linear regression model name.
 // testModels run a test file for each linear regression model passed in the linreg array.
-func testModels(r data.Reader, w data.Writer, lrs linreg.Regressions, mapUsedFeatures map[string][]int) {
+func testModels(r data.Reader, w data.Writer, models []*modelContainer) {
 	var dc data.Container
 	var err error
 	dc, err = r.Read()
@@ -20,8 +19,8 @@ func testModels(r data.Reader, w data.Writer, lrs linreg.Regressions, mapUsedFea
 		log.Println("error when getting data from reader,", err)
 	}
 
-	for i := 0; i < len(lrs); i++ {
-		predictions := linregTest(lrs[i], dc, mapUsedFeatures[lrs[i].Name])
-		w.Write(lrs[i].Name, predictions)
+	for _, m := range models {
+		predictions := linregTest(m, dc)
+		w.Write(m.Name, predictions)
 	}
 }

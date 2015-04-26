@@ -11,18 +11,19 @@ import (
 
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
-func linregTest(lr *linreg.LinearRegression, dc data.Container, keep []int) (predictions []int) {
-	fd := filter(dc.Data, keep)
+func linregTest(model *modelContainer, dc data.Container) (predictions []int) {
+	fd := filter(dc.Data, model.Filter)
+
 	for i := 0; i < len(fd); i++ {
 
 		x := []float64{1}
 		x = append(x, fd[i][:len(fd[i])-1]...)
 
-		if lr.HasTransform {
-			x = lr.TransformFunction(x)
+		if model.Model.HasTransform {
+			x = model.Model.TransformFunction(x)
 		}
 
-		gi, err := lr.Predict(x)
+		gi, err := model.Model.Predict(x)
 		if err != nil {
 			predictions = append(predictions, 0)
 			continue
@@ -39,24 +40,24 @@ func linregTest(lr *linreg.LinearRegression, dc data.Container, keep []int) (pre
 
 // linregVectorsOfInterval returns an array functions.
 // These functions return an array of linear regression and the corresponding features used.
-func linregAllCombinations() (funcs []func(data.Container) (linreg.Regressions, [][]int)) {
-	funcs = []func(dc data.Container) (linreg.Regressions, [][]int){
-		func(dc data.Container) (linreg.Regressions, [][]int) {
+func linregAllCombinations() (funcs []func(data.Container) []*modelContainer) {
+	funcs = []func(dc data.Container) []*modelContainer{
+		func(dc data.Container) []*modelContainer {
 			return linregCombinations(dc, 2)
 		},
-		func(dc data.Container) (linreg.Regressions, [][]int) {
+		func(dc data.Container) []*modelContainer {
 			return linregCombinations(dc, 3)
 		},
-		func(dc data.Container) (linreg.Regressions, [][]int) {
+		func(dc data.Container) []*modelContainer {
 			return linregCombinations(dc, 4)
 		},
-		func(dc data.Container) (linreg.Regressions, [][]int) {
+		func(dc data.Container) []*modelContainer {
 			return linregCombinations(dc, 5)
 		},
-		func(dc data.Container) (linreg.Regressions, [][]int) {
+		func(dc data.Container) []*modelContainer {
 			return linregCombinations(dc, 6)
 		},
-		func(dc data.Container) (linreg.Regressions, [][]int) {
+		func(dc data.Container) []*modelContainer {
 			return linregCombinations(dc, 7)
 		},
 	}
@@ -66,7 +67,7 @@ func linregAllCombinations() (funcs []func(data.Container) (linreg.Regressions, 
 // linregCombinations creates a linear regression model for each combination of
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
-func linregCombinations(dc data.Container, size int) (lrs linreg.Regressions, features [][]int) {
+func linregCombinations(dc data.Container, size int) (models []*modelContainer) {
 
 	combs := itertools.Combinations(dc.Features, size)
 
@@ -75,14 +76,13 @@ func linregCombinations(dc data.Container, size int) (lrs linreg.Regressions, fe
 		lr := linreg.NewLinearRegression()
 		lr.InitializeFromData(fd)
 
-		lr.Name = fmt.Sprintf("LinregModel-V-%d-%v", size, c)
+		name := fmt.Sprintf("LinregModel-V-%d-%v", size, c)
 
-		if err := lr.Learn(); err == nil {
-			// for debug
-			// fmt.Printf("EIn = %f \t using combination %v\n", lr.Ein(), c)
-			features = append(features, c)
-			lrs = append(lrs, lr)
+		if err := lr.Learn(); err != nil {
+			continue
 		}
+
+		models = append(models, NewModelContainer(lr, name, c))
 	}
 	return
 }
@@ -102,8 +102,8 @@ func filter(data [][]float64, keep []int) (filtered [][]float64) {
 	return
 }
 
-func specificLinregFuncs() []func(dc data.Container) (*linreg.LinearRegression, []int) {
-	return []func(dc data.Container) (*linreg.LinearRegression, []int){
+func specificLinregFuncs() []func(dc data.Container) (*modelContainer, error) {
+	return []func(dc data.Container) (*modelContainer, error){
 		linregSexAge,
 		linregPClassAge,
 		linregPClassSex,
@@ -111,81 +111,61 @@ func specificLinregFuncs() []func(dc data.Container) (*linreg.LinearRegression, 
 	}
 }
 
-func linregSexAgePClass(dc data.Container) (lr *linreg.LinearRegression, features []int) {
-	features = []int{
-		passengerIndexSex,
-		passengerIndexAge,
-		passengerIndexPclass,
-	}
+func linregSexAgePClass(dc data.Container) (*modelContainer, error) {
 
+	lr := linreg.NewLinearRegression()
+
+	features := []int{passengerIndexSex, passengerIndexAge, passengerIndexPclass}
 	fd := filter(dc.Data, features)
-
-	lr = linreg.NewLinearRegression()
-	lr.Name = "Sex Age PClass"
 	lr.InitializeFromData(fd)
-	if err := lr.Learn(); err == nil {
-		// fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
-		return
+	name := "Sex Age PClass"
+
+	if err := lr.Learn(); err != nil {
+		return nil, err
 	}
-	return nil, nil
+	return NewModelContainer(lr, name, features), nil
 }
 
-func linregSexAge(dc data.Container) (lr *linreg.LinearRegression, features []int) {
+func linregSexAge(dc data.Container) (*modelContainer, error) {
 
-	features = []int{
-		passengerIndexSex,
-		passengerIndexAge,
-	}
+	lr := linreg.NewLinearRegression()
 
+	features := []int{passengerIndexSex, passengerIndexAge}
 	fd := filter(dc.Data, features)
-
-	lr = linreg.NewLinearRegression()
 	lr.InitializeFromData(fd)
+	name := "Sex Age"
 
-	lr.Name = "Sex Age"
-	if err := lr.Learn(); err == nil {
-		// fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
-		return
+	if err := lr.Learn(); err != nil {
+		return nil, err
 	}
-	return nil, nil
+	return NewModelContainer(lr, name, features), nil
 }
 
-func linregPClassAge(dc data.Container) (lr *linreg.LinearRegression, features []int) {
+func linregPClassAge(dc data.Container) (*modelContainer, error) {
 
-	features = []int{
-		passengerIndexAge,
-		passengerIndexPclass,
-	}
+	lr := linreg.NewLinearRegression()
 
+	features := []int{passengerIndexAge, passengerIndexPclass}
 	fd := filter(dc.Data, features)
-
-	lr = linreg.NewLinearRegression()
 	lr.InitializeFromData(fd)
+	name := "PClass Age"
 
-	lr.Name = "PClass Age"
-	if err := lr.Learn(); err == nil {
-		// fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
-		return
+	if err := lr.Learn(); err != nil {
+		return nil, err
 	}
-	return nil, nil
+	return NewModelContainer(lr, name, features), nil
 }
 
-func linregPClassSex(dc data.Container) (lr *linreg.LinearRegression, features []int) {
+func linregPClassSex(dc data.Container) (*modelContainer, error) {
 
-	features = []int{
-		passengerIndexSex,
-		passengerIndexPclass,
-	}
+	lr := linreg.NewLinearRegression()
 
+	features := []int{passengerIndexSex, passengerIndexPclass}
 	fd := filter(dc.Data, features)
-
-	lr = linreg.NewLinearRegression()
 	lr.InitializeFromData(fd)
-
-	lr.Name = "PClass Sex"
-	if err := lr.Learn(); err == nil {
-		// fmt.Printf("EIn = %f \t%s\tfeatures used %v\n", lr.Ein(), lr.Name, features)
-		return
+	name := "PClass Sex"
+	if err := lr.Learn(); err != nil {
+		return nil, err
 	}
-	return nil, nil
+	return NewModelContainer(lr, name, features), nil
 }
