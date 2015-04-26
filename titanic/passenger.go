@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/santiaago/kaggle/data"
+	"github.com/santiaago/ml/data"
 )
 
 type passenger struct {

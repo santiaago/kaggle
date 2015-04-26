@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/santiaago/kaggle/data"
+	"github.com/santiaago/ml/data"
 )
 
 var (

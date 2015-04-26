@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/santiaago/kaggle/data"
 	"github.com/santiaago/kaggle/itertools"
 	"github.com/santiaago/kaggle/transform"
+	"github.com/santiaago/ml"
+	"github.com/santiaago/ml/data"
 	"github.com/santiaago/ml/linreg"
 )
 
@@ -17,7 +18,7 @@ import (
 // * trainSpecificModels
 // * trainModelsByFeatrueCombination
 // * trainModelsWithTransform
-func trainModels(reader data.Reader) (models modelContainers) {
+func trainModels(reader data.Reader) (models ml.ModelContainers) {
 
 	var dc data.Container
 	var err error
@@ -44,28 +45,28 @@ func trainModels(reader data.Reader) (models modelContainers) {
 // * linregPClassSex
 // * linregSexAgePClass
 // It returns an array of all the linear regression models trained.
-func trainSpecificModels(dc data.Container) modelContainers {
+func trainSpecificModels(dc data.Container) ml.ModelContainers {
 
 	models := specificLinregFuncs()
-	return modelsFromFuncs(dc, models)
+	return ml.ModelsFromFuncs(dc, models)
 }
 
 // trainModelsByFeatureCombination returns:
 // * an array of linearRegression models
 // It makes a model for every combinations of features present in the data.
 // Each feature corresponds to a column in the data set.
-func trainModelsByFeatureCombination(dc data.Container) modelContainers {
+func trainModelsByFeatureCombination(dc data.Container) ml.ModelContainers {
 
 	models := linregAllCombinations()
-	return modelsFromMetaFuncs(dc, models)
+	return ml.ModelsFromMetaFuncs(dc, models)
 }
 
 // trainModelsWithTransform returns:
 //   * an array of linearRegression models
 //   * an array of used features vectors.
-func trainModelsWithTransform(dc data.Container) modelContainers {
+func trainModelsWithTransform(dc data.Container) ml.ModelContainers {
 
-	var models modelContainers
+	var models ml.ModelContainers
 
 	models2D := trainModelsWith2DTransform(dc)
 	models = append(models, models2D...)
@@ -78,7 +79,7 @@ func trainModelsWithTransform(dc data.Container) modelContainers {
 
 // trainModelsWith2DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 2D transformation functions.
-func trainModelsWith2DTransform(dc data.Container) modelContainers {
+func trainModelsWith2DTransform(dc data.Container) ml.ModelContainers {
 
 	funcs := transform.Funcs2D()
 	dim := 2
@@ -87,7 +88,7 @@ func trainModelsWith2DTransform(dc data.Container) modelContainers {
 
 // trainModelsWith3DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 3D transformation functions.
-func trainModelsWith3DTransform(dc data.Container) modelContainers {
+func trainModelsWith3DTransform(dc data.Container) ml.ModelContainers {
 
 	funcs := transform.Funcs3D()
 	dim := 3
@@ -102,17 +103,17 @@ func trainModelsWith3DTransform(dc data.Container) modelContainers {
 // We generate a vector of combinations of the candidateFeatures vector.
 // Each combination has the size of the size of 'dimention'.
 // Each (combination, transform function) pair is a specific model.
-func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (models modelContainers) {
+func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (models ml.ModelContainers) {
 
 	combs := itertools.Combinations(dc.Features, dimension)
 	for _, c := range combs {
 
-		fd := dc.Filter(c)
+		fd := dc.FilterWithPredict(c)
 		index := 0
 		for _, f := range funcs {
 			if lr, err := trainModelWithTransform(fd, f); err == nil {
 				name := fmt.Sprintf("%dD %v transformed %d", dimension, c, index)
-				models = append(models, NewModelContainer(lr, name, c))
+				models = append(models, ml.NewModelContainer(lr, name, c))
 				index++
 			}
 		}
@@ -129,33 +130,4 @@ func trainModelWithTransform(data [][]float64, f func([]float64) []float64) (*li
 	lr.ApplyTransformation()
 	err := lr.Learn()
 	return lr, err
-}
-
-// modelsFromFuncs returns an array of modelContainer types merged from
-// the result of each function present in the 'funcs' array.
-// Each of those functions takes as param a data Container and
-// returns a modelContainer type.
-func modelsFromFuncs(dc data.Container, funcs []func(data.Container) (*modelContainer, error)) (models modelContainers) {
-
-	for _, f := range funcs {
-		if m, err := f(dc); err == nil {
-			models = append(models, m)
-		}
-	}
-	return
-}
-
-// modelsFromMetaFuncs returns an array of modelContrainer that
-// merges the result of each func present in the 'funcs' array passed
-// as param.
-// Each of those functions takes as argument a data.Container and return
-// an array of model Containers.
-func modelsFromMetaFuncs(dc data.Container, funcs []func(data.Container) modelContainers) modelContainers {
-
-	var allModels modelContainers
-	for _, f := range funcs {
-		models := f(dc)
-		allModels = append(allModels, models...)
-	}
-	return allModels
 }
