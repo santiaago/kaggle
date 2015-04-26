@@ -47,7 +47,7 @@ func trainModels(reader data.Reader) (models modelContainers) {
 func trainSpecificModels(dc data.Container) modelContainers {
 
 	models := specificLinregFuncs()
-	return trainModelsByFuncs(dc, models)
+	return modelsFromFuncs(dc, models)
 }
 
 // trainModelsByFeatureCombination returns:
@@ -57,7 +57,7 @@ func trainSpecificModels(dc data.Container) modelContainers {
 func trainModelsByFeatureCombination(dc data.Container) modelContainers {
 
 	models := linregAllCombinations()
-	return trainModelsByMetaFuncs(dc, models)
+	return modelsFromMetaFuncs(dc, models)
 }
 
 // trainModelsWithTransform returns:
@@ -131,11 +131,11 @@ func trainModelWithTransform(data [][]float64, f func([]float64) []float64) (*li
 	return lr, err
 }
 
-// trainModelsByFuncs returns an array of linear regression models with respect
-// to an array of functions passed as arguments.
-// Those function takes as argument a 2 dimensional data array and return a linear
-// regression model.
-func trainModelsByFuncs(dc data.Container, funcs []func(data.Container) (*modelContainer, error)) (models modelContainers) {
+// modelsFromFuncs returns an array of modelContainer types merged from
+// the result of each function present in the 'funcs' array.
+// Each of those functions takes as param a data Container and
+// returns a modelContainer type.
+func modelsFromFuncs(dc data.Container, funcs []func(data.Container) (*modelContainer, error)) (models modelContainers) {
 
 	for _, f := range funcs {
 		if m, err := f(dc); err == nil {
@@ -145,15 +145,15 @@ func trainModelsByFuncs(dc data.Container, funcs []func(data.Container) (*modelC
 	return
 }
 
-// trainModelsByMetaFuncs returns an array of linear regression models with
-// respect to an array of linear regression functions passed as arguments.
-// Those functions takes as argument a 2 dimensional array of data and
-// return an array of linear regression model.
-// todo(santiaago): rename func and params
-func trainModelsByMetaFuncs(dc data.Container, metaLinregFuncs []func(data.Container) modelContainers) modelContainers {
+// modelsFromMetaFuncs returns an array of modelContrainer that
+// merges the result of each func present in the 'funcs' array passed
+// as param.
+// Each of those functions takes as argument a data.Container and return
+// an array of model Containers.
+func modelsFromMetaFuncs(dc data.Container, funcs []func(data.Container) modelContainers) modelContainers {
 
 	var allModels modelContainers
-	for _, f := range metaLinregFuncs {
+	for _, f := range funcs {
 		models := f(dc)
 		allModels = append(allModels, models...)
 	}
