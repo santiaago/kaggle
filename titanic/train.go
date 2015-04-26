@@ -17,7 +17,7 @@ import (
 // * trainSpecificModels
 // * trainModelsByFeatrueCombination
 // * trainModelsWithTransform
-func trainModels(reader data.Reader) (models []*modelContainer) {
+func trainModels(reader data.Reader) (models modelContainers) {
 
 	var dc data.Container
 	var err error
@@ -44,7 +44,7 @@ func trainModels(reader data.Reader) (models []*modelContainer) {
 // * linregPClassSex
 // * linregSexAgePClass
 // It returns an array of all the linear regression models trained.
-func trainSpecificModels(dc data.Container) []*modelContainer {
+func trainSpecificModels(dc data.Container) modelContainers {
 
 	models := specificLinregFuncs()
 	return trainModelsByFuncs(dc, models)
@@ -54,7 +54,7 @@ func trainSpecificModels(dc data.Container) []*modelContainer {
 // * an array of linearRegression models
 // It makes a model for every combinations of features present in the data.
 // Each feature corresponds to a column in the data set.
-func trainModelsByFeatureCombination(dc data.Container) []*modelContainer {
+func trainModelsByFeatureCombination(dc data.Container) modelContainers {
 
 	models := linregAllCombinations()
 	return trainModelsByMetaFuncs(dc, models)
@@ -63,9 +63,9 @@ func trainModelsByFeatureCombination(dc data.Container) []*modelContainer {
 // trainModelsWithTransform returns:
 //   * an array of linearRegression models
 //   * an array of used features vectors.
-func trainModelsWithTransform(dc data.Container) []*modelContainer {
+func trainModelsWithTransform(dc data.Container) modelContainers {
 
-	var models []*modelContainer
+	var models modelContainers
 
 	models2D := trainModelsWith2DTransform(dc)
 	models = append(models, models2D...)
@@ -78,7 +78,7 @@ func trainModelsWithTransform(dc data.Container) []*modelContainer {
 
 // trainModelsWith2DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 2D transformation functions.
-func trainModelsWith2DTransform(dc data.Container) []*modelContainer {
+func trainModelsWith2DTransform(dc data.Container) modelContainers {
 
 	funcs := transform.Funcs2D()
 	dim := 2
@@ -87,7 +87,7 @@ func trainModelsWith2DTransform(dc data.Container) []*modelContainer {
 
 // trainModelsWith3DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 3D transformation functions.
-func trainModelsWith3DTransform(dc data.Container) []*modelContainer {
+func trainModelsWith3DTransform(dc data.Container) modelContainers {
 
 	funcs := transform.Funcs3D()
 	dim := 3
@@ -102,7 +102,7 @@ func trainModelsWith3DTransform(dc data.Container) []*modelContainer {
 // We generate a vector of combinations of the candidateFeatures vector.
 // Each combination has the size of the size of 'dimention'.
 // Each (combination, transform function) pair is a specific model.
-func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (models []*modelContainer) {
+func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (models modelContainers) {
 
 	combs := itertools.Combinations(dc.Features, dimension)
 	for _, c := range combs {
@@ -135,7 +135,7 @@ func trainModelWithTransform(data [][]float64, f func([]float64) []float64) (*li
 // to an array of functions passed as arguments.
 // Those function takes as argument a 2 dimensional data array and return a linear
 // regression model.
-func trainModelsByFuncs(dc data.Container, funcs []func(data.Container) (*modelContainer, error)) (models []*modelContainer) {
+func trainModelsByFuncs(dc data.Container, funcs []func(data.Container) (*modelContainer, error)) (models modelContainers) {
 
 	for _, f := range funcs {
 		if m, err := f(dc); err == nil {
@@ -150,9 +150,9 @@ func trainModelsByFuncs(dc data.Container, funcs []func(data.Container) (*modelC
 // Those functions takes as argument a 2 dimensional array of data and
 // return an array of linear regression model.
 // todo(santiaago): rename func and params
-func trainModelsByMetaFuncs(dc data.Container, metaLinregFuncs []func(data.Container) []*modelContainer) []*modelContainer {
+func trainModelsByMetaFuncs(dc data.Container, metaLinregFuncs []func(data.Container) modelContainers) modelContainers {
 
-	var allModels []*modelContainer
+	var allModels modelContainers
 	for _, f := range metaLinregFuncs {
 		models := f(dc)
 		allModels = append(allModels, models...)

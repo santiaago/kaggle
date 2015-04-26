@@ -11,7 +11,7 @@ import (
 // Then makes the predictions and write the predicted data to file using the
 // linear regression model name.
 // testModels run a test file for each linear regression model passed in the linreg array.
-func testModels(r data.Reader, w data.Writer, models []*modelContainer) {
+func testModels(r data.Reader, w data.Writer, models modelContainers) {
 	var dc data.Container
 	var err error
 	dc, err = r.Read()

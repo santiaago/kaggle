@@ -40,24 +40,24 @@ func linregTest(model *modelContainer, dc data.Container) (predictions []int) {
 
 // linregVectorsOfInterval returns an array functions.
 // These functions return an array of linear regression and the corresponding features used.
-func linregAllCombinations() (funcs []func(data.Container) []*modelContainer) {
-	funcs = []func(dc data.Container) []*modelContainer{
-		func(dc data.Container) []*modelContainer {
+func linregAllCombinations() (funcs []func(data.Container) modelContainers) {
+	funcs = []func(dc data.Container) modelContainers{
+		func(dc data.Container) modelContainers {
 			return linregCombinations(dc, 2)
 		},
-		func(dc data.Container) []*modelContainer {
+		func(dc data.Container) modelContainers {
 			return linregCombinations(dc, 3)
 		},
-		func(dc data.Container) []*modelContainer {
+		func(dc data.Container) modelContainers {
 			return linregCombinations(dc, 4)
 		},
-		func(dc data.Container) []*modelContainer {
+		func(dc data.Container) modelContainers {
 			return linregCombinations(dc, 5)
 		},
-		func(dc data.Container) []*modelContainer {
+		func(dc data.Container) modelContainers {
 			return linregCombinations(dc, 6)
 		},
-		func(dc data.Container) []*modelContainer {
+		func(dc data.Container) modelContainers {
 			return linregCombinations(dc, 7)
 		},
 	}
@@ -67,7 +67,7 @@ func linregAllCombinations() (funcs []func(data.Container) []*modelContainer) {
 // linregCombinations creates a linear regression model for each combination of
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
-func linregCombinations(dc data.Container, size int) (models []*modelContainer) {
+func linregCombinations(dc data.Container, size int) (models modelContainers) {
 
 	combs := itertools.Combinations(dc.Features, size)
 
