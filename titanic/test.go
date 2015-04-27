@@ -20,6 +20,10 @@ func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
 	}
 
 	for _, m := range models {
+		if m == nil {
+			continue
+		}
+
 		predictions, err := linregTest(m, dc)
 		if err == nil {
 			w.Write(m.Name, predictions)
