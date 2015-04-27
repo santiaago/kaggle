@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/santiaago/ml/data"
+	"github.com/santiaago/ml/linreg"
 )
 
 var (
@@ -23,12 +25,26 @@ func main() {
 	var drTrain data.Reader = NewPassengerReader(*train, xTrain)
 
 	models := trainModels(drTrain)
+	// todo(santiaago): refactor this.
+	// regModels := regularizedModels(models)
+
+	for _, m := range models {
+		if m == nil {
+			continue
+		}
+		lookupModelWithRegularization(m.Model.(*linreg.LinearRegression))
+	}
 
 	var xTest data.Extractor = NewPassengerTestExtractor()
 	var drTest data.Reader = NewPassengerReader(*test, xTest)
 
 	var wTest data.Writer = NewPassengerTestWriter(*test)
-	testModels(drTest, wTest, models)
 
+	if len(models) == 0 {
+		fmt.Println("no models found.")
+		return
+	}
+
+	testModels(drTest, wTest, models)
 	models.PrintTop(50)
 }

@@ -16,7 +16,6 @@ import (
 func linregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) {
 
 	fd := dc.Filter(model.Features)
-
 	lr := model.Model.(*linreg.LinearRegression)
 	return lr.Predictions(fd)
 }
@@ -109,6 +108,34 @@ func linregSexAge(dc data.Container) (*ml.ModelContainer, error) {
 		return nil, err
 	}
 	return ml.NewModelContainer(lr, name, features), nil
+}
+
+func lookupModelWithRegularization(lr *linreg.LinearRegression) error {
+	ein := lr.Ein()
+
+	eAugs := []float64{}
+	ks := []int{}
+	for k := -50; k < 50; k++ {
+		lr.K = k
+		if err := lr.LearnWeightDecay(); err != nil {
+			return err
+		}
+		eAugIn := lr.EAugIn()
+		eAugs = append(eAugs, eAugIn)
+		ks = append(ks, k)
+		// fmt.Printf("EAugIn = %f for k = %d\n", eAugIn, lr.K)
+	}
+
+	i := argmin(eAugs)
+	bestEAug := eAugs[i]
+
+	if bestEAug < ein {
+		fmt.Printf("found better Ein with regulirization.\n")
+		fmt.Printf("Ein = %f\n", ein)
+		fmt.Printf("EAugIn: %5.4f with k: %v\n", bestEAug, ks[i])
+
+	}
+	return nil
 }
 
 func linregPClassAge(dc data.Container) (*ml.ModelContainer, error) {
