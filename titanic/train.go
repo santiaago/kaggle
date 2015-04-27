@@ -47,8 +47,8 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 // It returns an array of all the linear regression models trained.
 func trainSpecificModels(dc data.Container) ml.ModelContainers {
 
-	models := specificLinregFuncs()
-	return ml.ModelsFromFuncs(dc, models)
+	modelFuncs := specificLinregFuncs()
+	return ml.ModelsFromFuncs(dc, modelFuncs)
 }
 
 // trainModelsByFeatureCombination returns:
@@ -57,8 +57,8 @@ func trainSpecificModels(dc data.Container) ml.ModelContainers {
 // Each feature corresponds to a column in the data set.
 func trainModelsByFeatureCombination(dc data.Container) ml.ModelContainers {
 
-	models := linregAllCombinations()
-	return ml.ModelsFromMetaFuncs(dc, models)
+	modelFuncs := linregAllCombinations()
+	return ml.ModelsFromMetaFuncs(dc, modelFuncs)
 }
 
 // trainModelsWithTransform returns:
