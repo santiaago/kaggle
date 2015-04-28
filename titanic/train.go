@@ -96,6 +96,9 @@ func trainModelsWithTransform(dc data.Container) ml.ModelContainers {
 	models3D := trainModelsWith3DTransform(dc)
 	models = append(models, models3D...)
 
+	models4D := trainModelsWith4DTransform(dc)
+	models = append(models, models4D...)
+
 	return models
 }
 
@@ -114,6 +117,15 @@ func trainModelsWith3DTransform(dc data.Container) ml.ModelContainers {
 
 	funcs := transform.Funcs3D()
 	dim := 3
+	return trainModelsWithNDTransformFuncs(dc, funcs, dim)
+}
+
+// trainModelsWith4DTransform returns a list of linear regression models and the corresponding feature used.
+// models learn based on some 4D transformation functions.
+func trainModelsWith4DTransform(dc data.Container) ml.ModelContainers {
+
+	funcs := transform.Funcs4D()
+	dim := 4
 	return trainModelsWithNDTransformFuncs(dc, funcs, dim)
 }
 
