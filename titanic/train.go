@@ -36,21 +36,29 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	transformModels := trainModelsWithTransform(dc)
 	models = append(models, transformModels...)
 
+	regModels := trainModelsRegularized(models)
+	models = append(models, regModels...)
+
 	return
 }
 
+// trainModelsRegularized returns an array of models that are better with regularized
+// option than the normal linear regression option.
+// to do this we go through all trained models and try
+// them with regularization if the in sample error
+// is lower append it to the list of models.
 func trainModelsRegularized(models ml.ModelContainers) ml.ModelContainers {
-	var regularizedModels ml.ModelContainers
+	var rModels ml.ModelContainers
 	for _, m := range models {
 		if m == nil {
 			continue
 		}
 		if nlr, err := linregWithRegularization(m.Model.(*linreg.LinearRegression)); err == nil && nlr != nil {
 			name := fmt.Sprintf("%v regularized k %v", m.Name, nlr.K)
-			regularizedModels = append(regularizedModels, ml.NewModelContainer(nlr, name, m.Features))
+			rModels = append(rModels, ml.NewModelContainer(nlr, name, m.Features))
 		}
 	}
-	return regularizedModels
+	return rModels
 }
 
 // trainSpecificModels trains the following models:

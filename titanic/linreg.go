@@ -71,6 +71,48 @@ func linregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 	return
 }
 
+// linregWithRegularization returns a linear regression model if
+// it is better than the model passed as argument, else it returns nil.
+// todo(santiaago): move this to ml/linreg.
+func linregWithRegularization(lr *linreg.LinearRegression) (*linreg.LinearRegression, error) {
+
+	ein := lr.Ein()
+
+	eAugs := []float64{}
+	ks := []int{}
+
+	// look for the best lambda = 10^-k
+	for k := -50; k < 50; k++ {
+		lr.K = k
+		if err := lr.LearnWeightDecay(); err != nil {
+			return nil, err
+		}
+		eAugIn := lr.EAugIn()
+		eAugs = append(eAugs, eAugIn)
+		ks = append(ks, k)
+	}
+
+	i := argmin(eAugs)
+	bestEAug := eAugs[i]
+
+	if bestEAug >= ein {
+		return nil, nil
+	}
+
+	// better model found, make a copy of the model passed in.
+	nlr := linreg.NewLinearRegression()
+	*nlr = *lr
+	nlr.K = ks[i]
+	if err := nlr.LearnWeightDecay(); err != nil {
+		return nil, err
+	}
+
+	// update Wn with WReg
+	nlr.Wn = nlr.WReg
+
+	return nlr, nil
+}
+
 func specificLinregFuncs() []func(dc data.Container) (*ml.ModelContainer, error) {
 	return []func(dc data.Container) (*ml.ModelContainer, error){
 		linregSexAge,
@@ -108,40 +150,6 @@ func linregSexAge(dc data.Container) (*ml.ModelContainer, error) {
 		return nil, err
 	}
 	return ml.NewModelContainer(lr, name, features), nil
-}
-
-// create a linear regression model with regularization with better than normal model
-func linregWithRegularization(lr *linreg.LinearRegression) (*linreg.LinearRegression, error) {
-	ein := lr.Ein()
-
-	eAugs := []float64{}
-	ks := []int{}
-	// look for the best lambda: 10^-k
-	for k := -50; k < 50; k++ {
-		lr.K = k
-		if err := lr.LearnWeightDecay(); err != nil {
-			return nil, err
-		}
-		eAugIn := lr.EAugIn()
-		eAugs = append(eAugs, eAugIn)
-		ks = append(ks, k)
-	}
-
-	i := argmin(eAugs)
-	bestEAug := eAugs[i]
-
-	if bestEAug >= ein {
-		return nil, nil
-	}
-	nlr := linreg.NewLinearRegression()
-	*nlr = *lr
-	nlr.K = ks[i]
-	if err := nlr.LearnWeightDecay(); err != nil {
-		return nil, err
-	}
-	// update Wn with WReg:
-	nlr.Wn = nlr.WReg
-	return nlr, nil
 }
 
 func linregPClassAge(dc data.Container) (*ml.ModelContainer, error) {

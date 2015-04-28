@@ -27,9 +27,6 @@ func main() {
 
 	models := trainModels(drTrain)
 
-	regModels := trainModelsRegularized(models)
-	models = append(models, regModels...)
-
 	var xTest data.Extractor
 	var wTest data.Writer
 	var drTest data.Reader
