@@ -110,32 +110,38 @@ func linregSexAge(dc data.Container) (*ml.ModelContainer, error) {
 	return ml.NewModelContainer(lr, name, features), nil
 }
 
-func lookupModelWithRegularization(lr *linreg.LinearRegression) error {
+// create a linear regression model with regularization with better than normal model
+func linregWithRegularization(lr *linreg.LinearRegression) (*linreg.LinearRegression, error) {
 	ein := lr.Ein()
 
 	eAugs := []float64{}
 	ks := []int{}
+	// look for the best lambda: 10^-k
 	for k := -50; k < 50; k++ {
 		lr.K = k
 		if err := lr.LearnWeightDecay(); err != nil {
-			return err
+			return nil, err
 		}
 		eAugIn := lr.EAugIn()
 		eAugs = append(eAugs, eAugIn)
 		ks = append(ks, k)
-		// fmt.Printf("EAugIn = %f for k = %d\n", eAugIn, lr.K)
 	}
 
 	i := argmin(eAugs)
 	bestEAug := eAugs[i]
 
-	if bestEAug < ein {
-		fmt.Printf("found better Ein with regulirization.\n")
-		fmt.Printf("Ein = %f\n", ein)
-		fmt.Printf("EAugIn: %5.4f with k: %v\n", bestEAug, ks[i])
-
+	if bestEAug >= ein {
+		return nil, nil
 	}
-	return nil
+	nlr := linreg.NewLinearRegression()
+	*nlr = *lr
+	nlr.K = ks[i]
+	if err := nlr.LearnWeightDecay(); err != nil {
+		return nil, err
+	}
+	// update Wn with WReg:
+	nlr.Wn = nlr.WReg
+	return nlr, nil
 }
 
 func linregPClassAge(dc data.Container) (*ml.ModelContainer, error) {

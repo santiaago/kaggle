@@ -39,6 +39,20 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	return
 }
 
+func trainModelsRegularized(models ml.ModelContainers) ml.ModelContainers {
+	var regularizedModels ml.ModelContainers
+	for _, m := range models {
+		if m == nil {
+			continue
+		}
+		if nlr, err := linregWithRegularization(m.Model.(*linreg.LinearRegression)); err == nil && nlr != nil {
+			name := fmt.Sprintf("%v regularized k %v", m.Name, nlr.K)
+			regularizedModels = append(regularizedModels, ml.NewModelContainer(nlr, name, m.Features))
+		}
+	}
+	return regularizedModels
+}
+
 // trainSpecificModels trains the following models:
 // * linregSexAge
 // * linregPClassAge
