@@ -34,7 +34,7 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
 	models = append(models, linregCombinationModels...)
 
-	linregTransformModels := trainLogregModelsWithTransform(dc)
+	linregTransformModels := trainLinregModelsWithTransform(dc)
 	models = append(models, linregTransformModels...)
 
 	// regModels := trainModelsRegularized(models)
