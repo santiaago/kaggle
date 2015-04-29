@@ -9,6 +9,7 @@ import (
 	"github.com/santiaago/ml"
 	"github.com/santiaago/ml/data"
 	"github.com/santiaago/ml/linreg"
+	"github.com/santiaago/ml/logreg"
 )
 
 // trainModels returns:
@@ -33,8 +34,8 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
 	models = append(models, linregCombinationModels...)
 
-	// transformModels := trainModelsWithTransform(dc)
-	// models = append(models, transformModels...)
+	linregTransformModels := trainLogregModelsWithTransform(dc)
+	models = append(models, linregTransformModels...)
 
 	// regModels := trainModelsRegularized(models)
 	// models = append(models, regModels...)
@@ -44,6 +45,9 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 
 	logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
 	models = append(models, logregCombinationModels...)
+
+	logregTransformModels := trainLogregModelsWithTransform(dc)
+	models = append(models, logregTransformModels...)
 
 	return
 }
@@ -108,53 +112,99 @@ func trainLogregModelsByFeatureCombination(dc data.Container) ml.ModelContainers
 	return ml.ModelsFromMetaFuncs(dc, modelFuncs)
 }
 
-// trainModelsWithTransform returns:
+// trainLinregModelsWithTransform returns:
 //   * an array of linearRegression models
 //   * an array of used features vectors.
-func trainModelsWithTransform(dc data.Container) ml.ModelContainers {
+func trainLinregModelsWithTransform(dc data.Container) ml.ModelContainers {
 
 	var models ml.ModelContainers
 
-	models2D := trainModelsWith2DTransform(dc)
+	models2D := trainLinregModelsWith2DTransform(dc)
 	models = append(models, models2D...)
 
-	models3D := trainModelsWith3DTransform(dc)
+	models3D := trainLinregModelsWith3DTransform(dc)
 	models = append(models, models3D...)
 
-	models4D := trainModelsWith4DTransform(dc)
+	models4D := trainLinregModelsWith4DTransform(dc)
 	models = append(models, models4D...)
 
 	return models
 }
 
-// trainModelsWith2DTransform returns a list of linear regression models and the corresponding feature used.
+// trainLogregModelsWithTransform returns:
+//   * an array of linearRegression models
+//   * an array of used features vectors.
+func trainLogregModelsWithTransform(dc data.Container) ml.ModelContainers {
+
+	var models ml.ModelContainers
+
+	models2D := trainLogregModelsWith2DTransform(dc)
+	models = append(models, models2D...)
+
+	models3D := trainLogregModelsWith3DTransform(dc)
+	models = append(models, models3D...)
+
+	models4D := trainLogregModelsWith4DTransform(dc)
+	models = append(models, models4D...)
+
+	return models
+}
+
+// trainLinregModelsWith2DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 2D transformation functions.
-func trainModelsWith2DTransform(dc data.Container) ml.ModelContainers {
+func trainLinregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
 
 	funcs := transform.Funcs2D()
 	dim := 2
-	return trainModelsWithNDTransformFuncs(dc, funcs, dim)
+	return trainLinregModelsWithNDTransformFuncs(dc, funcs, dim)
 }
 
-// trainModelsWith3DTransform returns a list of linear regression models and the corresponding feature used.
+// trainLinregModelsWith3DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 3D transformation functions.
-func trainModelsWith3DTransform(dc data.Container) ml.ModelContainers {
+func trainLinregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
 
 	funcs := transform.Funcs3D()
 	dim := 3
-	return trainModelsWithNDTransformFuncs(dc, funcs, dim)
+	return trainLinregModelsWithNDTransformFuncs(dc, funcs, dim)
 }
 
-// trainModelsWith4DTransform returns a list of linear regression models and the corresponding feature used.
+// trainLinregModelsWith4DTransform returns a list of linear regression models and the corresponding feature used.
 // models learn based on some 4D transformation functions.
-func trainModelsWith4DTransform(dc data.Container) ml.ModelContainers {
+func trainLinregModelsWith4DTransform(dc data.Container) ml.ModelContainers {
 
 	funcs := transform.Funcs4D()
 	dim := 4
-	return trainModelsWithNDTransformFuncs(dc, funcs, dim)
+	return trainLinregModelsWithNDTransformFuncs(dc, funcs, dim)
 }
 
-// trainModelsWithNDTransformFuncs returns
+// trainLogregModelsWith2DTransform returns a list of logistic regression models and the corresponding feature used.
+// models learn based on some 2D transformation functions.
+func trainLogregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
+
+	funcs := transform.Funcs2D()
+	dim := 2
+	return trainLogregModelsWithNDTransformFuncs(dc, funcs, dim)
+}
+
+// trainLogregModelsWith3DTransform returns a list of logistic regression models and the corresponding feature used.
+// models learn based on some 3D transformation functions.
+func trainLogregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
+
+	funcs := transform.Funcs3D()
+	dim := 3
+	return trainLogregModelsWithNDTransformFuncs(dc, funcs, dim)
+}
+
+// trainLogregModelsWith4DTransform returns a list of logistic regression models and the corresponding feature used.
+// models learn based on some 4D transformation functions.
+func trainLogregModelsWith4DTransform(dc data.Container) ml.ModelContainers {
+
+	funcs := transform.Funcs4D()
+	dim := 4
+	return trainLogregModelsWithNDTransformFuncs(dc, funcs, dim)
+}
+
+//trainLinregModelsWithNDTransformFuncs returns
 //   * an array of linearRegression models
 //   * an array of used features vectors
 // Models are created as follows:
@@ -162,7 +212,7 @@ func trainModelsWith4DTransform(dc data.Container) ml.ModelContainers {
 // We generate a vector of combinations of the candidateFeatures vector.
 // Each combination has the size of the size of 'dimention'.
 // Each (combination, transform function) pair is a specific model.
-func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (models ml.ModelContainers) {
+func trainLinregModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (models ml.ModelContainers) {
 
 	combs := itertools.Combinations(dc.Features, dimension)
 	for _, c := range combs {
@@ -170,8 +220,8 @@ func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) 
 		fd := dc.FilterWithPredict(c)
 		index := 0
 		for _, f := range funcs {
-			if lr, err := trainModelWithTransform(fd, f); err == nil {
-				name := fmt.Sprintf("%dD %v transformed %d", dimension, c, index)
+			if lr, err := trainLinregModelWithTransform(fd, f); err == nil {
+				name := fmt.Sprintf("linreg %dD %v transformed %d", dimension, c, index)
 				models = append(models, ml.NewModelContainer(lr, name, c))
 				index++
 			}
@@ -180,10 +230,48 @@ func trainModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) 
 	return
 }
 
-// trainModelWithTransform returns a linear model and an error if it fails to learn.
+//trainLogregModelsWithNDTransformFuncs returns
+//   * an array of linearRegression models
+//   * an array of used features vectors
+// Models are created as follows:
+// Data is filtered with respect to the 'candidateFeatures' vector and the 'dimension' param.
+// We generate a vector of combinations of the candidateFeatures vector.
+// Each combination has the size of the size of 'dimention'.
+// Each (combination, transform function) pair is a specific model.
+func trainLogregModelsWithNDTransformFuncs(dc data.Container, funcs []func([]float64) []float64, dimension int) (models ml.ModelContainers) {
+
+	combs := itertools.Combinations(dc.Features, dimension)
+	for _, c := range combs {
+
+		fd := dc.FilterWithPredict(c)
+		index := 0
+		for _, f := range funcs {
+			if lr, err := trainLogregModelWithTransform(fd, f); err == nil {
+				name := fmt.Sprintf("logreg %dD %v transformed %d", dimension, c, index)
+				fmt.Println(name)
+				models = append(models, ml.NewModelContainer(lr, name, c))
+				index++
+			}
+		}
+	}
+	return
+}
+
+// trainLinregModelWithTransform returns a linear model and an error if it fails to learn.
 // It uses the data passed as param and a transformation function.
-func trainModelWithTransform(data [][]float64, f func([]float64) []float64) (*linreg.LinearRegression, error) {
+func trainLinregModelWithTransform(data [][]float64, f func([]float64) []float64) (*linreg.LinearRegression, error) {
 	lr := linreg.NewLinearRegression()
+	lr.InitializeFromData(data)
+	lr.TransformFunction = f
+	lr.ApplyTransformation()
+	err := lr.Learn()
+	return lr, err
+}
+
+// trainLogregModelWithTransform returns a linear model and an error if it fails to learn.
+// It uses the data passed as param and a transformation function.
+func trainLogregModelWithTransform(data [][]float64, f func([]float64) []float64) (*logreg.LogisticRegression, error) {
+	lr := logreg.NewLogisticRegression()
 	lr.InitializeFromData(data)
 	lr.TransformFunction = f
 	lr.ApplyTransformation()
