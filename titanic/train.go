@@ -39,6 +39,9 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	regModels := trainModelsRegularized(models)
 	models = append(models, regModels...)
 
+	logregModels := trainLogregSpecificModels(dc)
+	models = append(models, logregModels...)
+
 	return
 }
 
@@ -74,6 +77,11 @@ func trainModelsRegularized(models ml.ModelContainers) ml.ModelContainers {
 func trainSpecificModels(dc data.Container) ml.ModelContainers {
 
 	modelFuncs := specificLinregFuncs()
+	return ml.ModelsFromFuncs(dc, modelFuncs)
+}
+
+func trainLogregSpecificModels(dc data.Container) ml.ModelContainers {
+	modelFuncs := specificLogregFuncs()
 	return ml.ModelsFromFuncs(dc, modelFuncs)
 }
 

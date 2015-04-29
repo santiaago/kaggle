@@ -125,21 +125,6 @@ func specificLinregFuncs() []func(dc data.Container) (*ml.ModelContainer, error)
 	}
 }
 
-func linregSexAgePClass(dc data.Container) (*ml.ModelContainer, error) {
-
-	lr := linreg.NewLinearRegression()
-
-	features := []int{passengerIndexSex, passengerIndexAge, passengerIndexPclass}
-	fd := dc.FilterWithPredict(features)
-	lr.InitializeFromData(fd)
-	name := "Sex Age PClass"
-
-	if err := lr.Learn(); err != nil {
-		return nil, err
-	}
-	return ml.NewModelContainer(lr, name, features), nil
-}
-
 func linregSexAge(dc data.Container) (*ml.ModelContainer, error) {
 
 	lr := linreg.NewLinearRegression()
@@ -178,6 +163,21 @@ func linregPClassSex(dc data.Container) (*ml.ModelContainer, error) {
 	fd := dc.FilterWithPredict(features)
 	lr.InitializeFromData(fd)
 	name := "PClass Sex"
+	if err := lr.Learn(); err != nil {
+		return nil, err
+	}
+	return ml.NewModelContainer(lr, name, features), nil
+}
+
+func linregSexAgePClass(dc data.Container) (*ml.ModelContainer, error) {
+
+	lr := linreg.NewLinearRegression()
+
+	features := []int{passengerIndexSex, passengerIndexAge, passengerIndexPclass}
+	fd := dc.FilterWithPredict(features)
+	lr.InitializeFromData(fd)
+	name := "Sex Age PClass"
+
 	if err := lr.Learn(); err != nil {
 		return nil, err
 	}
