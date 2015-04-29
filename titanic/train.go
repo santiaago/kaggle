@@ -30,8 +30,8 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	specificModels := trainSpecificModels(dc)
 	models = append(models, specificModels...)
 
-	// combinationModels := trainModelsByFeatureCombination(dc)
-	// models = append(models, combinationModels...)
+	linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
+	models = append(models, linregCombinationModels...)
 
 	// transformModels := trainModelsWithTransform(dc)
 	// models = append(models, transformModels...)
@@ -41,6 +41,9 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 
 	logregModels := trainLogregSpecificModels(dc)
 	models = append(models, logregModels...)
+
+	logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
+	models = append(models, logregCombinationModels...)
 
 	return
 }
@@ -85,13 +88,23 @@ func trainLogregSpecificModels(dc data.Container) ml.ModelContainers {
 	return ml.ModelsFromFuncs(dc, modelFuncs)
 }
 
-// trainModelsByFeatureCombination returns:
+// trainLinregModelsByFeatureCombination returns:
 // * an array of linearRegression models
 // It makes a model for every combinations of features present in the data.
 // Each feature corresponds to a column in the data set.
-func trainModelsByFeatureCombination(dc data.Container) ml.ModelContainers {
+func trainLinregModelsByFeatureCombination(dc data.Container) ml.ModelContainers {
 
 	modelFuncs := linregAllCombinations()
+	return ml.ModelsFromMetaFuncs(dc, modelFuncs)
+}
+
+// trainLogregModelsByFeatureCombination returns:
+// * an array of linearRegression models
+// It makes a model for every combinations of features present in the data.
+// Each feature corresponds to a column in the data set.
+func trainLogregModelsByFeatureCombination(dc data.Container) ml.ModelContainers {
+
+	modelFuncs := logregAllCombinations()
 	return ml.ModelsFromMetaFuncs(dc, modelFuncs)
 }
 
