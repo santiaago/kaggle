@@ -16,7 +16,10 @@ import (
 func linregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) {
 
 	fd := dc.Filter(model.Features)
-	lr := model.Model.(*linreg.LinearRegression)
+	lr, ok := model.Model.(*linreg.LinearRegression)
+	if !ok {
+		return nil, fmt.Errorf("not a linear regression")
+	}
 	return lr.Predictions(fd)
 }
 

@@ -53,7 +53,11 @@ func trainModelsRegularized(models ml.ModelContainers) ml.ModelContainers {
 		if m == nil {
 			continue
 		}
-		if nlr, err := linregWithRegularization(m.Model.(*linreg.LinearRegression)); err == nil && nlr != nil {
+		lr, ok := m.Model.(*linreg.LinearRegression)
+		if !ok {
+			continue
+		}
+		if nlr, err := linregWithRegularization(lr); err == nil && nlr != nil {
 			name := fmt.Sprintf("%v regularized k %v", m.Name, nlr.K)
 			rModels = append(rModels, ml.NewModelContainer(nlr, name, m.Features))
 		}
