@@ -5,6 +5,8 @@ import (
 
 	"github.com/santiaago/ml"
 	"github.com/santiaago/ml/data"
+	"github.com/santiaago/ml/linreg"
+	"github.com/santiaago/ml/logreg"
 )
 
 // testModel runs a linear regression model on the data passed in the reader.
@@ -23,10 +25,21 @@ func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
 		if m == nil {
 			continue
 		}
-
-		predictions, err := linregTest(m, dc)
-		if err == nil {
-			w.Write(m.Name, predictions)
+		_, ok := m.Model.(*linreg.LinearRegression)
+		if ok {
+			predictions, err := linregTest(m, dc)
+			if err == nil {
+				w.Write(m.Name, predictions)
+			}
+			continue
+		}
+		_, ok = m.Model.(*logreg.LogisticRegression)
+		if ok {
+			predictions, err := logregTest(m, dc)
+			if err == nil {
+				w.Write(m.Name, predictions)
+			}
+			continue
 		}
 	}
 }

@@ -30,14 +30,14 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	specificModels := trainSpecificModels(dc)
 	models = append(models, specificModels...)
 
-	combinationModels := trainModelsByFeatureCombination(dc)
-	models = append(models, combinationModels...)
+	// combinationModels := trainModelsByFeatureCombination(dc)
+	// models = append(models, combinationModels...)
 
-	transformModels := trainModelsWithTransform(dc)
-	models = append(models, transformModels...)
+	// transformModels := trainModelsWithTransform(dc)
+	// models = append(models, transformModels...)
 
-	regModels := trainModelsRegularized(models)
-	models = append(models, regModels...)
+	// regModels := trainModelsRegularized(models)
+	// models = append(models, regModels...)
 
 	logregModels := trainLogregSpecificModels(dc)
 	models = append(models, logregModels...)

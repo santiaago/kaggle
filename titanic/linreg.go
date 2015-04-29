@@ -12,7 +12,6 @@ import (
 
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
-
 func linregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) {
 
 	fd := dc.Filter(model.Features)
