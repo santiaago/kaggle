@@ -25,9 +25,9 @@ func logregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) 
 // These functions return an array of logistic regression and the corresponding features used.
 func logregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
 	funcs = []func(dc data.Container) ml.ModelContainers{
-		func(dc data.Container) ml.ModelContainers {
-			return logregCombinations(dc, 2)
-		},
+		// func(dc data.Container) ml.ModelContainers {
+		// 	return logregCombinations(dc, 2)
+		// },
 		func(dc data.Container) ml.ModelContainers {
 			return logregCombinations(dc, 3)
 		},
@@ -37,12 +37,12 @@ func logregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
 		func(dc data.Container) ml.ModelContainers {
 			return logregCombinations(dc, 5)
 		},
-		func(dc data.Container) ml.ModelContainers {
-			return logregCombinations(dc, 6)
-		},
-		func(dc data.Container) ml.ModelContainers {
-			return logregCombinations(dc, 7)
-		},
+		// func(dc data.Container) ml.ModelContainers {
+		// 	return logregCombinations(dc, 6)
+		// },
+		// func(dc data.Container) ml.ModelContainers {
+		// 	return logregCombinations(dc, 7)
+		// },
 	}
 	return
 }
@@ -60,11 +60,10 @@ func logregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 		lr := logreg.NewLogisticRegression()
 		lr.InitializeFromData(fd)
 
-		name := fmt.Sprintf("LogregModel-V-%d-%v", size, c)
-
 		if err := lr.Learn(); err != nil {
 			continue
 		}
+		name := fmt.Sprintf("LogregModel-V-%d-%v epochs-%v", size, c, lr.Epochs)
 
 		models = append(models, ml.NewModelContainer(lr, name, c))
 	}

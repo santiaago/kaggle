@@ -28,8 +28,8 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 		log.Println("error when getting the data.container from the reader,", err)
 	}
 
-	specificModels := trainSpecificModels(dc)
-	models = append(models, specificModels...)
+	// specificModels := trainSpecificModels(dc)
+	// models = append(models, specificModels...)
 
 	linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
 	models = append(models, linregCombinationModels...)
@@ -37,11 +37,11 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	linregTransformModels := trainLinregModelsWithTransform(dc)
 	models = append(models, linregTransformModels...)
 
-	// regModels := trainModelsRegularized(models)
-	// models = append(models, regModels...)
+	regModels := trainModelsRegularized(models)
+	models = append(models, regModels...)
 
-	logregModels := trainLogregSpecificModels(dc)
-	models = append(models, logregModels...)
+	// logregModels := trainLogregSpecificModels(dc)
+	// models = append(models, logregModels...)
 
 	logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
 	models = append(models, logregCombinationModels...)
@@ -119,8 +119,8 @@ func trainLinregModelsWithTransform(dc data.Container) ml.ModelContainers {
 
 	var models ml.ModelContainers
 
-	models2D := trainLinregModelsWith2DTransform(dc)
-	models = append(models, models2D...)
+	// models2D := trainLinregModelsWith2DTransform(dc)
+	// models = append(models, models2D...)
 
 	models3D := trainLinregModelsWith3DTransform(dc)
 	models = append(models, models3D...)
@@ -138,8 +138,8 @@ func trainLogregModelsWithTransform(dc data.Container) ml.ModelContainers {
 
 	var models ml.ModelContainers
 
-	models2D := trainLogregModelsWith2DTransform(dc)
-	models = append(models, models2D...)
+	// models2D := trainLogregModelsWith2DTransform(dc)
+	// models = append(models, models2D...)
 
 	models3D := trainLogregModelsWith3DTransform(dc)
 	models = append(models, models3D...)
@@ -247,7 +247,7 @@ func trainLogregModelsWithNDTransformFuncs(dc data.Container, funcs []func([]flo
 		index := 0
 		for _, f := range funcs {
 			if lr, err := trainLogregModelWithTransform(fd, f); err == nil {
-				name := fmt.Sprintf("logreg %dD %v transformed %d", dimension, c, index)
+				name := fmt.Sprintf("logreg %dD %v transformed %d epochs-%v", dimension, c, index, lr.Epochs)
 				fmt.Println(name)
 				models = append(models, ml.NewModelContainer(lr, name, c))
 				index++

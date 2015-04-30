@@ -26,9 +26,9 @@ func linregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) 
 // These functions return an array of linear regression and the corresponding features used.
 func linregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
 	funcs = []func(dc data.Container) ml.ModelContainers{
-		func(dc data.Container) ml.ModelContainers {
-			return linregCombinations(dc, 2)
-		},
+		// func(dc data.Container) ml.ModelContainers {
+		// 	return linregCombinations(dc, 2)
+		// },
 		func(dc data.Container) ml.ModelContainers {
 			return linregCombinations(dc, 3)
 		},
@@ -38,12 +38,12 @@ func linregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
 		func(dc data.Container) ml.ModelContainers {
 			return linregCombinations(dc, 5)
 		},
-		func(dc data.Container) ml.ModelContainers {
-			return linregCombinations(dc, 6)
-		},
-		func(dc data.Container) ml.ModelContainers {
-			return linregCombinations(dc, 7)
-		},
+		// func(dc data.Container) ml.ModelContainers {
+		// 	return linregCombinations(dc, 6)
+		// },
+		// func(dc data.Container) ml.ModelContainers {
+		// 	return linregCombinations(dc, 7)
+		// },
 	}
 	return
 }
