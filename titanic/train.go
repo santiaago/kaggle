@@ -168,6 +168,27 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 
 		}
 	}
+	// var nmodels ml.ModelContainers
+	// fmt.Println(len(models))
+	// for _, m := range models {
+	// 	if lr, ok := m.Model.(*logreg.LogisticRegression); ok {
+	// 		for k := -50; k < 50; k++ {
+	// 			nlr := logreg.NewLogisticRegression()
+	// 			fd := dc.FilterWithPredict(m.Features)
+	// 			nlr.InitializeFromData(fd)
+	// 			nlr.TransformFunction = lr.TransformFunction
+	// 			nlr.K = k
+	// 			name := fmt.Sprintf("%v regularized k %v", m.Name, k)
+	// 			if err := nlr.LearnRegularized(); err != nil {
+	// 				log.Println("error calling logreg.LearnRegularized, %v", err)
+	// 				continue
+	// 			}
+	// 			name += fmt.Sprintf(" epochs %v", nlr.Epochs)
+	// 			nmodels = append(nmodels, ml.NewModelContainer(nlr, name, m.Features))
+	// 		}
+	// 	}
+	// }
+	// models = append(models, nmodels...)
 	// 2 - generate all modes.
 
 	// specificModels := trainSpecificModels(dc)
