@@ -47,7 +47,8 @@ func main() {
 	testModels(drTest, wTest, models)
 
 	writeRankingEin(models, "ranking.ein.md")
-	writeRankingEcv(models, "ranking.ecv.md")
+	// todo(santiaago): too slow
+	// writeRankingEcv(models, "ranking.ecv.md")
 
 	models.PrintTop(50)
 }
