@@ -50,7 +50,7 @@ func main() {
 	// todo(santiaago): too slow
 	// writeRankingEcv(models, "ranking.ecv.md")
 
-	models.PrintTop(50)
+	models.PrintTop(500)
 }
 
 func writeRankingEin(models ml.ModelContainers, name string) {
