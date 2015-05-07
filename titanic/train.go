@@ -193,7 +193,6 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	}
 
 	var nmodels ml.ModelContainers
-	fmt.Println(len(models))
 
 	for _, m := range models {
 		if lr, ok := m.Model.(*logreg.LogisticRegression); ok {
