@@ -58,7 +58,7 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	// linregTransformModels := trainLinregModelsWithTransform(dc)
 	// models = append(models, linregTransformModels...)
 
-	// regModels := trainModelsRegularized(models)
+	// regModels := trainLinregModelsRegularized(models)
 	// models = append(models, regModels...)
 
 	// logregModels := trainLogregSpecificModels(dc)
@@ -73,13 +73,13 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	return
 }
 
-// trainModelsRegularized returns an array of models that are better with regularized
+// trainLinregModelsRegularized returns an array of models that are better with regularized
 // option than the normal linear regression option.
 // to do this we go through all trained models and try
 // them with regularization if the in sample error
 // is lower append it to the list of models.
 //
-func trainModelsRegularized(models ml.ModelContainers) ml.ModelContainers {
+func trainLinregModelsRegularized(models ml.ModelContainers) ml.ModelContainers {
 	var rModels ml.ModelContainers
 	for _, m := range models {
 		if m == nil {
@@ -443,31 +443,74 @@ func modelsFromRanking(dc data.Container) (models ml.ModelContainers) {
 		}
 	}
 
-	var nmodels ml.ModelContainers
+	nmodels := trainLogregModelsRegularized(models, dc)
+	models = append(models, nmodels...)
+	return
+}
+
+// trainLogregModelsRegularized returns the best regularized logreg model for
+// each logreg model passed in.
+//
+func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) (regModels ml.ModelContainers) {
+
+	var ok bool
 
 	for _, m := range models {
-		if lr, ok := m.Model.(*logreg.LogisticRegression); ok {
-			for k := -50; k < 50; k++ {
-				nlr := logreg.NewLogisticRegression()
-				fd := dc.FilterWithPredict(m.Features)
-				nlr.InitializeFromData(fd)
-				if lr.HasTransform {
-					nlr.TransformFunction = lr.TransformFunction
-					nlr.ApplyTransformation()
-				}
-				nlr.K = k
-				name := fmt.Sprintf("%v regularized k %v", m.Name, k)
-				if err := nlr.LearnRegularized(); err != nil {
-					log.Println("error calling logreg.LearnRegularized, %v", err)
-					continue
-				}
-				nlr.Wn = nlr.WReg
-				name += fmt.Sprintf(" epochs %v", nlr.Epochs)
-				nmodels = append(nmodels, ml.NewModelContainer(nlr, name, m.Features))
-			}
-		}
-	}
 
-	models = append(models, nmodels...)
+		var lr *logreg.LogisticRegression
+		if lr, ok = m.Model.(*logreg.LogisticRegression); !ok {
+			continue
+		}
+
+		if lr.IsRegularized {
+			continue
+		}
+
+		// ein := lr.Ein()
+		eAugs := []float64{}
+		ks := []int{}
+		names := []string{}
+		for k := -50; k < 50; k++ {
+			nlr := logreg.NewLogisticRegression()
+			fd := dc.FilterWithPredict(m.Features)
+			nlr.InitializeFromData(fd)
+
+			if lr.HasTransform {
+				nlr.TransformFunction = lr.TransformFunction
+				nlr.ApplyTransformation()
+			}
+
+			nlr.K = k
+			name := fmt.Sprintf("%v regularized k %v", m.Name, k)
+			if err := nlr.LearnRegularized(); err != nil {
+				log.Println("error calling logreg.LearnRegularized, %v", err)
+				continue
+			}
+			name += fmt.Sprintf(" epochs %v", nlr.Epochs)
+
+			eAugIn := nlr.EAugIn()
+			nlr.Wn = nlr.WReg
+
+			eAugs = append(eAugs, eAugIn)
+			ks = append(ks, k)
+			names = append(names, name)
+		}
+
+		i := argmin(eAugs)
+		// bestEAug := eAugs[i]
+
+		// if bestEAug >= ein {
+		// 	continue
+		// }
+
+		// better model found, make a copy of the model passed in.
+		nlr := logreg.NewLogisticRegression()
+		*nlr = *lr
+		nlr.K = ks[i]
+		if err := nlr.LearnRegularized(); err != nil {
+			continue
+		}
+		regModels = append(regModels, ml.NewModelContainer(nlr, names[i], m.Features))
+	}
 	return
 }
