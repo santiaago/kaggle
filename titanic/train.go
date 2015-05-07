@@ -44,6 +44,7 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	}
 
 	// 1 - use ranking to generate models.
+
 	rankedModels := []struct {
 		model       ModelType
 		transform   Transform
@@ -53,10 +54,10 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 		k           int
 	}{
 		{linearRegression, T4D, 4, []int{2, 4, 7, 11}, true, 2},
-		{linearRegression, T3D, 4, []int{2, 4, 11}, false, 0},
-		{logisticRegression, T3D, 1, []int{2, 4, 11}, false, 0},
+		{linearRegression, T3D, 6, []int{2, 4, 11}, false, 0},
+		{linearRegression, T4D, 1, []int{2, 4, 9, 11}, true, 2},
+		{logisticRegression, T4D, 1, []int{2, 4, 8, 11}, false, 0},
 		{logisticRegression, T3D, 4, []int{2, 4, 11}, false, 0},
-		{linearRegression, T4D, 6, []int{2, 4, 6, 7}, true, 2},
 	}
 
 	for _, modelInfo := range rankedModels {
@@ -74,6 +75,10 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 				case 4:
 					m.(*linreg.LinearRegression).TransformFunction = transform.Funcs3D()[4]
 					name += " transformed 4"
+				case 6:
+					m.(*linreg.LinearRegression).TransformFunction = transform.Funcs3D()[6]
+					name += " transformed 6"
+
 				}
 			} else if modelInfo.transform == T4D {
 				name += " 4D"
@@ -88,8 +93,8 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 					m.(*linreg.LinearRegression).TransformFunction = transform.Funcs4D()[6]
 					name += " transformed 6"
 				}
-
 			}
+
 		} else if modelInfo.model == logisticRegression {
 			name = "logreg"
 			m = logreg.NewLogisticRegression()
@@ -103,6 +108,7 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 					m.(*logreg.LogisticRegression).TransformFunction = transform.Funcs3D()[4]
 					name += " transformed 4"
 				}
+
 			} else if modelInfo.transform == T4D {
 				name += " 4D"
 				switch modelInfo.transformID {
@@ -126,27 +132,41 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 					lr := m.(*linreg.LinearRegression)
 					fd := dc.FilterWithPredict(modelInfo.features)
 					lr.InitializeFromData(fd)
+					if modelInfo.transform > NOT {
+						lr.ApplyTransformation()
+					}
 					lr.K = modelInfo.k
 					name += fmt.Sprintf(" %v regularized k %v", modelInfo.features, modelInfo.k)
 					if err := lr.LearnWeightDecay(); err != nil {
 						continue
 					}
+					// update Wn with WReg
+					// todo(santiaago): update should be part of WeightDecay?
+					lr.Wn = lr.WReg
 					mc = ml.NewModelContainer(lr, name, modelInfo.features)
+
 				} else {
 					lr := m.(*linreg.LinearRegression)
 					fd := dc.FilterWithPredict(modelInfo.features)
 					lr.InitializeFromData(fd)
+					if modelInfo.transform > NOT {
+						lr.ApplyTransformation()
+					}
 					name += fmt.Sprintf(" %v", modelInfo.features)
 					if err := lr.Learn(); err != nil {
 						continue
 					}
 					mc = ml.NewModelContainer(lr, name, modelInfo.features)
 				}
+
 			} else if modelInfo.model == logisticRegression {
 				if modelInfo.regularized {
 					lr := m.(*logreg.LogisticRegression)
 					fd := dc.FilterWithPredict(modelInfo.features)
 					lr.InitializeFromData(fd)
+					if modelInfo.transform > NOT {
+						lr.ApplyTransformation()
+					}
 					lr.K = modelInfo.k
 					name += fmt.Sprintf(" %v regularized k %v", modelInfo.features, modelInfo.k)
 					if err := lr.LearnRegularized(); err != nil {
@@ -157,6 +177,9 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 					lr := m.(*logreg.LogisticRegression)
 					fd := dc.FilterWithPredict(modelInfo.features)
 					lr.InitializeFromData(fd)
+					if modelInfo.transform > NOT {
+						lr.ApplyTransformation()
+					}
 					name += fmt.Sprintf(" %v", modelInfo.features)
 					if err := lr.Learn(); err != nil {
 						continue
@@ -165,11 +188,11 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 				}
 			}
 			models = append(models, mc)
-
 		}
 	}
-	// var nmodels ml.ModelContainers
-	// fmt.Println(len(models))
+
+	var nmodels ml.ModelContainers
+	fmt.Println(len(models))
 	// for _, m := range models {
 	// 	if lr, ok := m.Model.(*logreg.LogisticRegression); ok {
 	// 		for k := -50; k < 50; k++ {
@@ -188,7 +211,8 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	// 		}
 	// 	}
 	// }
-	// models = append(models, nmodels...)
+	models = append(models, nmodels...)
+
 	// 2 - generate all modes.
 
 	// specificModels := trainSpecificModels(dc)
