@@ -318,18 +318,47 @@ func trainLogregModelWithTransform(data [][]float64, f func([]float64) []float64
 	return lr, err
 }
 
+type modelInfo struct {
+	model       ModelType
+	transform   Transform
+	transformID int
+	features    []int
+	regularized bool
+	k           int
+}
+
+func nameFromModelInfo(mi modelInfo) (name string) {
+
+	if mi.model == linearRegression {
+		name = "linreg"
+	} else if mi.model == logisticRegression {
+		name = "logreg"
+	}
+
+	if mi.transform == T3D {
+		name += " 3D"
+	} else if mi.transform == T4D {
+		name += " 4D"
+	}
+
+	if mi.transform != NOT {
+		name += fmt.Sprintf(" transformed %v", mi.transformID)
+	}
+
+	name += fmt.Sprintf(" %v", mi.features)
+
+	if mi.regularized {
+		name += fmt.Sprintf(" regularized k %v", mi.k)
+	}
+
+	return
+}
+
 // modelsFromRanking build all the models defined in the ranking array (soon ranking.json) file.
 //
 func modelsFromRanking(dc data.Container) (models ml.ModelContainers) {
 
-	rankedModels := []struct {
-		model       ModelType
-		transform   Transform
-		transformID int
-		features    []int
-		regularized bool
-		k           int
-	}{
+	rankedModels := []modelInfo{
 		{linearRegression, T4D, 4, []int{2, 4, 7, 11}, true, 2},
 		{linearRegression, T3D, 6, []int{2, 4, 11}, false, 0},
 		{linearRegression, T4D, 1, []int{2, 4, 9, 11}, true, 2},
@@ -339,132 +368,77 @@ func modelsFromRanking(dc data.Container) (models ml.ModelContainers) {
 
 	for _, modelInfo := range rankedModels {
 		var m ml.Model
-		var name string
-		if modelInfo.model == linearRegression {
-			m = linreg.NewLinearRegression()
-			name = "linreg"
-			if modelInfo.transform == T3D {
-				name += " 3D"
-				switch modelInfo.transformID {
-				case 1:
-					m.(*linreg.LinearRegression).TransformFunction = transform.Funcs3D()[1]
-					name += " transformed 1"
-				case 4:
-					m.(*linreg.LinearRegression).TransformFunction = transform.Funcs3D()[4]
-					name += " transformed 4"
-				case 6:
-					m.(*linreg.LinearRegression).TransformFunction = transform.Funcs3D()[6]
-					name += " transformed 6"
+		name := nameFromModelInfo(modelInfo)
 
-				}
-			} else if modelInfo.transform == T4D {
-				name += " 4D"
-				switch modelInfo.transformID {
-				case 1:
-					m.(*linreg.LinearRegression).TransformFunction = transform.Funcs4D()[1]
-					name += " transformed 1"
-				case 4:
-					m.(*linreg.LinearRegression).TransformFunction = transform.Funcs4D()[4]
-					name += " transformed 4"
-				case 6:
-					m.(*linreg.LinearRegression).TransformFunction = transform.Funcs4D()[6]
-					name += " transformed 6"
-				}
-			}
+		// todo(santiaago): need ml.TransformFunc
+		var transformFunc func([]float64) []float64
 
-		} else if modelInfo.model == logisticRegression {
-			name = "logreg"
-			m = logreg.NewLogisticRegression()
-			if modelInfo.transform == T3D {
-				name += " 3D"
-				switch modelInfo.transformID {
-				case 1:
-					m.(*logreg.LogisticRegression).TransformFunction = transform.Funcs3D()[1]
-					name += " transformed 1"
-				case 4:
-					m.(*logreg.LogisticRegression).TransformFunction = transform.Funcs3D()[4]
-					name += " transformed 4"
-				}
-
-			} else if modelInfo.transform == T4D {
-				name += " 4D"
-				switch modelInfo.transformID {
-				case 1:
-					m.(*logreg.LogisticRegression).TransformFunction = transform.Funcs4D()[1]
-					name += " transformed 1"
-				case 4:
-					m.(*logreg.LogisticRegression).TransformFunction = transform.Funcs4D()[4]
-					name += " transformed 4"
-				case 6:
-					m.(*logreg.LogisticRegression).TransformFunction = transform.Funcs4D()[6]
-					name += " transformed 6"
-				}
-			}
+		if modelInfo.transform == T3D {
+			transformFunc = transform.Funcs3D()[modelInfo.transformID]
+		} else if modelInfo.transform == T4D {
+			transformFunc = transform.Funcs4D()[modelInfo.transformID]
 		}
 
-		if m != nil {
-			var mc *ml.ModelContainer
-			if modelInfo.model == linearRegression {
-				if modelInfo.regularized {
-					lr := m.(*linreg.LinearRegression)
-					fd := dc.FilterWithPredict(modelInfo.features)
-					lr.InitializeFromData(fd)
-					if modelInfo.transform > NOT {
-						lr.ApplyTransformation()
-					}
-					lr.K = modelInfo.k
-					name += fmt.Sprintf(" %v regularized k %v", modelInfo.features, modelInfo.k)
-					if err := lr.LearnWeightDecay(); err != nil {
-						continue
-					}
-					// update Wn with WReg
-					// todo(santiaago): update should be part of WeightDecay?
-					lr.Wn = lr.WReg
-					mc = ml.NewModelContainer(lr, name, modelInfo.features)
+		if modelInfo.model == linearRegression {
+			m = linreg.NewLinearRegression()
+			m.(*linreg.LinearRegression).TransformFunction = transformFunc
+		} else if modelInfo.model == logisticRegression {
+			m = logreg.NewLogisticRegression()
+			m.(*logreg.LogisticRegression).TransformFunction = transformFunc
+		}
 
-				} else {
-					lr := m.(*linreg.LinearRegression)
-					fd := dc.FilterWithPredict(modelInfo.features)
-					lr.InitializeFromData(fd)
-					if modelInfo.transform > NOT {
-						lr.ApplyTransformation()
-					}
-					name += fmt.Sprintf(" %v", modelInfo.features)
-					if err := lr.Learn(); err != nil {
-						continue
-					}
-					mc = ml.NewModelContainer(lr, name, modelInfo.features)
+		if m == nil {
+			continue
+		}
+
+		fd := dc.FilterWithPredict(modelInfo.features)
+
+		var mc *ml.ModelContainer
+
+		if lr, ok := m.(*linreg.LinearRegression); ok {
+			lr.InitializeFromData(fd)
+			if modelInfo.transform > NOT {
+				lr.ApplyTransformation()
+			}
+
+			if modelInfo.regularized {
+				lr.K = modelInfo.k
+				if err := lr.LearnWeightDecay(); err != nil {
+					continue
 				}
-
-			} else if modelInfo.model == logisticRegression {
-				if modelInfo.regularized {
-					lr := m.(*logreg.LogisticRegression)
-					fd := dc.FilterWithPredict(modelInfo.features)
-					lr.InitializeFromData(fd)
-					if modelInfo.transform > NOT {
-						lr.ApplyTransformation()
-					}
-					lr.K = modelInfo.k
-					name += fmt.Sprintf(" %v regularized k %v", modelInfo.features, modelInfo.k)
-					if err := lr.LearnRegularized(); err != nil {
-						continue
-					}
-					lr.Wn = lr.WReg
-					mc = ml.NewModelContainer(lr, name, modelInfo.features)
-				} else {
-					lr := m.(*logreg.LogisticRegression)
-					fd := dc.FilterWithPredict(modelInfo.features)
-					lr.InitializeFromData(fd)
-					if modelInfo.transform > NOT {
-						lr.ApplyTransformation()
-					}
-					name += fmt.Sprintf(" %v", modelInfo.features)
-					if err := lr.Learn(); err != nil {
-						continue
-					}
-					mc = ml.NewModelContainer(lr, name, modelInfo.features)
+				// update Wn with WReg
+				// todo(santiaago): update should be part of WeightDecay?
+				// this is only done so that test and ranking by ein works..
+				// need better way to do this.
+				lr.Wn = lr.WReg
+			} else {
+				if err := lr.Learn(); err != nil {
+					continue
 				}
 			}
+			mc = ml.NewModelContainer(lr, name, modelInfo.features)
+
+		} else if lr, ok := m.(*logreg.LogisticRegression); ok {
+			lr.InitializeFromData(fd)
+			if modelInfo.transform > NOT {
+				lr.ApplyTransformation()
+			}
+
+			if modelInfo.regularized {
+				lr.K = modelInfo.k
+				if err := lr.LearnRegularized(); err != nil {
+					continue
+				}
+				lr.Wn = lr.WReg
+			} else {
+				if err := lr.Learn(); err != nil {
+					continue
+				}
+			}
+			mc = ml.NewModelContainer(lr, name, modelInfo.features)
+		}
+
+		if mc != nil {
 			models = append(models, mc)
 		}
 	}
