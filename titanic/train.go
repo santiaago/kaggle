@@ -438,6 +438,7 @@ func modelFromModelInfo(mi modelInfo, dc data.Container) *ml.Model {
 //
 func modelsFromRanking(dc data.Container) (models ml.ModelContainers) {
 
+	// todo(santiaago): should read json file instead of having this hard coded.
 	rankedModels := []modelInfo{
 		{linearRegression, T4D, 4, []int{2, 4, 7, 11}, true, 2},
 		{linearRegression, T3D, 6, []int{2, 4, 11}, false, 0},
