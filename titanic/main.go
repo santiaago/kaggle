@@ -31,6 +31,11 @@ func main() {
 
 	models := trainModels(drTrain)
 
+	if len(models) == 0 {
+		fmt.Println("no models found.")
+		return
+	}
+
 	var xTest data.Extractor
 	var wTest data.Writer
 	var drTest data.Reader
@@ -38,11 +43,6 @@ func main() {
 	xTest = NewPassengerTestExtractor()
 	wTest = NewPassengerTestWriter(*test)
 	drTest = NewPassengerReader(*test, xTest)
-
-	if len(models) == 0 {
-		fmt.Println("no models found.")
-		return
-	}
 
 	testModels(drTest, wTest, models)
 
