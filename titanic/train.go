@@ -329,10 +329,10 @@ type modelInfo struct {
 	k           int       // k param used in regularization.
 }
 
-// nameFromModelInfo returns the name of the model
+// name returns the name of the model
 // a describes the model info passed in.
 //
-func nameFromModelInfo(mi modelInfo) (name string) {
+func (mi modelInfo) name() (name string) {
 
 	if mi.model == linearRegression {
 		name = "linreg"
@@ -359,10 +359,10 @@ func nameFromModelInfo(mi modelInfo) (name string) {
 	return
 }
 
-// newModelFromModelInfo creates model type with respect to the model
+// newModel creates model type with respect to the model
 // info passed in.
 //
-func newModelFromModelInfo(mi modelInfo) (m ml.Model) {
+func (mi modelInfo) newModel() (m ml.Model) {
 	// todo(santiaago): need ml.TransformFunc
 	var transformFunc func([]float64) []float64
 
@@ -382,12 +382,12 @@ func newModelFromModelInfo(mi modelInfo) (m ml.Model) {
 	return
 }
 
-// modelFromModelInfo return a Model with respect to the model information
+// model return a Model with respect to the model information
 // passed in.
 //
-func modelFromModelInfo(mi modelInfo, dc data.Container) *ml.Model {
+func (mi modelInfo) Model(dc data.Container) *ml.Model {
 
-	m := newModelFromModelInfo(mi)
+	m := mi.newModel()
 	if m == nil {
 		return nil
 	}
@@ -434,25 +434,32 @@ func modelFromModelInfo(mi modelInfo, dc data.Container) *ml.Model {
 	return &m
 }
 
-// modelsFromRanking build all the models defined in the ranking array (soon ranking.json) file.
+// getRankedModels returns an array of modelInfo type with the
+// top 5 current models.
+// todo(santiaago): should read json file instead of having this hard coded.
 //
-func modelsFromRanking(dc data.Container) (models ml.ModelContainers) {
-
-	// todo(santiaago): should read json file instead of having this hard coded.
-	rankedModels := []modelInfo{
+func getRankedModels() []modelInfo {
+	return []modelInfo{
 		{linearRegression, T4D, 4, []int{2, 4, 7, 11}, true, 2},
 		{linearRegression, T3D, 6, []int{2, 4, 11}, false, 0},
 		{linearRegression, T4D, 1, []int{2, 4, 9, 11}, true, 2},
 		{logisticRegression, T4D, 1, []int{2, 4, 8, 11}, false, 0},
 		{logisticRegression, T3D, 4, []int{2, 4, 11}, false, 0},
 	}
+}
 
-	for _, modelInfo := range rankedModels {
-		m := modelFromModelInfo(modelInfo, dc)
-		name := nameFromModelInfo(modelInfo)
+// modelsFromRanking build all the models defined in the ranking array (soon ranking.json) file.
+//
+func modelsFromRanking(dc data.Container) (models ml.ModelContainers) {
+
+	rankedModels := getRankedModels()
+
+	for _, mi := range rankedModels {
+		m := mi.Model(dc)
 
 		if m != nil {
-			models = append(models, ml.NewModelContainer(*m, name, modelInfo.features))
+			mc := ml.NewModelContainer(*m, mi.name(), mi.features)
+			models = append(models, mc)
 		}
 	}
 
