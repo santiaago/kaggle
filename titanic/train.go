@@ -135,40 +135,42 @@ func trainLogregModelsByFeatureCombination(dc data.Container) ml.ModelContainers
 //   * an array of linearRegression models
 //   * an array of used features vectors.
 //
-func trainLinregModelsWithTransform(dc data.Container) ml.ModelContainers {
+func trainLinregModelsWithTransform(dc data.Container) (models ml.ModelContainers) {
 
-	var models ml.ModelContainers
-
-	// models2D := trainLinregModelsWith2DTransform(dc)
-	// models = append(models, models2D...)
-
-	models3D := trainLinregModelsWith3DTransform(dc)
-	models = append(models, models3D...)
-
-	models4D := trainLinregModelsWith4DTransform(dc)
-	models = append(models, models4D...)
-
-	return models
+	if *trainLinregTransform2D {
+		models2D := trainLinregModelsWith2DTransform(dc)
+		models = append(models, models2D...)
+	}
+	if *trainLinregTransform3D {
+		models3D := trainLinregModelsWith3DTransform(dc)
+		models = append(models, models3D...)
+	}
+	if *trainLinregTransform4D {
+		models4D := trainLinregModelsWith4DTransform(dc)
+		models = append(models, models4D...)
+	}
+	return
 }
 
 // trainLogregModelsWithTransform returns:
 //   * an array of linearRegression models
 //   * an array of used features vectors.
 //
-func trainLogregModelsWithTransform(dc data.Container) ml.ModelContainers {
+func trainLogregModelsWithTransform(dc data.Container) (models ml.ModelContainers) {
 
-	var models ml.ModelContainers
-
-	// models2D := trainLogregModelsWith2DTransform(dc)
-	// models = append(models, models2D...)
-
-	models3D := trainLogregModelsWith3DTransform(dc)
-	models = append(models, models3D...)
-
-	models4D := trainLogregModelsWith4DTransform(dc)
-	models = append(models, models4D...)
-
-	return models
+	if *trainLogregTransform2D {
+		models2D := trainLogregModelsWith2DTransform(dc)
+		models = append(models, models2D...)
+	}
+	if *trainLogregTransform3D {
+		models3D := trainLogregModelsWith3DTransform(dc)
+		models = append(models, models3D...)
+	}
+	if *trainLogregTransform4D {
+		models4D := trainLogregModelsWith4DTransform(dc)
+		models = append(models, models4D...)
+	}
+	return
 }
 
 // trainLinregModelsWith2DTransform returns a list of linear regression models and the corresponding feature used.
@@ -176,9 +178,7 @@ func trainLogregModelsWithTransform(dc data.Container) ml.ModelContainers {
 //
 func trainLinregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
 
-	funcs := transform.Funcs2D()
-	dim := 2
-	return trainLinregModelsWithNDTransformFuncs(dc, funcs, dim)
+	return trainLinregModelsWithNDTransformFuncs(dc, transform.Funcs2D(), 2)
 }
 
 // trainLinregModelsWith3DTransform returns a list of linear regression models and the corresponding feature used.
@@ -186,9 +186,7 @@ func trainLinregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
 //
 func trainLinregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
 
-	funcs := transform.Funcs3D()
-	dim := 3
-	return trainLinregModelsWithNDTransformFuncs(dc, funcs, dim)
+	return trainLinregModelsWithNDTransformFuncs(dc, transform.Funcs3D(), 3)
 }
 
 // trainLinregModelsWith4DTransform returns a list of linear regression models and the corresponding feature used.
@@ -196,9 +194,7 @@ func trainLinregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
 //
 func trainLinregModelsWith4DTransform(dc data.Container) ml.ModelContainers {
 
-	funcs := transform.Funcs4D()
-	dim := 4
-	return trainLinregModelsWithNDTransformFuncs(dc, funcs, dim)
+	return trainLinregModelsWithNDTransformFuncs(dc, transform.Funcs4D(), 4)
 }
 
 // trainLogregModelsWith2DTransform returns a list of logistic regression models and the corresponding feature used.
@@ -206,9 +202,7 @@ func trainLinregModelsWith4DTransform(dc data.Container) ml.ModelContainers {
 //
 func trainLogregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
 
-	funcs := transform.Funcs2D()
-	dim := 2
-	return trainLogregModelsWithNDTransformFuncs(dc, funcs, dim)
+	return trainLogregModelsWithNDTransformFuncs(dc, transform.Funcs2D(), 2)
 }
 
 // trainLogregModelsWith3DTransform returns a list of logistic regression models and the corresponding feature used.
@@ -216,9 +210,7 @@ func trainLogregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
 //
 func trainLogregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
 
-	funcs := transform.Funcs3D()
-	dim := 3
-	return trainLogregModelsWithNDTransformFuncs(dc, funcs, dim)
+	return trainLogregModelsWithNDTransformFuncs(dc, transform.Funcs3D(), 3)
 }
 
 // trainLogregModelsWith4DTransform returns a list of logistic regression models and the corresponding feature used.
@@ -226,9 +218,7 @@ func trainLogregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
 //
 func trainLogregModelsWith4DTransform(dc data.Container) ml.ModelContainers {
 
-	funcs := transform.Funcs4D()
-	dim := 4
-	return trainLogregModelsWithNDTransformFuncs(dc, funcs, dim)
+	return trainLogregModelsWithNDTransformFuncs(dc, transform.Funcs4D(), 4)
 }
 
 //trainLinregModelsWithNDTransformFuncs returns
