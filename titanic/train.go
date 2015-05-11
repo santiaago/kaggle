@@ -30,31 +30,62 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	}
 
 	// 1 - use ranking to generate models.
-	models = modelsFromRanking(dc)
+	// models = modelsFromRanking(dc)
 
-	// 2 - generate all models.
+	linregModels := trainLinregModels(dc)
+	models = append(models, linregModels...)
 
-	// specificModels := trainSpecificModels(dc)
-	// models = append(models, specificModels...)
+	logregModels := trainLogregModels(dc)
+	models = append(models, logregModels...)
 
-	// linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
-	// models = append(models, linregCombinationModels...)
+	return
+}
 
-	// linregTransformModels := trainLinregModelsWithTransform(dc)
-	// models = append(models, linregTransformModels...)
+func trainLinregModels(dc data.Container) (linregModels ml.ModelContainers) {
+	if !*trainLinreg {
+		return
+	}
 
-	// regModels := trainLinregModelsRegularized(models)
-	// models = append(models, regModels...)
+	if *trainLinregSpecific {
+		specificModels := trainSpecificModels(dc)
+		linregModels = append(linregModels, specificModels...)
+	}
+	if *trainLinregCombinations {
+		linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
+		linregModels = append(linregModels, linregCombinationModels...)
+	}
+	if *trainLinregTransforms {
+		linregTransformModels := trainLinregModelsWithTransform(dc)
+		linregModels = append(linregModels, linregTransformModels...)
+	}
+	if *trainLinregRegularized {
+		regModels := trainLinregModelsRegularized(linregModels)
+		linregModels = append(linregModels, regModels...)
+	}
+	return
+}
 
-	// logregModels := trainLogregSpecificModels(dc)
-	// models = append(models, logregModels...)
+func trainLogregModels(dc data.Container) (logregModels ml.ModelContainers) {
+	if !*trainLogreg {
+		return
+	}
 
-	// logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
-	// models = append(models, logregCombinationModels...)
-
-	// logregTransformModels := trainLogregModelsWithTransform(dc)
-	// models = append(models, logregTransformModels...)
-
+	if *trainLogregSpecific {
+		specificModels := trainLogregSpecificModels(dc)
+		logregModels = append(logregModels, specificModels...)
+	}
+	if *trainLogregCombinations {
+		logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
+		logregModels = append(logregModels, logregCombinationModels...)
+	}
+	if *trainLogregTransforms {
+		logregTransformModels := trainLogregModelsWithTransform(dc)
+		logregModels = append(logregModels, logregTransformModels...)
+	}
+	if *trainLogregRegularized {
+		nmodels := trainLogregModelsRegularized(logregModels, dc)
+		logregModels = append(logregModels, nmodels...)
+	}
 	return
 }
 
