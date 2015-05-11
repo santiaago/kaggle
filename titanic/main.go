@@ -9,18 +9,25 @@ import (
 )
 
 var (
-	test                    = flag.String("test", "data/test.csv", "testing set")
-	train                   = flag.String("train", "data/train.csv", "training set")
-	trainLinreg             = flag.Bool("linreg", true, "train linear regressions.")
+	test  = flag.String("test", "data/test.csv", "testing set")
+	train = flag.String("train", "data/train.csv", "training set")
+
+	trainLinreg = flag.Bool("linreg", false, "train linear regressions.")
+
 	trainLinregSpecific     = flag.Bool("linregspec", false, "train specific linear regressions.")
 	trainLinregCombinations = flag.Bool("linregcomb", true, "train linear regressions combinations.")
 	trainLinregTransforms   = flag.Bool("linregtrans", true, "train all linear regressions with transformations.")
-	trainLinregRegularized  = flag.Bool("linregReg", true, "train all linear regressions with regularization.")
-	trainLogreg             = flag.Bool("logreg", true, "train logistic regressions.")
+	trainLinregRegularized  = flag.Bool("linregReg", false, "train all linear regressions with regularization.")
+
+	trainLogreg = flag.Bool("logreg", false, "train logistic regressions.")
+
 	trainLogregSpecific     = flag.Bool("logregspec", false, "train specific logistic regressions.")
 	trainLogregCombinations = flag.Bool("logregcomb", true, "train logistic regressions combinations.")
 	trainLogregTransforms   = flag.Bool("logregtrans", true, "train all logistic regressions with transformations.")
 	trainLogregRegularized  = flag.Bool("logregReg", false, "train all logistic regressions with regularization.")
+
+	einRank = flag.Bool("einRank", false, "write a ranking.ein.md file with the in sample ranking of all processed models.")
+	ecvRank = flag.Bool("ecvRank", false, "write a ranking.ecv.md file with the cross validation ranking of all processed models.")
 )
 
 func init() {
@@ -52,9 +59,9 @@ func main() {
 
 	testModels(drTest, wTest, models)
 
-	// writeEinRanking(models, "ranking.ein.md")
+	writeEinRanking(models, "ranking.ein.md")
 	// todo(santiaago): too slow
-	// writeEcvRanking(models, "ranking.ecv.md")
+	writeEcvRanking(models, "ranking.ecv.md")
 
-	models.PrintTop(500)
+	models.PrintTop(25)
 }

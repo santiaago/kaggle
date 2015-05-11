@@ -11,6 +11,9 @@ import (
 )
 
 func writeEinRanking(models ml.ModelContainers, name string) {
+	if !*einRank {
+		return
+	}
 	temp := "data/temp/"
 	if _, err := os.Stat(temp); os.IsNotExist(err) {
 		if err = os.Mkdir(temp, 0777); err != nil {
@@ -47,6 +50,10 @@ func writeEinRanking(models ml.ModelContainers, name string) {
 }
 
 func writeEcvRanking(models ml.ModelContainers, name string) {
+	if !*ecvRank {
+		return
+	}
+
 	temp := "data/temp/"
 	if _, err := os.Stat(temp); os.IsNotExist(err) {
 		if err = os.Mkdir(temp, 0777); err != nil {
