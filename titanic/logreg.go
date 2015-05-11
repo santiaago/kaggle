@@ -11,6 +11,7 @@ import (
 
 // logregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
+//
 func logregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) {
 
 	fd := dc.Filter(model.Features)
@@ -23,6 +24,7 @@ func logregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) 
 
 // logregVectorsOfInterval returns an array functions.
 // These functions return an array of logistic regression and the corresponding features used.
+//
 func logregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
 	funcs = []func(dc data.Container) ml.ModelContainers{
 		// func(dc data.Container) ml.ModelContainers {
@@ -51,6 +53,7 @@ func logregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
 // todo(santiaago): move to ml
+//
 func logregCombinations(dc data.Container, size int) (models ml.ModelContainers) {
 
 	combs := itertools.Combinations(dc.Features, size)
@@ -63,7 +66,7 @@ func logregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 		if err := lr.Learn(); err != nil {
 			continue
 		}
-		name := fmt.Sprintf("LogregModel-V-%d-%v epochs-%v", size, c, lr.Epochs)
+		name := fmt.Sprintf("Logreg 1D %v epochs-%v", size, c, lr.Epochs)
 
 		models = append(models, ml.NewModelContainer(lr, name, c))
 	}

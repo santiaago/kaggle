@@ -12,6 +12,7 @@ import (
 
 // linregTest sets the Survived field of each passenger in the passenger array
 // with respect to the prediction set by the linear regression 'linreg' passed as argument.
+//
 func linregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) {
 
 	fd := dc.Filter(model.Features)
@@ -24,6 +25,7 @@ func linregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) 
 
 // linregVectorsOfInterval returns an array functions.
 // These functions return an array of linear regression and the corresponding features used.
+//
 func linregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
 	funcs = []func(dc data.Container) ml.ModelContainers{
 		// func(dc data.Container) ml.ModelContainers {
@@ -52,7 +54,7 @@ func linregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
 // todo(santiaago): move to ml
-
+//
 func linregCombinations(dc data.Container, size int) (models ml.ModelContainers) {
 
 	combs := itertools.Combinations(dc.Features, size)
@@ -62,7 +64,7 @@ func linregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 		lr := linreg.NewLinearRegression()
 		lr.InitializeFromData(fd)
 
-		name := fmt.Sprintf("LinregModel-V-%d-%v", size, c)
+		name := fmt.Sprintf("linreg 1D %v", c)
 
 		if err := lr.Learn(); err != nil {
 			continue
@@ -76,6 +78,7 @@ func linregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 // linregWithRegularization returns a linear regression model if
 // it is better than the model passed as argument, else it returns nil.
 // todo(santiaago): move this to ml/linreg.
+//
 func linregWithRegularization(lr *linreg.LinearRegression) (*linreg.LinearRegression, error) {
 
 	ein := lr.Ein()
