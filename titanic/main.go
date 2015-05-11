@@ -15,15 +15,15 @@ var (
 	trainLinreg = flag.Bool("linreg", false, "train linear regressions.")
 
 	trainLinregSpecific     = flag.Bool("linregspec", false, "train specific linear regressions.")
-	trainLinregCombinations = flag.Bool("linregcomb", true, "train linear regressions combinations.")
-	trainLinregTransforms   = flag.Bool("linregtrans", true, "train all linear regressions with transformations.")
+	trainLinregCombinations = flag.Bool("linregcomb", false, "train linear regressions combinations.")
+	trainLinregTransforms   = flag.Bool("linregtrans", false, "train all linear regressions with transformations.")
 	trainLinregRegularized  = flag.Bool("linregReg", false, "train all linear regressions with regularization.")
 
 	trainLogreg = flag.Bool("logreg", false, "train logistic regressions.")
 
 	trainLogregSpecific     = flag.Bool("logregspec", false, "train specific logistic regressions.")
-	trainLogregCombinations = flag.Bool("logregcomb", true, "train logistic regressions combinations.")
-	trainLogregTransforms   = flag.Bool("logregtrans", true, "train all logistic regressions with transformations.")
+	trainLogregCombinations = flag.Bool("logregcomb", false, "train logistic regressions combinations.")
+	trainLogregTransforms   = flag.Bool("logregtrans", false, "train all logistic regressions with transformations.")
 	trainLogregRegularized  = flag.Bool("logregReg", false, "train all logistic regressions with regularization.")
 
 	einRank = flag.Bool("einRank", false, "write a ranking.ein.md file with the in sample ranking of all processed models.")
@@ -63,5 +63,11 @@ func main() {
 	// todo(santiaago): too slow
 	writeEcvRanking(models, "ranking.ecv.md")
 
-	models.PrintTop(25)
+	if *einRank {
+		models.TopEin(25)
+	}
+
+	if *ecvRank {
+		models.TopEcv(25)
+	}
 }

@@ -30,7 +30,7 @@ func writeEinRanking(models ml.ModelContainers, name string) {
 
 	writer := bufio.NewWriter(file)
 
-	if _, err := writer.WriteString("model ranking\n"); err != nil {
+	if _, err := writer.WriteString("model ranking in sample error\n"); err != nil {
 		log.Fatalln(err)
 	}
 
@@ -70,7 +70,7 @@ func writeEcvRanking(models ml.ModelContainers, name string) {
 
 	writer := bufio.NewWriter(file)
 
-	if _, err := writer.WriteString("model ranking\n"); err != nil {
+	if _, err := writer.WriteString("model ranking cross validation error\n"); err != nil {
 		log.Fatalln(err)
 	}
 
