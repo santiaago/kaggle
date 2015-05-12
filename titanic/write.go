@@ -10,16 +10,22 @@ import (
 	"github.com/santiaago/ml"
 )
 
+func createTempFolder(path string) {
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err = os.Mkdir(path, 0777); err != nil {
+			log.Fatalln(err)
+		}
+	}
+}
+
 func writeEinRanking(models ml.ModelContainers, name string) {
 	if !*einRank {
 		return
 	}
+
 	temp := "data/temp/"
-	if _, err := os.Stat(temp); os.IsNotExist(err) {
-		if err = os.Mkdir(temp, 0777); err != nil {
-			log.Fatalln(err)
-		}
-	}
+	createTempFolder(temp)
 
 	file, err := os.Create(temp + name)
 	defer file.Close()
@@ -55,11 +61,7 @@ func writeEcvRanking(models ml.ModelContainers, name string) {
 	}
 
 	temp := "data/temp/"
-	if _, err := os.Stat(temp); os.IsNotExist(err) {
-		if err = os.Mkdir(temp, 0777); err != nil {
-			log.Fatalln(err)
-		}
-	}
+	createTempFolder(temp)
 
 	file, err := os.Create(temp + name)
 	defer file.Close()
