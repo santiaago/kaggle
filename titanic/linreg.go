@@ -39,11 +39,9 @@ func linregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 
 		name := fmt.Sprintf("linreg 1D %v", c)
 
-		if err := lr.Learn(); err != nil {
-			continue
+		if err := lr.Learn(); err == nil {
+			models = append(models, ml.NewModelContainer(lr, name, c))
 		}
-
-		models = append(models, ml.NewModelContainer(lr, name, c))
 	}
 	return
 }
