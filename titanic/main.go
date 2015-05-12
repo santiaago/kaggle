@@ -28,6 +28,7 @@ var (
 	trainLogregRegularized  = flag.Bool("logregReg", false, "train all logistic regressions with regularization.")
 
 	transformDimension = flag.Int("dim", 0, "dimension of transformation.")
+	combinations       = flag.Int("comb", 0, "number of features to try with all combinations.")
 
 	einRank = flag.Bool("einRank", false, "write a ranking.ein.md file with the in sample ranking of all processed models.")
 	ecvRank = flag.Bool("ecvRank", false, "write a ranking.ecv.md file with the cross validation ranking of all processed models.")

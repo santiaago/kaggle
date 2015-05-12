@@ -73,7 +73,7 @@ func (mi modelInfo) name() (name string) {
 //
 func (mi modelInfo) newModel() (m ml.Model) {
 	// todo(santiaago): need ml.TransformFunc type
-	var transformFunc func([]float64) []float64
+	var transformFunc func([]float64) ([]float64, error)
 
 	if mi.transform == T3D {
 		transformFunc = transform.Funcs3D()[mi.transformID]

@@ -22,33 +22,6 @@ func logregTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) 
 	return lr.Predictions(fd)
 }
 
-// logregVectorsOfInterval returns an array functions.
-// These functions return an array of logistic regression and the corresponding features used.
-//
-func logregAllCombinations() (funcs []func(data.Container) ml.ModelContainers) {
-	funcs = []func(dc data.Container) ml.ModelContainers{
-		func(dc data.Container) ml.ModelContainers {
-			return logregCombinations(dc, 2)
-		},
-		func(dc data.Container) ml.ModelContainers {
-			return logregCombinations(dc, 3)
-		},
-		func(dc data.Container) ml.ModelContainers {
-			return logregCombinations(dc, 4)
-		},
-		func(dc data.Container) ml.ModelContainers {
-			return logregCombinations(dc, 5)
-		},
-		func(dc data.Container) ml.ModelContainers {
-			return logregCombinations(dc, 6)
-		},
-		func(dc data.Container) ml.ModelContainers {
-			return logregCombinations(dc, 7)
-		},
-	}
-	return
-}
-
 // logregCombinations creates a logistic regression model for each combination of
 // the feature vector with respect to the size param.
 // It returns an array of linear regressions, one for each combination.
