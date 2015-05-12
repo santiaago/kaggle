@@ -134,14 +134,15 @@ func trainLogregModelsByFeatureCombination(dc data.Container) ml.ModelContainers
 //
 func trainLinregModelsWithTransform(dc data.Container) (models ml.ModelContainers) {
 
-	if *trainLinregTransform2D {
+	switch *transformDimension {
+	case 2:
 		models = append(models, trainLinregModelsWith2DTransform(dc)...)
-	}
-	if *trainLinregTransform3D {
+	case 3:
 		models = append(models, trainLinregModelsWith3DTransform(dc)...)
-	}
-	if *trainLinregTransform4D {
+	case 4:
 		models = append(models, trainLinregModelsWith4DTransform(dc)...)
+	default:
+		log.Println("transformed dimension not supported")
 	}
 	return
 }
@@ -152,14 +153,15 @@ func trainLinregModelsWithTransform(dc data.Container) (models ml.ModelContainer
 //
 func trainLogregModelsWithTransform(dc data.Container) (models ml.ModelContainers) {
 
-	if *trainLogregTransform2D {
+	switch *transformDimension {
+	case 2:
 		models = append(models, trainLogregModelsWith2DTransform(dc)...)
-	}
-	if *trainLogregTransform3D {
+	case 3:
 		models = append(models, trainLogregModelsWith3DTransform(dc)...)
-	}
-	if *trainLogregTransform4D {
+	case 4:
 		models = append(models, trainLogregModelsWith4DTransform(dc)...)
+	default:
+		log.Println("transformed dimension not supported")
 	}
 	return
 }
