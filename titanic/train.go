@@ -41,50 +41,50 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	return
 }
 
-func trainLinregModels(dc data.Container) (linregModels ml.ModelContainers) {
+func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 	if !*trainLinreg {
 		return
 	}
 
 	if *trainLinregSpecific {
 		specificModels := trainSpecificModels(dc)
-		linregModels = append(linregModels, specificModels...)
+		models = append(models, specificModels...)
 	}
 	if *trainLinregCombinations {
 		linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
-		linregModels = append(linregModels, linregCombinationModels...)
+		models = append(models, linregCombinationModels...)
 	}
 	if *trainLinregTransforms {
 		linregTransformModels := trainLinregModelsWithTransform(dc)
-		linregModels = append(linregModels, linregTransformModels...)
+		models = append(models, linregTransformModels...)
 	}
 	if *trainLinregRegularized {
-		regModels := trainLinregModelsRegularized(linregModels)
-		linregModels = append(linregModels, regModels...)
+		regModels := trainLinregModelsRegularized(models)
+		models = append(models, regModels...)
 	}
 	return
 }
 
-func trainLogregModels(dc data.Container) (logregModels ml.ModelContainers) {
+func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 	if !*trainLogreg {
 		return
 	}
 
 	if *trainLogregSpecific {
 		specificModels := trainLogregSpecificModels(dc)
-		logregModels = append(logregModels, specificModels...)
+		models = append(models, specificModels...)
 	}
 	if *trainLogregCombinations {
 		logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
-		logregModels = append(logregModels, logregCombinationModels...)
+		models = append(models, logregCombinationModels...)
 	}
 	if *trainLogregTransforms {
 		logregTransformModels := trainLogregModelsWithTransform(dc)
-		logregModels = append(logregModels, logregTransformModels...)
+		models = append(models, logregTransformModels...)
 	}
 	if *trainLogregRegularized {
-		nmodels := trainLogregModelsRegularized(logregModels, dc)
-		logregModels = append(logregModels, nmodels...)
+		regModels := trainLogregModelsRegularized(models, dc)
+		models = append(models, regModels...)
 	}
 	return
 }
@@ -98,15 +98,14 @@ func trainLogregModels(dc data.Container) (logregModels ml.ModelContainers) {
 //
 func trainSpecificModels(dc data.Container) ml.ModelContainers {
 
-	modelFuncs := specificLinregFuncs()
-	return ml.ModelsFromFuncs(dc, modelFuncs)
+	return ml.ModelsFromFuncs(dc, specificLinregFuncs())
 }
 
 // trainLogregSpecificModels returns some simple ml models.
 //
 func trainLogregSpecificModels(dc data.Container) ml.ModelContainers {
-	modelFuncs := specificLogregFuncs()
-	return ml.ModelsFromFuncs(dc, modelFuncs)
+
+	return ml.ModelsFromFuncs(dc, specificLogregFuncs())
 }
 
 // trainLinregModelsByFeatureCombination returns:
@@ -116,8 +115,7 @@ func trainLogregSpecificModels(dc data.Container) ml.ModelContainers {
 //
 func trainLinregModelsByFeatureCombination(dc data.Container) ml.ModelContainers {
 
-	modelFuncs := linregAllCombinations()
-	return ml.ModelsFromMetaFuncs(dc, modelFuncs)
+	return ml.ModelsFromMetaFuncs(dc, linregAllCombinations())
 }
 
 // trainLogregModelsByFeatureCombination returns:
@@ -127,8 +125,7 @@ func trainLinregModelsByFeatureCombination(dc data.Container) ml.ModelContainers
 //
 func trainLogregModelsByFeatureCombination(dc data.Container) ml.ModelContainers {
 
-	modelFuncs := logregAllCombinations()
-	return ml.ModelsFromMetaFuncs(dc, modelFuncs)
+	return ml.ModelsFromMetaFuncs(dc, logregAllCombinations())
 }
 
 // trainLinregModelsWithTransform returns:
@@ -138,16 +135,13 @@ func trainLogregModelsByFeatureCombination(dc data.Container) ml.ModelContainers
 func trainLinregModelsWithTransform(dc data.Container) (models ml.ModelContainers) {
 
 	if *trainLinregTransform2D {
-		models2D := trainLinregModelsWith2DTransform(dc)
-		models = append(models, models2D...)
+		models = append(models, trainLinregModelsWith2DTransform(dc)...)
 	}
 	if *trainLinregTransform3D {
-		models3D := trainLinregModelsWith3DTransform(dc)
-		models = append(models, models3D...)
+		models = append(models, trainLinregModelsWith3DTransform(dc)...)
 	}
 	if *trainLinregTransform4D {
-		models4D := trainLinregModelsWith4DTransform(dc)
-		models = append(models, models4D...)
+		models = append(models, trainLinregModelsWith4DTransform(dc)...)
 	}
 	return
 }
@@ -159,21 +153,19 @@ func trainLinregModelsWithTransform(dc data.Container) (models ml.ModelContainer
 func trainLogregModelsWithTransform(dc data.Container) (models ml.ModelContainers) {
 
 	if *trainLogregTransform2D {
-		models2D := trainLogregModelsWith2DTransform(dc)
-		models = append(models, models2D...)
+		models = append(models, trainLogregModelsWith2DTransform(dc)...)
 	}
 	if *trainLogregTransform3D {
-		models3D := trainLogregModelsWith3DTransform(dc)
-		models = append(models, models3D...)
+		models = append(models, trainLogregModelsWith3DTransform(dc)...)
 	}
 	if *trainLogregTransform4D {
-		models4D := trainLogregModelsWith4DTransform(dc)
-		models = append(models, models4D...)
+		models = append(models, trainLogregModelsWith4DTransform(dc)...)
 	}
 	return
 }
 
-// trainLinregModelsWith2DTransform returns a list of linear regression models and the corresponding feature used.
+// trainLinregModelsWith2DTransform returns a list of linear regression models
+// and the corresponding feature used.
 // models learn based on some 2D transformation functions.
 //
 func trainLinregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
@@ -181,7 +173,8 @@ func trainLinregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
 	return trainLinregModelsWithNDTransformFuncs(dc, transform.Funcs2D(), 2)
 }
 
-// trainLinregModelsWith3DTransform returns a list of linear regression models and the corresponding feature used.
+// trainLinregModelsWith3DTransform returns a list of linear regression models
+// and the corresponding feature used.
 // models learn based on some 3D transformation functions.
 //
 func trainLinregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
@@ -189,7 +182,8 @@ func trainLinregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
 	return trainLinregModelsWithNDTransformFuncs(dc, transform.Funcs3D(), 3)
 }
 
-// trainLinregModelsWith4DTransform returns a list of linear regression models and the corresponding feature used.
+// trainLinregModelsWith4DTransform returns a list of linear regression models
+// and the corresponding feature used.
 // models learn based on some 4D transformation functions.
 //
 func trainLinregModelsWith4DTransform(dc data.Container) ml.ModelContainers {
@@ -197,7 +191,8 @@ func trainLinregModelsWith4DTransform(dc data.Container) ml.ModelContainers {
 	return trainLinregModelsWithNDTransformFuncs(dc, transform.Funcs4D(), 4)
 }
 
-// trainLogregModelsWith2DTransform returns a list of logistic regression models and the corresponding feature used.
+// trainLogregModelsWith2DTransform returns a list of logistic regression models
+// and the corresponding feature used.
 // models learn based on some 2D transformation functions.
 //
 func trainLogregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
@@ -205,7 +200,8 @@ func trainLogregModelsWith2DTransform(dc data.Container) ml.ModelContainers {
 	return trainLogregModelsWithNDTransformFuncs(dc, transform.Funcs2D(), 2)
 }
 
-// trainLogregModelsWith3DTransform returns a list of logistic regression models and the corresponding feature used.
+// trainLogregModelsWith3DTransform returns a list of logistic regression models
+// and the corresponding feature used.
 // models learn based on some 3D transformation functions.
 //
 func trainLogregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
@@ -213,7 +209,8 @@ func trainLogregModelsWith3DTransform(dc data.Container) ml.ModelContainers {
 	return trainLogregModelsWithNDTransformFuncs(dc, transform.Funcs3D(), 3)
 }
 
-// trainLogregModelsWith4DTransform returns a list of logistic regression models and the corresponding feature used.
+// trainLogregModelsWith4DTransform returns a list of logistic regression models
+// and the corresponding feature used.
 // models learn based on some 4D transformation functions.
 //
 func trainLogregModelsWith4DTransform(dc data.Container) ml.ModelContainers {
@@ -267,6 +264,8 @@ func trainLogregModelsWithNDTransformFuncs(dc data.Container, funcs []func([]flo
 		for _, f := range funcs {
 			if lr, err := trainLogregModelWithTransform(fd, f); err == nil {
 				name := fmt.Sprintf("logreg %dD %v transformed %d epochs-%v", dimension, c, index, lr.Epochs)
+				// this print is to show progress
+				// todo(santiaago): Show progress as a progress bar
 				fmt.Println(name)
 				models = append(models, ml.NewModelContainer(lr, name, c))
 				index++
@@ -278,6 +277,7 @@ func trainLogregModelsWithNDTransformFuncs(dc data.Container, funcs []func([]flo
 
 // trainLinregModelWithTransform returns a linear model and an error if it fails to learn.
 // It uses the data passed as param and a transformation function.
+// todo(santiago): export transform function type from ml.
 //
 func trainLinregModelWithTransform(data [][]float64, f func([]float64) []float64) (*linreg.LinearRegression, error) {
 	lr := linreg.NewLinearRegression()
@@ -306,8 +306,8 @@ func trainLogregModelWithTransform(data [][]float64, f func([]float64) []float64
 // them with regularization if the in sample error
 // is lower append it to the list of models.
 //
-func trainLinregModelsRegularized(models ml.ModelContainers) ml.ModelContainers {
-	var rModels ml.ModelContainers
+func trainLinregModelsRegularized(models ml.ModelContainers) (regModels ml.ModelContainers) {
+
 	for _, m := range models {
 		if m == nil {
 			continue
@@ -318,10 +318,10 @@ func trainLinregModelsRegularized(models ml.ModelContainers) ml.ModelContainers 
 		}
 		if nlr, err := linregWithRegularization(lr); err == nil && nlr != nil {
 			name := fmt.Sprintf("%v regularized k %v", m.Name, nlr.K)
-			rModels = append(rModels, ml.NewModelContainer(nlr, name, m.Features))
+			regModels = append(regModels, ml.NewModelContainer(nlr, name, m.Features))
 		}
 	}
-	return rModels
+	return
 }
 
 // trainLogregModelsRegularized returns the best regularized logreg model for
@@ -337,7 +337,6 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 		if lr, ok = m.Model.(*logreg.LogisticRegression); !ok {
 			continue
 		}
-
 		if lr.IsRegularized {
 			continue
 		}
@@ -346,6 +345,7 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 
 		for k := -20; k < 20; k++ {
 			nlr := logregFromK(k, fd, lr)
+			// todo(santiaago) clean this up
 			nlr.Wn = nlr.WReg
 
 			name := fmt.Sprintf("%v regularized k %v", m.Name, k)
@@ -358,7 +358,8 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 	return
 }
 
-// logregFromK return a logistic regression model based on the k parameter passed in and the logreg passed in.
+// logregFromK return a logistic regression model
+// based on the k parameter passed in and the logreg passed in.
 //
 func logregFromK(k int, fd [][]float64, lr *logreg.LogisticRegression) *logreg.LogisticRegression {
 	nlr := logreg.NewLogisticRegression()
@@ -371,7 +372,7 @@ func logregFromK(k int, fd [][]float64, lr *logreg.LogisticRegression) *logreg.L
 
 	nlr.K = k
 	if err := nlr.LearnRegularized(); err != nil {
-		log.Println("error calling logreg.LearnRegularized, %v", err)
+		log.Printf("error calling logreg.LearnRegularized, %v\n", err)
 		return nil
 	}
 	return nlr
@@ -391,16 +392,15 @@ func getRankedModels() []modelInfo {
 	}
 }
 
-// modelsFromRanking build all the models defined in the ranking array (soon ranking.json) file.
+// modelsFromRanking build all the models defined in the ranking array
+// (soon ranking.json) file.
 //
 func modelsFromRanking(dc data.Container) (models ml.ModelContainers) {
 
 	rankedModels := getRankedModels()
 
 	for _, mi := range rankedModels {
-		m := mi.Model(dc)
-
-		if m != nil {
+		if m := mi.Model(dc); m != nil {
 			mc := ml.NewModelContainer(*m, mi.name(), mi.features)
 			models = append(models, mc)
 		}
