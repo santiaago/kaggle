@@ -19,47 +19,31 @@ func createTempFolder(path string) {
 	}
 }
 
-func writeEinRanking(models ml.ModelContainers, name string) {
-	if !*einRank {
-		return
-	}
-
-	temp := "data/temp/"
-	createTempFolder(temp)
-
-	file, err := os.Create(temp + name)
-	defer file.Close()
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	writer := bufio.NewWriter(file)
-
-	if _, err := writer.WriteString("model ranking in sample error\n"); err != nil {
-		log.Fatalln(err)
-	}
-
-	sort.Sort(ml.ByEin(models))
-	for i, m := range models {
-		if m == nil || m.Model == nil {
-			continue
-		}
-
-		line := fmt.Sprintf("%v\t\tEin = %f\tmodel: %v\n", i, m.Model.Ein(), m.Name)
-		if _, err := writer.WriteString(line); err != nil {
-			log.Fatalln(err)
-		}
-		writer.Flush()
-	}
-	writer.Flush()
-}
-
 func writeEcvRanking(models ml.ModelContainers, name string) {
 	if !*ecvRank {
 		return
 	}
 
+	sort.Sort(ml.ByEcv(models))
+
+	ecv := func(m *ml.ModelContainer) float64 { return m.Model.Ecv() }
+
+	writeRanking(models, name, "model ranking in cross validation error", "Ecv", ecv)
+}
+
+func writeEinRanking(models ml.ModelContainers, name string) {
+	if !*einRank {
+		return
+	}
+	sort.Sort(ml.ByEin(models))
+
+	ein := func(m *ml.ModelContainer) float64 { return m.Model.Ein() }
+
+	writeRanking(models, name, "model ranking in sample error", "Ein", ein)
+}
+
+func writeRanking(models ml.ModelContainers, name, title, errTitle string, modelError func(m *ml.ModelContainer) float64) {
+
 	temp := "data/temp/"
 	createTempFolder(temp)
 
@@ -72,17 +56,15 @@ func writeEcvRanking(models ml.ModelContainers, name string) {
 
 	writer := bufio.NewWriter(file)
 
-	if _, err := writer.WriteString("model ranking cross validation error\n"); err != nil {
+	if _, err := writer.WriteString(title + "\n"); err != nil {
 		log.Fatalln(err)
 	}
-
-	sort.Sort(ml.ByEcv(models))
 	for i, m := range models {
 		if m == nil || m.Model == nil {
 			continue
 		}
 
-		line := fmt.Sprintf("%v\t\tEcv = %f\tmodel: %v\n", i, m.Model.Ecv(), m.Name)
+		line := fmt.Sprintf("%v\t\t%v = %f\tmodel: %v\n", i, errTitle, modelError(m), m.Name)
 		if _, err := writer.WriteString(line); err != nil {
 			log.Fatalln(err)
 		}
