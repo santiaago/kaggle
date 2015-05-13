@@ -13,6 +13,8 @@ var (
 	test  = flag.String("test", "data/test.csv", "testing set")
 	train = flag.String("train", "data/train.csv", "training set")
 
+	tempPath = flag.String("temp", "data/temp/", "path of temp folder where all model results and rankings will be written.")
+
 	trainLinreg = flag.Bool("linreg", false, "train linear regressions.")
 	trainLogreg = flag.Bool("logreg", false, "train logistic regressions.")
 
@@ -22,8 +24,8 @@ var (
 	transformDimension = flag.Int("dim", 0, "dimension of transformation.")
 	trainRegularized   = flag.Bool("reg", false, "train models with regularization.")
 
-	einRank = flag.Bool("einRank", false, "write a ranking.ein.md file with the in sample ranking of all processed models.")
-	ecvRank = flag.Bool("ecvRank", false, "write a ranking.ecv.md file with the cross validation ranking of all processed models.")
+	einRank = flag.Bool("einRank", false, "writes a ranking.ein.md file with the in sample ranking of all processed models.")
+	ecvRank = flag.Bool("ecvRank", false, "writes a ranking.ecv.md file with the cross validation ranking of all processed models.")
 )
 
 func init() {

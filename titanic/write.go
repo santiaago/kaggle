@@ -44,10 +44,9 @@ func writeEinRanking(models ml.ModelContainers, name string) {
 
 func writeRanking(models ml.ModelContainers, name, title, errTitle string, modelError func(m *ml.ModelContainer) float64) {
 
-	temp := "data/temp/"
-	createTempFolder(temp)
+	createTempFolder(*tempPath)
 
-	file, err := os.Create(temp + name)
+	file, err := os.Create(*tempPath + name)
 	defer file.Close()
 
 	if err != nil {
