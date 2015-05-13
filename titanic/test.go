@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/santiaago/ml"
@@ -15,7 +16,7 @@ import (
 // testModels run a test file for each linear regression model passed in the linreg array.
 //
 func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
-
+	fmt.Println("Starting testing models")
 	var dc data.Container
 	var err error
 
@@ -23,12 +24,11 @@ func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
 		log.Println("error when getting data from reader,", err)
 	}
 
-	for _, m := range models {
-
+	for i, m := range models {
+		fmt.Printf("\r\ttesting model:%v/%v", i, len(models))
 		if m == nil {
 			continue
 		}
-
 		switch m.Model.(type) {
 		case *linreg.LinearRegression:
 			if predictions, err := linregTest(m, dc); err == nil {
@@ -40,4 +40,6 @@ func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
 			}
 		}
 	}
+	fmt.Printf("\n")
+	fmt.Println("Done testing models")
 }

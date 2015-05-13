@@ -20,7 +20,7 @@ import (
 // * trainModelsWithTransform
 //
 func trainModels(reader data.Reader) (models ml.ModelContainers) {
-
+	fmt.Println("Starting training models")
 	var dc data.Container
 	var err error
 	dc, err = reader.Read()
@@ -36,7 +36,7 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 
 	logregModels := trainLogregModels(dc)
 	models = append(models, logregModels...)
-
+	fmt.Println("Done training models")
 	return
 }
 
@@ -48,23 +48,27 @@ func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 	if !*trainLinreg {
 		return
 	}
-
+	fmt.Println("training linreg models")
 	if *trainSpecific {
+		fmt.Println("\ttraining specific")
 		specificModels := trainSpecificModels(dc)
 		models = append(models, specificModels...)
 	}
 
 	if *combinations > 0 {
+		fmt.Println("\ttraining combinations")
 		linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
 		models = append(models, linregCombinationModels...)
 	}
 
 	if *trainTransforms {
+		fmt.Println("\ttraining transforms")
 		linregTransformModels := trainLinregModelsWithTransform(models, dc)
 		models = append(models, linregTransformModels...)
 	}
 
 	if *trainRegularized {
+		fmt.Println("\ttraining regularized models")
 		regModels := trainLinregModelsRegularized(models)
 		models = append(models, regModels...)
 	}
@@ -79,23 +83,27 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 	if !*trainLogreg {
 		return
 	}
-
+	fmt.Println("training logreg models")
 	if *trainSpecific {
+		fmt.Println("\ttraining specific")
 		specificModels := trainLogregSpecificModels(dc)
 		models = append(models, specificModels...)
 	}
 
 	if *combinations > 0 {
+		fmt.Println("\ttraining combinations")
 		logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
 		models = append(models, logregCombinationModels...)
 	}
 
 	if *trainTransforms {
+		fmt.Println("\ttraining transforms")
 		logregTransformModels := trainLogregModelsWithTransform(models, dc)
 		models = append(models, logregTransformModels...)
 	}
 
 	if *trainRegularized {
+		fmt.Println("\ttraining regularized models")
 		regModels := trainLogregModelsRegularized(models, dc)
 		models = append(models, regModels...)
 	}
@@ -311,8 +319,8 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 
 	var ok bool
 
-	for _, m := range models {
-
+	for i, m := range models {
+		fmt.Printf("\rregularizing model %v/%v", i, len(models))
 		var lr *logreg.LogisticRegression
 		if lr, ok = m.Model.(*logreg.LogisticRegression); !ok {
 			continue
@@ -323,7 +331,8 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 
 		fd := dc.FilterWithPredict(m.Features)
 
-		for k := -20; k < 20; k++ {
+		for k := -5; k < 5; k++ {
+			fmt.Printf("\rregularizing model %v/%v with k:%v", i, len(models), k)
 			var nlr *logreg.LogisticRegression
 			if nlr = logregFromK(k, fd, lr); nlr == nil {
 				continue
