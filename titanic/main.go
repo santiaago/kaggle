@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 
 	"github.com/santiaago/ml"
@@ -12,6 +14,12 @@ import (
 var (
 	test  = flag.String("test", "data/test.csv", "testing set")
 	train = flag.String("train", "data/train.csv", "training set")
+
+	importPath   = flag.String("ipath", "models.json", "path to a json array with models to use description.")
+	importModels = flag.Bool("i", false, "defines if the program should import the models defined in ipath")
+
+	exportPath   = flag.String("epath", "usedModels.json", "json array with the description of the trained models.")
+	exportModels = flag.Bool("e", false, "defines if the program should export the used models defined in epath")
 
 	tempPath = flag.String("temp", "data/temp/", "path of temp folder where all model results and rankings will be written.")
 
@@ -58,6 +66,37 @@ func main() {
 	testModels(drTest, wTest, models)
 
 	rank(models)
+
+	if *exportModels {
+		// export models here..
+		export(models, *exportPath)
+	}
+
+}
+
+func export(models ml.ModelContainers, path string) {
+	var a []modelInfo
+
+	for m := range models {
+		if models[m] == nil {
+			continue
+		}
+
+		mi := ModelInfoFromModel(models[m])
+		a = append(a, mi)
+	}
+	var b []byte
+	var err error
+
+	if b, err = json.Marshal(a); err != nil {
+		log.Printf("unable to marshal array of modelInfo objects ", err)
+	}
+
+	err = ioutil.WriteFile(path, b, 0644)
+	if err != nil {
+		log.Printf("unable to write to file %v, %v", path, err)
+		panic(err)
+	}
 }
 
 func rank(models ml.ModelContainers) {

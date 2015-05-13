@@ -12,12 +12,13 @@ import (
 )
 
 // trainModels returns:
-// * an array of trained LinearRegression models.
+// * an array of trained LinearRegression/LogisticRegression models.
 // It uses the reader passed as param to read the data.
 // It trains multiple models using different techniques:
 // * trainSpecificModels
 // * trainModelsByFeatrueCombination
 // * trainModelsWithTransform
+// * trainModelsWithRegularization
 //
 func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	fmt.Println("Starting training models")
@@ -28,8 +29,12 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 		log.Println("error when getting the data.container from the reader,", err)
 	}
 
-	// 1 - use ranking to generate models.
-	// models = modelsFromRanking(dc)
+	if *importModels {
+		// get models from json file
+
+		// train these models.
+		return
+	}
 
 	linregModels := trainLinregModels(dc)
 	models = append(models, linregModels...)
@@ -391,14 +396,13 @@ func getRankedModels() []modelInfo {
 func modelsFromRanking(dc data.Container) (models ml.ModelContainers) {
 
 	rankedModels := getRankedModels()
-
 	for _, mi := range rankedModels {
-		if m := mi.Model(dc); m != nil {
-			mc := ml.NewModelContainer(*m, mi.name(), mi.features)
+		if m := mi.GetModel(dc); m != nil {
+			mc := ml.NewModelContainer(*m, mi.name(), mi.Features)
 			models = append(models, mc)
 		}
 	}
-
+	// train models here
 	nmodels := trainLogregModelsRegularized(models, dc)
 	models = append(models, nmodels...)
 	return

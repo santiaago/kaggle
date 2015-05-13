@@ -30,12 +30,40 @@ const (
 // modelInfo is a type that describes the model to use.
 //
 type modelInfo struct {
-	model       ModelType // the model type, either logistic regression or linear regression.
-	transform   Transform // the transform dimension if any.
-	transformID int       // the id of the transformation function.
-	features    []int     // the features to use for this model.
-	regularized bool      // flag to know if model is using regularization.
-	k           int       // k param used in regularization.
+	Model       ModelType // the model type, either logistic regression or linear regression.
+	Transform   Transform // the transform dimension if any.
+	TransformID int       // the id of the transformation function.
+	Features    []int     // the features to use for this model.
+	Regularized bool      // flag to know if model is using regularization.
+	K           int       // k param used in regularization.
+}
+
+// ModelInfoFromModel returns a modelInfo type from
+// a Model type.
+//
+func ModelInfoFromModel(m *ml.ModelContainer) (mi modelInfo) {
+
+	if lr, ok := m.Model.(*linreg.LinearRegression); ok {
+		mi.Model = linearRegression
+		if !lr.HasTransform {
+			mi.Transform = NOT
+		}
+		if lr.IsRegularized {
+			mi.Regularized = true
+			mi.K = lr.K
+		}
+	} else if _, ok := m.Model.(*logreg.LogisticRegression); ok {
+		mi.Model = logisticRegression
+		if !lr.HasTransform {
+			mi.Transform = NOT
+		}
+		if lr.IsRegularized {
+			mi.Regularized = true
+			mi.K = lr.K
+		}
+	}
+	mi.Features = m.Features
+	return
 }
 
 // name returns the name of the model
@@ -43,26 +71,26 @@ type modelInfo struct {
 //
 func (mi modelInfo) name() (name string) {
 
-	if mi.model == linearRegression {
+	if mi.Model == linearRegression {
 		name = "linreg"
-	} else if mi.model == logisticRegression {
+	} else if mi.Model == logisticRegression {
 		name = "logreg"
 	}
 
-	if mi.transform == T3D {
+	if mi.Transform == T3D {
 		name += " 3D"
-	} else if mi.transform == T4D {
+	} else if mi.Transform == T4D {
 		name += " 4D"
 	}
 
-	if mi.transform != NOT {
-		name += fmt.Sprintf(" transformed %v", mi.transformID)
+	if mi.Transform != NOT {
+		name += fmt.Sprintf(" transformed %v", mi.TransformID)
 	}
 
-	name += fmt.Sprintf(" %v", mi.features)
+	name += fmt.Sprintf(" %v", mi.Features)
 
-	if mi.regularized {
-		name += fmt.Sprintf(" regularized k %v", mi.k)
+	if mi.Regularized {
+		name += fmt.Sprintf(" regularized k %v", mi.K)
 	}
 
 	return
@@ -75,16 +103,16 @@ func (mi modelInfo) newModel() (m ml.Model) {
 	// todo(santiaago): need ml.TransformFunc type
 	var transformFunc func([]float64) ([]float64, error)
 
-	if mi.transform == T3D {
-		transformFunc = transform.Funcs3D()[mi.transformID]
-	} else if mi.transform == T4D {
-		transformFunc = transform.Funcs4D()[mi.transformID]
+	if mi.Transform == T3D {
+		transformFunc = transform.Funcs3D()[mi.TransformID]
+	} else if mi.Transform == T4D {
+		transformFunc = transform.Funcs4D()[mi.TransformID]
 	}
 
-	if mi.model == linearRegression {
+	if mi.Model == linearRegression {
 		m = linreg.NewLinearRegression()
 		m.(*linreg.LinearRegression).TransformFunction = transformFunc
-	} else if mi.model == logisticRegression {
+	} else if mi.Model == logisticRegression {
 		m = logreg.NewLogisticRegression()
 		m.(*logreg.LogisticRegression).TransformFunction = transformFunc
 	}
@@ -94,24 +122,24 @@ func (mi modelInfo) newModel() (m ml.Model) {
 // model return a ml.Model with respect to the model information
 // passed in.
 //
-func (mi modelInfo) Model(dc data.Container) *ml.Model {
+func (mi modelInfo) GetModel(dc data.Container) *ml.Model {
 
 	m := mi.newModel()
 	if m == nil {
 		return nil
 	}
 
-	fd := dc.FilterWithPredict(mi.features)
+	fd := dc.FilterWithPredict(mi.Features)
 
 	if lr, ok := m.(*linreg.LinearRegression); ok {
 
 		lr.InitializeFromData(fd)
-		if mi.transform > NOT {
+		if mi.Transform > NOT {
 			lr.ApplyTransformation()
 		}
 
-		if mi.regularized {
-			lr.K = mi.k
+		if mi.Regularized {
+			lr.K = mi.K
 			if err := lr.LearnWeightDecay(); err != nil {
 				return nil
 			}
@@ -124,12 +152,12 @@ func (mi modelInfo) Model(dc data.Container) *ml.Model {
 		}
 	} else if lr, ok := m.(*logreg.LogisticRegression); ok {
 		lr.InitializeFromData(fd)
-		if mi.transform > NOT {
+		if mi.Transform > NOT {
 			lr.ApplyTransformation()
 		}
 
-		if mi.regularized {
-			lr.K = mi.k
+		if mi.Regularized {
+			lr.K = mi.K
 			if err := lr.LearnRegularized(); err != nil {
 				return nil
 			}
