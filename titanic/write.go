@@ -59,6 +59,7 @@ func writeRanking(models ml.ModelContainers, name, title, errTitle string, model
 	if _, err := writer.WriteString(title + "\n"); err != nil {
 		log.Fatalln(err)
 	}
+
 	for i, m := range models {
 		if m == nil || m.Model == nil {
 			continue

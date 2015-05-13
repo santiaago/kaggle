@@ -40,6 +40,10 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	return
 }
 
+// trainLinregModels returns an array of modelContainers
+// with the trained linear regression models specified to be trained.
+// You specify which models to train by setting the trainLinreg flags.
+//
 func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 	if !*trainLinreg {
 		return
@@ -49,14 +53,17 @@ func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 		specificModels := trainSpecificModels(dc)
 		models = append(models, specificModels...)
 	}
+
 	if *trainLinregCombinations {
 		linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
 		models = append(models, linregCombinationModels...)
 	}
+
 	if *trainLinregTransforms {
 		linregTransformModels := trainLinregModelsWithTransform(models, dc)
 		models = append(models, linregTransformModels...)
 	}
+
 	if *trainLinregRegularized {
 		regModels := trainLinregModelsRegularized(models)
 		models = append(models, regModels...)
@@ -64,6 +71,10 @@ func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 	return
 }
 
+// trainLogregModels returns an array of modelContainers
+// with the trained logistic regression models specified to be trained.
+// You specify which models to train by setting the trainLinreg flags.
+//
 func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 	if !*trainLogreg {
 		return
