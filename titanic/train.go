@@ -49,7 +49,7 @@ func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 		return
 	}
 
-	if *trainLinregSpecific {
+	if *trainSpecific {
 		specificModels := trainSpecificModels(dc)
 		models = append(models, specificModels...)
 	}
@@ -59,12 +59,12 @@ func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 		models = append(models, linregCombinationModels...)
 	}
 
-	if *trainLinregTransforms {
+	if *trainTransforms {
 		linregTransformModels := trainLinregModelsWithTransform(models, dc)
 		models = append(models, linregTransformModels...)
 	}
 
-	if *trainLinregRegularized {
+	if *trainRegularized {
 		regModels := trainLinregModelsRegularized(models)
 		models = append(models, regModels...)
 	}
@@ -80,7 +80,7 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 		return
 	}
 
-	if *trainLogregSpecific {
+	if *trainSpecific {
 		specificModels := trainLogregSpecificModels(dc)
 		models = append(models, specificModels...)
 	}
@@ -90,12 +90,12 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 		models = append(models, logregCombinationModels...)
 	}
 
-	if *trainLogregTransforms {
+	if *trainTransforms {
 		logregTransformModels := trainLogregModelsWithTransform(models, dc)
 		models = append(models, logregTransformModels...)
 	}
 
-	if *trainLogregRegularized {
+	if *trainRegularized {
 		regModels := trainLogregModelsRegularized(models, dc)
 		models = append(models, regModels...)
 	}

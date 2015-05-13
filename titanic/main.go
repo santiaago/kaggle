@@ -14,19 +14,13 @@ var (
 	train = flag.String("train", "data/train.csv", "training set")
 
 	trainLinreg = flag.Bool("linreg", false, "train linear regressions.")
-
-	trainLinregSpecific    = flag.Bool("linregspec", false, "train specific linear regressions.")
-	trainLinregTransforms  = flag.Bool("linregtrans", false, "train linear regressions with transformations.")
-	trainLinregRegularized = flag.Bool("linregReg", false, "train all linear regressions with regularization.")
-
 	trainLogreg = flag.Bool("logreg", false, "train logistic regressions.")
 
-	trainLogregSpecific    = flag.Bool("logregspec", false, "train specific logistic regressions.")
-	trainLogregTransforms  = flag.Bool("logregtrans", false, "train all logistic regressions with transformations.")
-	trainLogregRegularized = flag.Bool("logregReg", false, "train all logistic regressions with regularization.")
-
-	transformDimension = flag.Int("dim", 0, "dimension of transformation.")
+	trainSpecific      = flag.Bool("specific", false, "train specific models.")
 	combinations       = flag.Int("comb", 0, "number of features to try with all combinations.")
+	trainTransforms    = flag.Bool("trans", false, "train models with transformations.")
+	transformDimension = flag.Int("dim", 0, "dimension of transformation.")
+	trainRegularized   = flag.Bool("reg", false, "train models with regularization.")
 
 	einRank = flag.Bool("einRank", false, "write a ranking.ein.md file with the in sample ranking of all processed models.")
 	ecvRank = flag.Bool("ecvRank", false, "write a ranking.ecv.md file with the cross validation ranking of all processed models.")
