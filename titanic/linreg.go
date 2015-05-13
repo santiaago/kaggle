@@ -33,6 +33,7 @@ func linregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 	combs := itertools.Combinations(dc.Features, size)
 
 	for _, c := range combs {
+		fmt.Printf("\r%v/%v", c, len(combs))
 		fd := dc.FilterWithPredict(c)
 		lr := linreg.NewLinearRegression()
 		lr.InitializeFromData(fd)
@@ -43,6 +44,7 @@ func linregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 			models = append(models, ml.NewModelContainer(lr, name, c))
 		}
 	}
+	fmt.Println()
 	return
 }
 

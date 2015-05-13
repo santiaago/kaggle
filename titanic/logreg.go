@@ -32,6 +32,7 @@ func logregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 	combs := itertools.Combinations(dc.Features, size)
 
 	for _, c := range combs {
+		fmt.Printf("\r%v/%v", c, len(combs))
 		fd := dc.FilterWithPredict(c)
 		lr := logreg.NewLogisticRegression()
 		lr.InitializeFromData(fd)
@@ -39,10 +40,11 @@ func logregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 		if err := lr.Learn(); err != nil {
 			continue
 		}
-		name := fmt.Sprintf("Logreg 1D %v epochs-%v", size, c, lr.Epochs)
+		name := fmt.Sprintf("Logreg 1D %v epochs-%v", c, lr.Epochs)
 
 		models = append(models, ml.NewModelContainer(lr, name, c))
 	}
+	fmt.Println()
 	return
 }
 

@@ -63,19 +63,17 @@ func main() {
 func rank(models ml.ModelContainers) {
 	fmt.Println("Start ranking models")
 	if *einRank {
-		fmt.Println("Start ranking models by Ein\n")
+		fmt.Println("Start ranking models by Ein")
 		writeEinRanking(models, "ranking.ein.md")
-		fmt.Println()
 		models.TopEin(25)
 		fmt.Println("Done ranking models by Ein")
 	}
 
 	if *ecvRank {
-		fmt.Println("Start ranking models by Ecv\n")
+		fmt.Println("Start ranking models by Ecv")
 		writeEcvRanking(models, "ranking.ecv.md")
-		fmt.Println()
 		models.TopEcv(25)
-		fmt.Println("Done ranking models by Ecv\n")
+		fmt.Println("Done ranking models by Ecv")
 	}
 	fmt.Println("Done ranking models")
 }
