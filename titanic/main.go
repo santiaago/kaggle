@@ -15,17 +15,15 @@ var (
 
 	trainLinreg = flag.Bool("linreg", false, "train linear regressions.")
 
-	trainLinregSpecific     = flag.Bool("linregspec", false, "train specific linear regressions.")
-	trainLinregCombinations = flag.Bool("linregcomb", false, "train linear regressions combinations.")
-	trainLinregTransforms   = flag.Bool("linregtrans", false, "train linear regressions with transformations.")
-	trainLinregRegularized  = flag.Bool("linregReg", false, "train all linear regressions with regularization.")
+	trainLinregSpecific    = flag.Bool("linregspec", false, "train specific linear regressions.")
+	trainLinregTransforms  = flag.Bool("linregtrans", false, "train linear regressions with transformations.")
+	trainLinregRegularized = flag.Bool("linregReg", false, "train all linear regressions with regularization.")
 
 	trainLogreg = flag.Bool("logreg", false, "train logistic regressions.")
 
-	trainLogregSpecific     = flag.Bool("logregspec", false, "train specific logistic regressions.")
-	trainLogregCombinations = flag.Bool("logregcomb", false, "train logistic regressions combinations.")
-	trainLogregTransforms   = flag.Bool("logregtrans", false, "train all logistic regressions with transformations.")
-	trainLogregRegularized  = flag.Bool("logregReg", false, "train all logistic regressions with regularization.")
+	trainLogregSpecific    = flag.Bool("logregspec", false, "train specific logistic regressions.")
+	trainLogregTransforms  = flag.Bool("logregtrans", false, "train all logistic regressions with transformations.")
+	trainLogregRegularized = flag.Bool("logregReg", false, "train all logistic regressions with regularization.")
 
 	transformDimension = flag.Int("dim", 0, "dimension of transformation.")
 	combinations       = flag.Int("comb", 0, "number of features to try with all combinations.")

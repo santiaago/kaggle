@@ -54,7 +54,7 @@ func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 		models = append(models, specificModels...)
 	}
 
-	if *trainLinregCombinations {
+	if *combinations > 0 {
 		linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
 		models = append(models, linregCombinationModels...)
 	}
@@ -85,7 +85,7 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 		models = append(models, specificModels...)
 	}
 
-	if *trainLogregCombinations {
+	if *combinations > 0 {
 		logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
 		models = append(models, logregCombinationModels...)
 	}
@@ -324,7 +324,7 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 		fd := dc.FilterWithPredict(m.Features)
 
 		for k := -20; k < 20; k++ {
-			var nlr logreg.LogisticRegression
+			var nlr *logreg.LogisticRegression
 			if nlr = logregFromK(k, fd, lr); nlr == nil {
 				continue
 			}
