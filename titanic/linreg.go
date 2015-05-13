@@ -78,6 +78,7 @@ func linregWithRegularization(lr *linreg.LinearRegression) (*linreg.LinearRegres
 	// better model found, make a copy of the model passed in.
 	nlr := linreg.NewLinearRegression()
 	*nlr = *lr
+	nlr.IsRegularized = true
 	nlr.K = ks[i]
 	if err := nlr.LearnWeightDecay(); err != nil {
 		return nil, err

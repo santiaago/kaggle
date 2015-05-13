@@ -84,14 +84,17 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 		specificModels := trainLogregSpecificModels(dc)
 		models = append(models, specificModels...)
 	}
+
 	if *trainLogregCombinations {
 		logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
 		models = append(models, logregCombinationModels...)
 	}
+
 	if *trainLogregTransforms {
 		logregTransformModels := trainLogregModelsWithTransform(models, dc)
 		models = append(models, logregTransformModels...)
 	}
+
 	if *trainLogregRegularized {
 		regModels := trainLogregModelsRegularized(models, dc)
 		models = append(models, regModels...)
@@ -294,6 +297,8 @@ func trainLinregModelsRegularized(models ml.ModelContainers) (regModels ml.Model
 		if nlr, err := linregWithRegularization(lr); err == nil && nlr != nil {
 			name := fmt.Sprintf("%v regularized k %v", m.Name, nlr.K)
 			regModels = append(regModels, ml.NewModelContainer(nlr, name, m.Features))
+		} else if err != nil {
+			log.Printf("cannot regularized model: %v, %v", m.Name, err)
 		}
 	}
 	return
@@ -312,17 +317,21 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 		if lr, ok = m.Model.(*logreg.LogisticRegression); !ok {
 			continue
 		}
-		if lr.IsRegularized {
+		if lr.IsRegularized { // skip models that are already regularized<
 			continue
 		}
 
 		fd := dc.FilterWithPredict(m.Features)
 
 		for k := -20; k < 20; k++ {
-			nlr := logregFromK(k, fd, lr)
+			var nlr logreg.LogisticRegression
+			if nlr = logregFromK(k, fd, lr); nlr == nil {
+				continue
+			}
+
 			// todo(santiaago) clean this up
 			nlr.Wn = nlr.WReg
-
+			nlr.IsRegularized = true
 			name := fmt.Sprintf("%v regularized k %v", m.Name, k)
 			name += fmt.Sprintf(" epochs %v", nlr.Epochs)
 
