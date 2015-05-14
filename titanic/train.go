@@ -162,17 +162,7 @@ func trainLogregModelsByFeatureCombination(dc data.Container) ml.ModelContainers
 //
 func trainLinregModelsWithTransform(models ml.ModelContainers, dc data.Container) (transModels ml.ModelContainers) {
 
-	switch *transformDimension {
-	case 2:
-		transModels = trainLinregModelsWithNDTransformFuncs(models, dc, transform.Funcs2D(), 2)
-	case 3:
-		transModels = trainLinregModelsWithNDTransformFuncs(models, dc, transform.Funcs3D(), 3)
-	case 4:
-		transModels = trainLinregModelsWithNDTransformFuncs(models, dc, transform.Funcs4D(), 4)
-	default:
-		log.Printf("transformed dimension not supported %v", *transformDimension)
-	}
-	return
+	return trainLinregModelsWithNDTransformFuncs(models, dc, transformArray(*transformDimension), *transformDimension)
 }
 
 // trainLogregModelsWithTransform returns:
@@ -181,17 +171,22 @@ func trainLinregModelsWithTransform(models ml.ModelContainers, dc data.Container
 //
 func trainLogregModelsWithTransform(models ml.ModelContainers, dc data.Container) (transModels ml.ModelContainers) {
 
-	switch *transformDimension {
+	return trainLogregModelsWithNDTransformFuncs(models, dc, transformArray(*transformDimension), *transformDimension)
+}
+
+// transformArray returns an array of transform functions with respect to the dimension passed in.
+func transformArray(dim int) []func([]float64) ([]float64, error) {
+	switch dim {
 	case 2:
-		transModels = trainLogregModelsWithNDTransformFuncs(models, dc, transform.Funcs2D(), 2)
+		return transform.Funcs2D()
 	case 3:
-		transModels = trainLogregModelsWithNDTransformFuncs(models, dc, transform.Funcs2D(), 2)
+		return transform.Funcs3D()
 	case 4:
-		transModels = trainLogregModelsWithNDTransformFuncs(models, dc, transform.Funcs2D(), 2)
+		return transform.Funcs4D()
 	default:
-		log.Println("transformed dimension not supported")
+		log.Printf("transformed dimension not supported %v", *transformDimension)
+		return nil
 	}
-	return
 }
 
 //trainLinregModelsWithNDTransformFuncs returns
@@ -398,10 +393,13 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 
 	for _, mc := range models {
 		if lr, ok := mc.Model.(*linreg.LinearRegression); ok {
-			if !lr.HasTransform && !lr.IsRegularized {
-				fd := dc.FilterWithPredict(mc.Features)
-				lr.InitializeFromData(fd)
+			fd := dc.FilterWithPredict(mc.Features)
+			lr.InitializeFromData(fd)
+			if lr.HasTransform {
+				// dimension := mc.TransformDimension
 
+			}
+			if !lr.HasTransform && !lr.IsRegularized {
 				if err := lr.Learn(); err != nil {
 					log.Printf("unable to train model %v\n", mc.Name)
 					continue
