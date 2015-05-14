@@ -373,20 +373,6 @@ func logregFromK(k int, fd [][]float64, lr *logreg.LogisticRegression) *logreg.L
 	return nlr
 }
 
-// getRankedModels returns an array of modelInfo type with the
-// top 5 current models.
-// todo(santiaago): should read json file instead of having this hard coded.
-//
-func getRankedModels() []modelInfo {
-	return []modelInfo{
-		{linearRegression, T4D, 4, []int{2, 4, 7, 11}, true, 2},
-		{linearRegression, T3D, 6, []int{2, 4, 11}, false, 0},
-		{linearRegression, T4D, 1, []int{2, 4, 9, 11}, true, 2},
-		{logisticRegression, T4D, 1, []int{2, 4, 8, 11}, false, 0},
-		{logisticRegression, T3D, 4, []int{2, 4, 11}, false, 0},
-	}
-}
-
 // updateModels re-trains all the models passed in.
 //
 func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels ml.ModelContainers) {
