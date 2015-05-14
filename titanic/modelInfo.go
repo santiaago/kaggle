@@ -90,11 +90,11 @@ func (mi modelInfo) name() (name string) {
 		name += " 4D"
 	}
 
+	name += fmt.Sprintf(" %v", mi.Features)
+
 	if mi.TransformDimension != NOT {
 		name += fmt.Sprintf(" transformed %v", mi.TransformID)
 	}
-
-	name += fmt.Sprintf(" %v", mi.Features)
 
 	if mi.Regularized {
 		name += fmt.Sprintf(" regularized k %v", mi.K)
