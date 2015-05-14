@@ -200,7 +200,7 @@ func transformArray(dim int) []func([]float64) ([]float64, error) {
 //
 func trainLinregModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Container, funcs []func([]float64) ([]float64, error), dimension int) (transModels ml.ModelContainers) {
 
-	for i, m := range models {
+	for _, m := range models {
 		if m == nil {
 			continue
 		}
@@ -208,7 +208,7 @@ func trainLinregModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Co
 		fd := dc.FilterWithPredict(m.Features)
 		index := 0
 		format := "linreg %dD %v transformed %d"
-		for _, f := range funcs {
+		for i, f := range funcs {
 			if lr, err := trainLinregModelWithTransform(fd, f); err == nil {
 				name := fmt.Sprintf(format, dimension, m.Features, index)
 				mc := ml.NewModelContainer(lr, name, m.Features)
@@ -396,10 +396,10 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 			fd := dc.FilterWithPredict(mc.Features)
 			lr.InitializeFromData(fd)
 			if lr.HasTransform {
-				// dimension := mc.TransformDimension
-
+				lr.TransformFunction = transformArray(mc.TransformDimension)[mc.TransformID]
+				lr.ApplyTransformation()
 			}
-			if !lr.HasTransform && !lr.IsRegularized {
+			if !lr.IsRegularized {
 				if err := lr.Learn(); err != nil {
 					log.Printf("unable to train model %v\n", mc.Name)
 					continue

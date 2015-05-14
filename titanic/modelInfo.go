@@ -51,6 +51,8 @@ func ModelInfoFromModel(m *ml.ModelContainer) (mi modelInfo) {
 		if !lr.HasTransform {
 			mi.TransformDimension = NOT
 		}
+		mi.TransformDimension = Dimension(m.TransformDimension)
+		mi.TransformID = m.TransformID
 		if lr.IsRegularized {
 			mi.Regularized = true
 			mi.K = lr.K
@@ -60,6 +62,8 @@ func ModelInfoFromModel(m *ml.ModelContainer) (mi modelInfo) {
 		if !lr.HasTransform {
 			mi.TransformDimension = NOT
 		}
+		mi.TransformDimension = Dimension(m.TransformDimension)
+		mi.TransformID = m.TransformID
 		if lr.IsRegularized {
 			mi.Regularized = true
 			mi.K = lr.K
@@ -115,9 +119,16 @@ func (mi modelInfo) newModel() (m ml.Model) {
 	if mi.Model == linearRegression {
 		m = linreg.NewLinearRegression()
 		m.(*linreg.LinearRegression).TransformFunction = transformFunc
+		if mi.TransformDimension > 0 {
+			m.(*linreg.LinearRegression).HasTransform = true
+		}
 	} else if mi.Model == logisticRegression {
 		m = logreg.NewLogisticRegression()
 		m.(*logreg.LogisticRegression).TransformFunction = transformFunc
+		if mi.TransformDimension > 0 {
+			m.(*logreg.LogisticRegression).HasTransform = true
+		}
+
 	}
 	return
 }
