@@ -170,7 +170,7 @@ func trainLinregModelsWithTransform(models ml.ModelContainers, dc data.Container
 	case 4:
 		transModels = trainLinregModelsWithNDTransformFuncs(models, dc, transform.Funcs4D(), 4)
 	default:
-		log.Println("transformed dimension not supported")
+		log.Printf("transformed dimension not supported %v", *transformDimension)
 	}
 	return
 }
