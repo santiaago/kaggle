@@ -20,9 +20,6 @@ func createTempFolder(path string) {
 }
 
 func writeEcvRanking(models ml.ModelContainers, name string) {
-	if !*ecvRank {
-		return
-	}
 
 	sort.Sort(ml.ByEcv(models))
 
@@ -32,9 +29,7 @@ func writeEcvRanking(models ml.ModelContainers, name string) {
 }
 
 func writeEinRanking(models ml.ModelContainers, name string) {
-	if !*einRank {
-		return
-	}
+
 	sort.Sort(ml.ByEin(models))
 
 	ein := func(m *ml.ModelContainer) float64 { return m.Model.Ein() }

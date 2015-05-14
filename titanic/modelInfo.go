@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 
 	"github.com/santiaago/kaggle/transform"
 	"github.com/santiaago/ml"
@@ -169,4 +172,57 @@ func (mi modelInfo) GetModel(dc data.Container) *ml.Model {
 		}
 	}
 	return &m
+}
+
+func importModels(path string) (models ml.ModelContainers) {
+	fmt.Printf("importing models to %v\n", path)
+	var b []byte
+	var err error
+	if b, err = ioutil.ReadFile(path); err != nil {
+		log.Printf("unable to read file %v, %v", path, err)
+		return
+	}
+
+	var modelInfos []modelInfo
+	if err = json.Unmarshal(b, &modelInfos); err != nil {
+		log.Printf("unable to unmarshal bytes %v", err)
+		return
+	}
+
+	for _, mi := range modelInfos {
+		m := mi.newModel()
+		mc := ml.NewModelContainer(m, mi.name(), mi.Features)
+		models = append(models, mc)
+	}
+
+	fmt.Printf("Done importing %v models from %v\n", len(models), path)
+	return
+}
+
+func exportModels(models ml.ModelContainers, path string) {
+	fmt.Printf("exporting models to %v\n", path)
+
+	var modelInfos []modelInfo
+
+	for m := range models {
+		if models[m] == nil {
+			continue
+		}
+
+		mi := ModelInfoFromModel(models[m])
+		modelInfos = append(modelInfos, mi)
+	}
+	var b []byte
+	var err error
+
+	if b, err = json.Marshal(modelInfos); err != nil {
+		log.Printf("unable to marshal array of modelInfo objects ", err)
+	}
+
+	err = ioutil.WriteFile(path, b, 0644)
+	if err != nil {
+		log.Printf("unable to write to file %v, %v", path, err)
+		panic(err)
+	}
+	fmt.Printf("Done exporting models to %v\n", path)
 }

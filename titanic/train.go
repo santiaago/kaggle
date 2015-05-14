@@ -29,9 +29,8 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 		log.Println("error when getting the data.container from the reader,", err)
 	}
 
-	if *importModels {
-		// get models from json file
-
+	if *canImportModels {
+		models = importModels(*importPath)
 		// train these models.
 		return
 	}
@@ -393,17 +392,20 @@ func getRankedModels() []modelInfo {
 // modelsFromRanking build all the models defined in the ranking array
 // (soon ranking.json) file.
 //
-func modelsFromRanking(dc data.Container) (models ml.ModelContainers) {
+func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels ml.ModelContainers) {
 
-	rankedModels := getRankedModels()
-	for _, mi := range rankedModels {
-		if m := mi.GetModel(dc); m != nil {
-			mc := ml.NewModelContainer(*m, mi.name(), mi.Features)
-			models = append(models, mc)
-		}
-	}
-	// train models here
-	nmodels := trainLogregModelsRegularized(models, dc)
-	models = append(models, nmodels...)
+	// for _, m := range models {
+	// 	// if linreg
+	// 	//   if transformed
+	// 	//   if regularized
+	// 	//   if normal
+	// 	// if logreg
+	// 	// if transformed
+	// 	// if regularized
+	// 	// if normal
+	// }
+	// // train models here
+	// nmodels := trainLogregModelsRegularized(models, dc)
+	// models = append(models, nmodels...)
 	return
 }
