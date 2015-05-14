@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/santiaago/kaggle/transform"
 	"github.com/santiaago/ml"
 	"github.com/santiaago/ml/data"
 	"github.com/santiaago/ml/linreg"
 	"github.com/santiaago/ml/logreg"
+	"github.com/santiaago/ml/transform"
 )
 
 // trainModels returns:
