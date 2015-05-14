@@ -205,7 +205,7 @@ func trainLogregModelsWithTransform(models ml.ModelContainers, dc data.Container
 //
 func trainLinregModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Container, funcs []func([]float64) ([]float64, error), dimension int) (transModels ml.ModelContainers) {
 
-	for _, m := range models {
+	for i, m := range models {
 		if m == nil {
 			continue
 		}
@@ -216,7 +216,10 @@ func trainLinregModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Co
 		for _, f := range funcs {
 			if lr, err := trainLinregModelWithTransform(fd, f); err == nil {
 				name := fmt.Sprintf(format, dimension, m.Features, index)
-				transModels = append(transModels, ml.NewModelContainer(lr, name, m.Features))
+				mc := ml.NewModelContainer(lr, name, m.Features)
+				mc.TransformDimension = dimension
+				mc.TransformID = i
+				transModels = append(transModels, mc)
 				index++
 			}
 		}
@@ -243,13 +246,14 @@ func trainLogregModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Co
 		fd := dc.FilterWithPredict(m.Features)
 		index := 0
 		format := "logreg %dD %v transformed %d epochs-%v"
-		for _, f := range funcs {
+		for i, f := range funcs {
 			if lr, err := trainLogregModelWithTransform(fd, f); err == nil {
 				name := fmt.Sprintf(format, dimension, m.Features, index, lr.Epochs)
-				// this print is to show progress
-				// todo(santiaago): Show progress as a progress bar
-				fmt.Println(name)
-				transModels = append(transModels, ml.NewModelContainer(lr, name, m.Features))
+				fmt.Printf("\r%v", name)
+				mc := ml.NewModelContainer(lr, name, m.Features)
+				mc.TransformDimension = dimension
+				mc.TransformID = i
+				transModels = append(transModels, mc)
 				index++
 			}
 		}
