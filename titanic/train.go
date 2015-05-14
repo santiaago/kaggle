@@ -30,8 +30,7 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 	}
 
 	if *canImportModels {
-		models = importModels(*importPath)
-		// train these models.
+		models = updateModels(dc, importModels(*importPath))
 		return
 	}
 
@@ -389,23 +388,23 @@ func getRankedModels() []modelInfo {
 	}
 }
 
-// modelsFromRanking build all the models defined in the ranking array
-// (soon ranking.json) file.
+// updateModels re-trains all the models passed in.
 //
 func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels ml.ModelContainers) {
 
-	// for _, m := range models {
-	// 	// if linreg
-	// 	//   if transformed
-	// 	//   if regularized
-	// 	//   if normal
-	// 	// if logreg
-	// 	// if transformed
-	// 	// if regularized
-	// 	// if normal
-	// }
-	// // train models here
-	// nmodels := trainLogregModelsRegularized(models, dc)
-	// models = append(models, nmodels...)
+	for _, mc := range models {
+		if lr, ok := mc.Model.(*linreg.LinearRegression); ok {
+			if !lr.HasTransform && !lr.IsRegularized {
+				fd := dc.FilterWithPredict(mc.Features)
+				lr.InitializeFromData(fd)
+
+				if err := lr.Learn(); err != nil {
+					log.Printf("unable to train model %v\n", mc.Name)
+					continue
+				}
+				trainedModels = append(trainedModels, mc)
+			}
+		}
+	}
 	return
 }
