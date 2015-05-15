@@ -406,6 +406,12 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 					continue
 				}
 				trainedModels = append(trainedModels, mc)
+			} else {
+				if err := lr.LearnWeightDecay(); err != nil {
+					log.Printf("error calling lr.LearnWeightDecay, %v\n", err)
+					continue
+				}
+				trainedModels = append(trainedModels, mc)
 			}
 		} else if lr, ok := mc.Model.(*logreg.LogisticRegression); ok {
 			fd := dc.FilterWithPredict(mc.Features)
@@ -417,6 +423,12 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 			if !lr.IsRegularized {
 				if err := lr.Learn(); err != nil {
 					log.Printf("unable to train model %v\n", mc.Name)
+					continue
+				}
+				trainedModels = append(trainedModels, mc)
+			} else {
+				if err := lr.LearnRegularized(); err != nil {
+					log.Printf("error calling logreg.LearnRegularized, %v\n", err)
 					continue
 				}
 				trainedModels = append(trainedModels, mc)
