@@ -28,6 +28,7 @@ const (
 	NOT Dimension = 0
 	T3D Dimension = 3
 	T4D Dimension = 4
+	T5D Dimension = 5
 )
 
 // modelInfo is a type that describes the model to use.
@@ -88,6 +89,8 @@ func (mi modelInfo) name() (name string) {
 		name += " 3D"
 	} else if mi.TransformDimension == T4D {
 		name += " 4D"
+	} else if mi.TransformDimension == T5D {
+		name += " 5D"
 	}
 
 	name += fmt.Sprintf(" %v", mi.Features)
@@ -114,6 +117,8 @@ func (mi modelInfo) newModel() (m ml.Model) {
 		transformFunc = transform.Funcs3D()[mi.TransformID]
 	} else if mi.TransformDimension == T4D {
 		transformFunc = transform.Funcs4D()[mi.TransformID]
+	} else if mi.TransformDimension == T5D {
+		transformFunc = transform.Funcs5D()[mi.TransformID]
 	}
 
 	if mi.Model == linearRegression {

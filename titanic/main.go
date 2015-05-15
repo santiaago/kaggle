@@ -32,6 +32,8 @@ var (
 
 	rankEin = flag.Bool("rankEin", false, "writes a ranking.ein.md file with the in sample ranking of all processed models.")
 	rankEcv = flag.Bool("rankEcv", false, "writes a ranking.ecv.md file with the cross validation ranking of all processed models.")
+
+	verbose = flag.Bool("v", false, "verbose: print additional output")
 )
 
 func init() {
@@ -49,7 +51,9 @@ func main() {
 	models := trainModels(drTrain)
 
 	if len(models) == 0 {
-		fmt.Println("no models found.")
+		if *verbose {
+			fmt.Println("no models found.")
+		}
 		return
 	}
 
@@ -72,19 +76,31 @@ func main() {
 }
 
 func rank(models ml.ModelContainers) {
-	fmt.Println("Start ranking models")
+	if *verbose {
+		fmt.Println("Start ranking models")
+	}
 	if *rankEin {
-		fmt.Println("Start ranking models by Ein")
+		if *verbose {
+			fmt.Println("Start ranking models by Ein")
+		}
 		writeEinRanking(models, "ranking.ein.md")
 		models.TopEin(25)
-		fmt.Println("Done ranking models by Ein")
+		if *verbose {
+			fmt.Println("Done ranking models by Ein")
+		}
 	}
 
 	if *rankEcv {
-		fmt.Println("Start ranking models by Ecv")
+		if *verbose {
+			fmt.Println("Start ranking models by Ecv")
+		}
 		writeEcvRanking(models, "ranking.ecv.md")
 		models.TopEcv(25)
-		fmt.Println("Done ranking models by Ecv")
+		if *verbose {
+			fmt.Println("Done ranking models by Ecv")
+		}
 	}
-	fmt.Println("Done ranking models")
+	if *verbose {
+		fmt.Println("Done ranking models")
+	}
 }

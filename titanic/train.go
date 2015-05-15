@@ -21,7 +21,9 @@ import (
 // * trainModelsWithRegularization
 //
 func trainModels(reader data.Reader) (models ml.ModelContainers) {
-	fmt.Println("Starting training models")
+	if *verbose {
+		fmt.Println("Starting training models")
+	}
 	var dc data.Container
 	var err error
 	dc, err = reader.Read()
@@ -39,7 +41,9 @@ func trainModels(reader data.Reader) (models ml.ModelContainers) {
 
 	logregModels := trainLogregModels(dc)
 	models = append(models, logregModels...)
-	fmt.Println("Done training models")
+	if *verbose {
+		fmt.Println("Done training models")
+	}
 	return
 }
 
@@ -51,26 +55,36 @@ func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 	if !*trainLinreg {
 		return
 	}
-	fmt.Println("training linreg models")
+	if *verbose {
+		fmt.Println("training linreg models")
+	}
 	if *trainSpecific {
-		fmt.Println("\ttraining specific")
+		if *verbose {
+			fmt.Println("\ttraining specific")
+		}
 		models = append(models, specificLinregModels(dc)...)
 	}
 
 	if *combinations > 0 {
-		fmt.Println("\ttraining combinations")
+		if *verbose {
+			fmt.Println("\ttraining combinations")
+		}
 		linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
 		models = append(models, linregCombinationModels...)
 	}
 
 	if *trainTransforms {
-		fmt.Println("\ttraining transforms")
+		if *verbose {
+			fmt.Println("\ttraining transforms")
+		}
 		linregTransformModels := trainLinregModelsWithTransform(models, dc)
 		models = append(models, linregTransformModels...)
 	}
 
 	if *trainRegularized {
-		fmt.Println("\ttraining regularized models")
+		if *verbose {
+			fmt.Println("\ttraining regularized models")
+		}
 		regModels := trainLinregModelsRegularized(models)
 		models = append(models, regModels...)
 	}
@@ -85,26 +99,36 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 	if !*trainLogreg {
 		return
 	}
-	fmt.Println("training logreg models")
+	if *verbose {
+		fmt.Println("training logreg models")
+	}
 	if *trainSpecific {
-		fmt.Println("\ttraining specific")
+		if *verbose {
+			fmt.Println("\ttraining specific")
+		}
 		models = append(models, specificLogregModels(dc)...)
 	}
 
 	if *combinations > 0 {
-		fmt.Println("\ttraining combinations")
+		if *verbose {
+			fmt.Println("\ttraining combinations")
+		}
 		logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
 		models = append(models, logregCombinationModels...)
 	}
 
 	if *trainTransforms {
-		fmt.Println("\ttraining transforms")
+		if *verbose {
+			fmt.Println("\ttraining transforms")
+		}
 		logregTransformModels := trainLogregModelsWithTransform(models, dc)
 		models = append(models, logregTransformModels...)
 	}
 
 	if *trainRegularized {
-		fmt.Println("\ttraining regularized models")
+		if *verbose {
+			fmt.Println("\ttraining regularized models")
+		}
 		regModels := trainLogregModelsRegularized(models, dc)
 		models = append(models, regModels...)
 	}
@@ -162,6 +186,8 @@ func transformArray(dim int) []func([]float64) ([]float64, error) {
 		return transform.Funcs3D()
 	case 4:
 		return transform.Funcs4D()
+	case 5:
+		return transform.Funcs5D()
 	default:
 		log.Printf("transformed dimension not supported %v", *transformDimension)
 		return nil
@@ -223,7 +249,9 @@ func trainLogregModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Co
 		for i, f := range funcs {
 			if lr, err := trainLogregModelWithTransform(fd, f); err == nil {
 				name := fmt.Sprintf(format, dimension, m.Features, index, lr.Epochs)
-				fmt.Printf("\r%v", name)
+				if *verbose {
+					fmt.Printf("\r%v", name)
+				}
 				mc := ml.NewModelContainer(lr, name, m.Features)
 				mc.TransformDimension = dimension
 				mc.TransformID = i
@@ -275,13 +303,16 @@ func trainLogregModelWithTransform(data [][]float64, f func([]float64) ([]float6
 //
 func trainLinregModelsRegularized(models ml.ModelContainers) (regModels ml.ModelContainers) {
 
-	for _, m := range models {
+	for i, m := range models {
 		if m == nil {
 			continue
 		}
 		lr, ok := m.Model.(*linreg.LinearRegression)
 		if !ok {
 			continue
+		}
+		if *verbose {
+			fmt.Printf("\rtraining regularized model %v %v/%v", m.Name, i, len(models))
 		}
 		if nlr, err := linregWithRegularization(lr); err == nil && nlr != nil {
 			name := fmt.Sprintf("%v regularized k %v", m.Name, nlr.K)
@@ -290,6 +321,7 @@ func trainLinregModelsRegularized(models ml.ModelContainers) (regModels ml.Model
 			log.Printf("cannot regularized model: %v, %v", m.Name, err)
 		}
 	}
+	fmt.Println()
 	return
 }
 
@@ -301,7 +333,6 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 	var ok bool
 
 	for i, m := range models {
-		fmt.Printf("\rregularizing model %v/%v", i, len(models))
 		var lr *logreg.LogisticRegression
 		if lr, ok = m.Model.(*logreg.LogisticRegression); !ok {
 			continue
@@ -309,11 +340,15 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 		if lr.IsRegularized { // skip models that are already regularized<
 			continue
 		}
-
+		if *verbose {
+			fmt.Printf("\rtraining regularized model %v %v/%v", m.Name, i, len(models))
+		}
 		fd := dc.FilterWithPredict(m.Features)
 
 		for k := -5; k < 5; k++ {
-			fmt.Printf("\rregularizing model %v/%v with k:%v", i, len(models), k)
+			if *verbose {
+				fmt.Printf("\rregularizing model %v/%v with k:%v", i, len(models), k)
+			}
 			var nlr *logreg.LogisticRegression
 			if nlr = logregFromK(k, fd, lr); nlr == nil {
 				continue
@@ -329,6 +364,7 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 			regModels = append(regModels, mc)
 		}
 	}
+	fmt.Println()
 	return
 }
 
@@ -358,6 +394,20 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 
 	for _, mc := range models {
 		if lr, ok := mc.Model.(*linreg.LinearRegression); ok {
+			fd := dc.FilterWithPredict(mc.Features)
+			lr.InitializeFromData(fd)
+			if lr.HasTransform {
+				lr.TransformFunction = transformArray(mc.TransformDimension)[mc.TransformID]
+				lr.ApplyTransformation()
+			}
+			if !lr.IsRegularized {
+				if err := lr.Learn(); err != nil {
+					log.Printf("unable to train model %v\n", mc.Name)
+					continue
+				}
+				trainedModels = append(trainedModels, mc)
+			}
+		} else if lr, ok := mc.Model.(*logreg.LogisticRegression); ok {
 			fd := dc.FilterWithPredict(mc.Features)
 			lr.InitializeFromData(fd)
 			if lr.HasTransform {
