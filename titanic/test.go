@@ -16,7 +16,9 @@ import (
 // testModels run a test file for each linear regression model passed in the linreg array.
 //
 func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
-	fmt.Println("Starting testing models")
+	if *verbose {
+		fmt.Println("Starting testing models")
+	}
 	var dc data.Container
 	var err error
 
@@ -25,7 +27,9 @@ func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
 	}
 
 	for i, m := range models {
-		fmt.Printf("\r\ttesting model:%v/%v", i, len(models))
+		if *verbose {
+			fmt.Printf("\r\ttesting model:%v/%v", i, len(models))
+		}
 		if m == nil {
 			continue
 		}
@@ -40,6 +44,8 @@ func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
 			}
 		}
 	}
-	fmt.Printf("\n")
-	fmt.Println("Done testing models")
+	if *verbose {
+		fmt.Printf("\n")
+		fmt.Println("Done testing models")
+	}
 }

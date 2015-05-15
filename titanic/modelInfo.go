@@ -191,7 +191,9 @@ func (mi modelInfo) GetModel(dc data.Container) *ml.Model {
 }
 
 func importModels(path string) (models ml.ModelContainers) {
-	fmt.Printf("importing models to %v\n", path)
+	if *verbose {
+		fmt.Printf("importing models to %v\n", path)
+	}
 	var b []byte
 	var err error
 	if b, err = ioutil.ReadFile(path); err != nil {
@@ -212,13 +214,16 @@ func importModels(path string) (models ml.ModelContainers) {
 		mc.TransformID = mi.TransformID
 		models = append(models, mc)
 	}
-
-	fmt.Printf("Done importing %v models from %v\n", len(models), path)
+	if *verbose {
+		fmt.Printf("Done importing %v models from %v\n", len(models), path)
+	}
 	return
 }
 
 func exportModels(models ml.ModelContainers, path string) {
-	fmt.Printf("exporting models to %v\n", path)
+	if *verbose {
+		fmt.Printf("exporting models to %v\n", path)
+	}
 
 	var modelInfos []modelInfo
 
@@ -242,5 +247,7 @@ func exportModels(models ml.ModelContainers, path string) {
 		log.Printf("unable to write to file %v, %v", path, err)
 		panic(err)
 	}
-	fmt.Printf("Done exporting models to %v\n", path)
+	if *verbose {
+		fmt.Printf("Done exporting models to %v\n", path)
+	}
 }
