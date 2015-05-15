@@ -88,8 +88,7 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 	fmt.Println("training logreg models")
 	if *trainSpecific {
 		fmt.Println("\ttraining specific")
-		specificModels := trainLogregSpecificModels(dc)
-		models = append(models, specificModels...)
+		models = append(models, specificLogregModels(dc)...)
 	}
 
 	if *combinations > 0 {
@@ -110,13 +109,6 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 		models = append(models, regModels...)
 	}
 	return
-}
-
-// trainLogregSpecificModels returns some simple ml models.
-//
-func trainLogregSpecificModels(dc data.Container) ml.ModelContainers {
-
-	return ml.ModelsFromFuncs(dc, specificLogregFuncs())
 }
 
 // trainLinregModelsByFeatureCombination returns:

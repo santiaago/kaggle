@@ -48,70 +48,41 @@ func logregCombinations(dc data.Container, size int) (models ml.ModelContainers)
 	return
 }
 
-func specificLogregFuncs() []func(dc data.Container) (*ml.ModelContainer, error) {
-	return []func(dc data.Container) (*ml.ModelContainer, error){
-		logregSexAge,
-		logregPClassAge,
-		logregPClassSex,
-		logregSexAgePClass,
+func specificLogregModels(dc data.Container) (models ml.ModelContainers) {
+
+	cases := []struct {
+		features []int
+		name     string
+	}{
+		{
+			[]int{passengerIndexSex, passengerIndexAge},
+			"Sex Age logistic regression",
+		},
+		{
+			[]int{passengerIndexAge, passengerIndexPclass},
+			"PClass Age logistic regression",
+		},
+
+		{
+			[]int{passengerIndexSex, passengerIndexPclass},
+			"PClass Sex logistic regression",
+		},
+		{
+			[]int{passengerIndexSex, passengerIndexAge, passengerIndexPclass},
+			"Sex Age PClass logistic regression",
+		},
 	}
-}
 
-func logregSexAge(dc data.Container) (*ml.ModelContainer, error) {
+	for _, c := range cases {
+		lr := logreg.NewLogisticRegression()
+		fd := dc.FilterWithPredict(c.features)
+		lr.InitializeFromData(fd)
 
-	lr := logreg.NewLogisticRegression()
-
-	features := []int{passengerIndexSex, passengerIndexAge}
-	fd := dc.FilterWithPredict(features)
-	lr.InitializeFromData(fd)
-	name := "Sex Age logistic regression"
-
-	if err := lr.Learn(); err != nil {
-		return nil, err
+		if err := lr.Learn(); err != nil {
+			continue
+		}
+		mc := ml.NewModelContainer(lr, c.name, c.features)
+		models = append(models, mc)
 	}
-	return ml.NewModelContainer(lr, name, features), nil
-}
-
-func logregPClassAge(dc data.Container) (*ml.ModelContainer, error) {
-
-	lr := logreg.NewLogisticRegression()
-
-	features := []int{passengerIndexAge, passengerIndexPclass}
-	fd := dc.FilterWithPredict(features)
-	lr.InitializeFromData(fd)
-	name := "PClass Age regression"
-
-	if err := lr.Learn(); err != nil {
-		return nil, err
-	}
-	return ml.NewModelContainer(lr, name, features), nil
-}
-
-func logregPClassSex(dc data.Container) (*ml.ModelContainer, error) {
-
-	lr := logreg.NewLogisticRegression()
-
-	features := []int{passengerIndexSex, passengerIndexPclass}
-	fd := dc.FilterWithPredict(features)
-	lr.InitializeFromData(fd)
-	name := "PClass Sex regression"
-	if err := lr.Learn(); err != nil {
-		return nil, err
-	}
-	return ml.NewModelContainer(lr, name, features), nil
-}
-
-func logregSexAgePClass(dc data.Container) (*ml.ModelContainer, error) {
-
-	lr := logreg.NewLogisticRegression()
-
-	features := []int{passengerIndexSex, passengerIndexAge, passengerIndexPclass}
-	fd := dc.FilterWithPredict(features)
-	lr.InitializeFromData(fd)
-	name := "Sex Age PClass regression"
-
-	if err := lr.Learn(); err != nil {
-		return nil, err
-	}
-	return ml.NewModelContainer(lr, name, features), nil
+	return
 }
