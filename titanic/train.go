@@ -54,8 +54,7 @@ func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 	fmt.Println("training linreg models")
 	if *trainSpecific {
 		fmt.Println("\ttraining specific")
-		specificModels := trainSpecificModels(dc)
-		models = append(models, specificModels...)
+		models = append(models, specificLinregModels(dc)...)
 	}
 
 	if *combinations > 0 {
@@ -111,18 +110,6 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 		models = append(models, regModels...)
 	}
 	return
-}
-
-// trainSpecificModels trains the following models:
-// * linregSexAge
-// * linregPClassAge
-// * linregPClassSex
-// * linregSexAgePClass
-// It returns an array of all the linear regression models trained.
-//
-func trainSpecificModels(dc data.Container) ml.ModelContainers {
-
-	return ml.ModelsFromFuncs(dc, specificLinregFuncs())
 }
 
 // trainLogregSpecificModels returns some simple ml models.
