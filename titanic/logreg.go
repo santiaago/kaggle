@@ -56,20 +56,20 @@ func specificLogregModels(dc data.Container) (models ml.ModelContainers) {
 	}{
 		{
 			[]int{passengerIndexSex, passengerIndexAge},
-			"Sex Age logistic regression",
+			"logreg Sex Age",
 		},
 		{
 			[]int{passengerIndexAge, passengerIndexPclass},
-			"PClass Age logistic regression",
+			"logreg PClass Age",
 		},
 
 		{
 			[]int{passengerIndexSex, passengerIndexPclass},
-			"PClass Sex logistic regression",
+			"logreg PClass Sex",
 		},
 		{
 			[]int{passengerIndexSex, passengerIndexAge, passengerIndexPclass},
-			"Sex Age PClass logistic regression",
+			"logreg Sex Age PClass",
 		},
 	}
 

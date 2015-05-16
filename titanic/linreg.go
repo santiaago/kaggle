@@ -100,20 +100,20 @@ func specificLinregModels(dc data.Container) (models ml.ModelContainers) {
 	}{
 		{
 			[]int{passengerIndexSex, passengerIndexAge},
-			"Sex Age",
+			"linreg Sex Age",
 		},
 		{
 			[]int{passengerIndexAge, passengerIndexPclass},
-			"PClass Age",
+			"linreg PClass Age",
 		},
 
 		{
 			[]int{passengerIndexSex, passengerIndexPclass},
-			"PClass Sex",
+			"linreg PClass Sex",
 		},
 		{
 			[]int{passengerIndexSex, passengerIndexAge, passengerIndexPclass},
-			"Sex Age PClass",
+			"linreg Sex Age PClass",
 		},
 	}
 
