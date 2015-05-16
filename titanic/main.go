@@ -23,6 +23,7 @@ var (
 
 	trainLinreg = flag.Bool("linreg", false, "train linear regressions.")
 	trainLogreg = flag.Bool("logreg", false, "train logistic regressions.")
+	trainSvm    = flag.Bool("svm", false, "train support vector machines.")
 
 	trainSpecific      = flag.Bool("specific", false, "train specific models.")
 	combinations       = flag.Int("comb", 0, "number of features to try with all combinations.")
