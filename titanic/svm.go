@@ -33,15 +33,34 @@ func svmCombinations(dc data.Container, size int) (models ml.ModelContainers) {
 	combs := itertools.Combinations(dc.Features, size)
 
 	for _, c := range combs {
-		fmt.Printf("\r%v/%v", c, len(combs))
-		fd := dc.FilterWithPredict(c)
-		svm := svm.NewSVM()
-		svm.InitializeFromData(fd)
+		if *svmK == 1 {
+			for k := 1; k <= *svmKRange; k++ {
+				fmt.Printf("\r%v/%v", c, len(combs))
+				fd := dc.FilterWithPredict(c)
+				svm := svm.NewSVM()
+				svm.K = k
+				svm.Lambda = *svmLambda
+				svm.InitializeFromData(fd)
 
-		name := fmt.Sprintf("svm 1D %v", c)
+				name := fmt.Sprintf("svm 1D %v k %v", c, k)
 
-		if err := svm.Learn(); err == nil {
-			models = append(models, ml.NewModelContainer(svm, name, c))
+				if err := svm.Learn(); err == nil {
+					models = append(models, ml.NewModelContainer(svm, name, c))
+				}
+			}
+		} else {
+			fmt.Printf("\r%v/%v", c, len(combs))
+			fd := dc.FilterWithPredict(c)
+			svm := svm.NewSVM()
+			svm.K = *svmK
+			svm.Lambda = *svmLambda
+			svm.InitializeFromData(fd)
+
+			name := fmt.Sprintf("svm 1D %v k %v", c, *svmK)
+
+			if err := svm.Learn(); err == nil {
+				models = append(models, ml.NewModelContainer(svm, name, c))
+			}
 		}
 	}
 	fmt.Println()

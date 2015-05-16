@@ -31,6 +31,10 @@ var (
 	transformDimension = flag.Int("dim", 0, "dimension of transformation.")
 	trainRegularized   = flag.Bool("reg", false, "train models with regularization.")
 
+	svmKRange = flag.Int("svmKRange", 1, "range of number of block size that should be try for the svm pegasos algorithm. If k = 10, we will try all values from 1 to k")
+	svmK      = flag.Int("svmK", 1, "number of block size that should be try for the svm pegasos algorithm.")
+	svmLambda = flag.Float64("svmL", 0.001, "lambda, regularization parameter.")
+
 	rankEin = flag.Bool("rankEin", false, "writes a ranking.ein.md file with the in sample ranking of all processed models.")
 	rankEcv = flag.Bool("rankEcv", false, "writes a ranking.ecv.md file with the cross validation ranking of all processed models.")
 
