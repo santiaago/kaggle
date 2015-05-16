@@ -8,6 +8,7 @@ import (
 	"github.com/santiaago/ml/data"
 	"github.com/santiaago/ml/linreg"
 	"github.com/santiaago/ml/logreg"
+	"github.com/santiaago/ml/svm"
 )
 
 // testModels runs a linear regression model on the data passed in the reader.
@@ -40,6 +41,10 @@ func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
 			}
 		case *logreg.LogisticRegression:
 			if predictions, err := logregTest(m, dc); err == nil {
+				w.Write(m.Name, predictions)
+			}
+		case *svm.SVM:
+			if predictions, err := svmTest(m, dc); err == nil {
 				w.Write(m.Name, predictions)
 			}
 		}

@@ -10,6 +10,7 @@ import (
 	"github.com/santiaago/ml/data"
 	"github.com/santiaago/ml/linreg"
 	"github.com/santiaago/ml/logreg"
+	"github.com/santiaago/ml/svm"
 	"github.com/santiaago/ml/transform"
 )
 
@@ -19,6 +20,7 @@ type ModelType int
 const (
 	linearRegression ModelType = iota
 	logisticRegression
+	supportVectorMachines
 )
 
 // Dimension defines the type of transformation used.
@@ -58,7 +60,7 @@ func ModelInfoFromModel(m *ml.ModelContainer) (mi modelInfo) {
 			mi.Regularized = true
 			mi.K = lr.K
 		}
-	} else if _, ok := m.Model.(*logreg.LogisticRegression); ok {
+	} else if lr, ok := m.Model.(*logreg.LogisticRegression); ok {
 		mi.Model = logisticRegression
 		if !lr.HasTransform {
 			mi.TransformDimension = NOT
@@ -69,6 +71,14 @@ func ModelInfoFromModel(m *ml.ModelContainer) (mi modelInfo) {
 			mi.Regularized = true
 			mi.K = lr.K
 		}
+	} else if svm, ok := m.Model.(*svm.SVM); ok {
+		mi.Model = supportVectorMachines
+		if !svm.HasTransform {
+			mi.TransformDimension = NOT
+		}
+		mi.TransformDimension = Dimension(m.TransformDimension)
+		mi.TransformID = m.TransformID
+		mi.K = svm.K
 	}
 	mi.Features = m.Features
 	return
@@ -83,6 +93,8 @@ func (mi modelInfo) name() (name string) {
 		name = "linreg"
 	} else if mi.Model == logisticRegression {
 		name = "logreg"
+	} else if mi.Model == supportVectorMachines {
+		name = "svm"
 	}
 
 	if mi.TransformDimension == T3D {
@@ -132,6 +144,12 @@ func (mi modelInfo) newModel() (m ml.Model) {
 		m.(*logreg.LogisticRegression).TransformFunction = transformFunc
 		if mi.TransformDimension > 0 {
 			m.(*logreg.LogisticRegression).HasTransform = true
+		}
+	} else if mi.Model == supportVectorMachines {
+		m = svm.NewSVM()
+		m.(*svm.SVM).TransformFunction = transformFunc
+		if mi.TransformDimension > 0 {
+			m.(*svm.SVM).HasTransform = true
 		}
 
 	}
@@ -185,6 +203,14 @@ func (mi modelInfo) GetModel(dc data.Container) *ml.Model {
 			if err := lr.Learn(); err != nil {
 				return nil
 			}
+		}
+	} else if svm, ok := m.(*svm.SVM); ok {
+		svm.InitializeFromData(fd)
+		if mi.TransformDimension > NOT {
+			svm.ApplyTransformation()
+		}
+		if err := lr.Learn(); err != nil {
+			return nil
 		}
 	}
 	return &m
