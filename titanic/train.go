@@ -344,10 +344,10 @@ func trainSvmModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Conta
 
 		fd := dc.FilterWithPredict(m.Features)
 		index := 0
-		format := "svm %dD %v transformed %d"
+		format := "svm %dD %v k %v T %v transformed %d"
 		for i, f := range funcs {
 			if svm, err := trainSvmModelWithTransform(fd, f); err == nil {
-				name := fmt.Sprintf(format, dimension, m.Features, index)
+				name := fmt.Sprintf(format, dimension, m.Features, svm.K, svm.T, index)
 				if *verbose {
 					fmt.Printf("\r%v", name)
 				}
