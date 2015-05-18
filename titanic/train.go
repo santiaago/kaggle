@@ -395,6 +395,7 @@ func trainSvmModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Conta
 		index := 0
 		format := "svm %dD %v k %v T %v transformed %d"
 		for i, f := range funcs {
+			// todo(santiaago): should pass the model to copy all params from it.
 			if svm, err := trainSvmModelWithTransform(fd, f); err == nil {
 				name := fmt.Sprintf(format, dimension, m.Features, svm.K, svm.T, index)
 				if *verbose {
@@ -451,6 +452,10 @@ func trainSvmModelWithTransform(data [][]float64, f func([]float64) ([]float64, 
 	svm := svm.NewSVM()
 	svm.InitializeFromData(data)
 	svm.TransformFunction = f
+	svm.K = *svmK
+	svm.Lambda = *svmLambda
+	svm.T = *svmT
+
 	if err = svm.ApplyTransformation(); err != nil {
 		return nil, err
 	}
@@ -601,6 +606,15 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 			if svm.HasTransform {
 				svm.TransformFunction = transformArray(mc.TransformDimension)[mc.TransformID]
 				svm.ApplyTransformation()
+			}
+			if *svmKOverride {
+				svm.K = *svmK
+			}
+			if *svmTOverride {
+				svm.T = *svmT
+			}
+			if *svmLambdaOverride {
+				svm.Lambda = *svmLambda
 			}
 			if err := svm.Learn(); err != nil {
 				log.Printf("unable to train model %v\n", mc.Name)

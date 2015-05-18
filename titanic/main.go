@@ -37,6 +37,10 @@ var (
 	svmLambda = flag.Float64("svmL", 0.001, "lambda, regularization parameter.")
 	svmT      = flag.Int("svmT", 1000, "number of iterations for svm Pegasos algorithm.")
 
+	svmKOverride      = flag.Bool("osvmK", false, "override svmK.")
+	svmLambdaOverride = flag.Bool("osvmL", false, "override svmL.")
+	svmTOverride      = flag.Bool("osvmT", false, "override svmT.")
+
 	rankEin = flag.Bool("rankEin", false, "writes a ranking.ein.md file with the in sample ranking of all processed models.")
 	rankEcv = flag.Bool("rankEcv", false, "writes a ranking.ecv.md file with the cross validation ranking of all processed models.")
 

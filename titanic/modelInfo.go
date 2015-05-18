@@ -41,7 +41,9 @@ type modelInfo struct {
 	TransformID        int       // the id of the transformation function.
 	Features           []int     // the features to use for this model.
 	Regularized        bool      // flag to know if model is using regularization.
-	K                  int       // k param used in regularization.
+	K                  int       // k param used in regularization or in svm.
+	T                  int       // param used in svm algorithm.
+	L                  float64   // param used in svm algorithm.
 }
 
 // ModelInfoFromModel returns a modelInfo type from
@@ -79,6 +81,8 @@ func ModelInfoFromModel(m *ml.ModelContainer) (mi modelInfo) {
 		mi.TransformDimension = Dimension(m.TransformDimension)
 		mi.TransformID = m.TransformID
 		mi.K = svm.K
+		mi.T = svm.T
+		mi.L = svm.Lambda
 	}
 	mi.Features = m.Features
 	return
@@ -106,6 +110,22 @@ func (mi modelInfo) name() (name string) {
 	}
 
 	name += fmt.Sprintf(" %v", mi.Features)
+
+	if mi.Model == supportVectorMachines {
+		k := mi.K
+		t := mi.T
+		l := mi.L
+		if *svmKOverride {
+			k = *svmK
+		}
+		if *svmTOverride {
+			t = *svmT
+		}
+		if *svmLambdaOverride {
+			l = *svmLambda
+		}
+		name += fmt.Sprintf(" k %v T %v L %v", k, t, l)
+	}
 
 	if mi.TransformDimension != NOT {
 		name += fmt.Sprintf(" transformed %v", mi.TransformID)
@@ -151,7 +171,9 @@ func (mi modelInfo) newModel() (m ml.Model) {
 		if mi.TransformDimension > 0 {
 			m.(*svm.SVM).HasTransform = true
 		}
-
+		m.(*svm.SVM).K = mi.K
+		m.(*svm.SVM).T = mi.T
+		m.(*svm.SVM).Lambda = mi.L
 	}
 	return
 }
