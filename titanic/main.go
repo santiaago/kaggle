@@ -6,12 +6,13 @@ import (
 	"log"
 
 	"github.com/santiaago/ml"
-	"github.com/santiaago/ml/data"
 )
 
 var (
-	test  = flag.String("test", "data/test.csv", "testing set")
-	train = flag.String("train", "data/train.csv", "training set")
+	testSrc  = flag.String("testSrc", "data/test.csv", "testing set.")
+	trainSrc = flag.String("trainSrc", "data/train.csv", "training set.")
+
+	test = flag.Bool("test", false, "run test on test source and write to predictions to files.")
 
 	importPath      = flag.String("ipath", "models.json", "path to a json array with models to use description.")
 	canImportModels = flag.Bool("i", false, "defines if the program should import the models defined in ipath")
@@ -39,6 +40,8 @@ var (
 	rankEin = flag.Bool("rankEin", false, "writes a ranking.ein.md file with the in sample ranking of all processed models.")
 	rankEcv = flag.Bool("rankEcv", false, "writes a ranking.ecv.md file with the cross validation ranking of all processed models.")
 
+	topN = flag.Int("top", 10, "exports the top N models")
+
 	verbose = flag.Bool("v", false, "verbose: print additional output")
 )
 
@@ -49,36 +52,29 @@ func init() {
 func main() {
 	flag.Parse()
 
-	var xTrain data.Extractor
-	var drTrain data.Reader
-	xTrain = NewPassengerTrainExtractor()
-	drTrain = NewPassengerReader(*train, xTrain)
-
-	models := trainModels(drTrain)
-
-	if len(models) == 0 {
+	var models ml.ModelContainers
+	if models = trainModels(); len(models) == 0 {
 		if *verbose {
 			fmt.Println("no models found.")
 		}
 		return
 	}
 
-	var xTest data.Extractor
-	var wTest data.Writer
-	var drTest data.Reader
+	testModels(models)
 
-	xTest = NewPassengerTestExtractor()
-	wTest = NewPassengerTestWriter(*test)
-	drTest = NewPassengerReader(*test, xTest)
-
-	testModels(drTest, wTest, models)
+	models = filterTop(*topN, models)
 
 	rank(models)
 
-	if *canExportModels {
-		exportModels(models, *exportPath)
-	}
+	exportModels(models, *exportPath)
+}
 
+func filterTop(top int, models ml.ModelContainers) ml.ModelContainers {
+	n := top
+	if top >= len(models) {
+		n = len(models)
+	}
+	return models[:n]
 }
 
 func rank(models ml.ModelContainers) {

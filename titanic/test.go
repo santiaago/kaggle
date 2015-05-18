@@ -16,7 +16,13 @@ import (
 // linear regression model name.
 // testModels run a test file for each linear regression model passed in the linreg array.
 //
-func testModels(r data.Reader, w data.Writer, models ml.ModelContainers) {
+func testModels(models ml.ModelContainers) {
+	if !*test {
+		return
+	}
+	w := NewPassengerTestWriter(*testSrc)
+	r := NewPassengerReader(*testSrc, NewPassengerTestExtractor())
+
 	if *verbose {
 		fmt.Println("Starting testing models")
 	}

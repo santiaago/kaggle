@@ -21,10 +21,13 @@ import (
 // * trainModelsWithTransform
 // * trainModelsWithRegularization
 //
-func trainModels(reader data.Reader) (models ml.ModelContainers) {
+func trainModels() (models ml.ModelContainers) {
 	if *verbose {
 		fmt.Println("Starting training models")
 	}
+
+	reader := NewPassengerReader(*trainSrc, NewPassengerTrainExtractor())
+
 	var dc data.Container
 	var err error
 	dc, err = reader.Read()

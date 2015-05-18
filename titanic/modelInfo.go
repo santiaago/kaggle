@@ -247,6 +247,10 @@ func importModels(path string) (models ml.ModelContainers) {
 }
 
 func exportModels(models ml.ModelContainers, path string) {
+	if !*canExportModels {
+		return
+	}
+
 	if *verbose {
 		fmt.Printf("exporting models to %v\n", path)
 	}
