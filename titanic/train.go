@@ -50,7 +50,7 @@ func trainModels() (models ml.ModelContainers) {
 	models = append(models, svmModels...)
 
 	if *verbose {
-		fmt.Println("Done training models")
+		fmt.Printf("Done. Trained %v models\n", len(models))
 	}
 	return
 }
@@ -68,33 +68,53 @@ func trainLinregModels(dc data.Container) (models ml.ModelContainers) {
 	}
 	if *trainSpecific {
 		if *verbose {
-			fmt.Println("\ttraining specific")
+			fmt.Println("\n\ttraining specific")
 		}
-		models = append(models, specificLinregModels(dc)...)
+
+		s := specificLinregModels(dc)
+		models = append(models, s...)
+
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v specific models\n", len(s))
+		}
 	}
 
 	if *combinations > 0 {
 		if *verbose {
-			fmt.Println("\ttraining combinations")
+			fmt.Println("\n\ttraining combinations")
 		}
-		linregCombinationModels := trainLinregModelsByFeatureCombination(dc)
-		models = append(models, linregCombinationModels...)
+
+		c := trainLinregModelsByFeatureCombination(dc)
+		models = append(models, c...)
+
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v combination models\n", len(c))
+		}
 	}
 
 	if *trainTransforms {
 		if *verbose {
-			fmt.Println("\ttraining transforms")
+			fmt.Println("\n\ttraining transforms")
 		}
-		linregTransformModels := trainLinregModelsWithTransform(models, dc)
-		models = append(models, linregTransformModels...)
+
+		t := trainLinregModelsWithTransform(models, dc)
+		models = append(models, t...)
+
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v transformed models\n", len(t))
+		}
 	}
 
 	if *trainRegularized {
 		if *verbose {
-			fmt.Println("\ttraining regularized models")
+			fmt.Println("\n\ttraining regularized models")
 		}
-		regModels := trainLinregModelsRegularized(models)
-		models = append(models, regModels...)
+		r := trainLinregModelsRegularized(models)
+		models = append(models, r...)
+
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v regularized models\n", len(r))
+		}
 	}
 	return
 }
@@ -110,35 +130,50 @@ func trainLogregModels(dc data.Container) (models ml.ModelContainers) {
 	if *verbose {
 		fmt.Println("training logreg models")
 	}
+
 	if *trainSpecific {
 		if *verbose {
 			fmt.Println("\ttraining specific")
 		}
-		models = append(models, specificLogregModels(dc)...)
+		s := specificLogregModels(dc)
+		models = append(models, s...)
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v specific models\n", len(s))
+		}
+
 	}
 
 	if *combinations > 0 {
 		if *verbose {
 			fmt.Println("\ttraining combinations")
 		}
-		logregCombinationModels := trainLogregModelsByFeatureCombination(dc)
-		models = append(models, logregCombinationModels...)
+		c := trainLogregModelsByFeatureCombination(dc)
+		models = append(models, c...)
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v combination models\n", len(c))
+		}
 	}
 
 	if *trainTransforms {
 		if *verbose {
 			fmt.Println("\ttraining transforms")
 		}
-		logregTransformModels := trainLogregModelsWithTransform(models, dc)
-		models = append(models, logregTransformModels...)
+		t := trainLogregModelsWithTransform(models, dc)
+		models = append(models, t...)
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v combination models\n", len(t))
+		}
 	}
 
 	if *trainRegularized {
 		if *verbose {
 			fmt.Println("\ttraining regularized models")
 		}
-		regModels := trainLogregModelsRegularized(models, dc)
-		models = append(models, regModels...)
+		r := trainLogregModelsRegularized(models, dc)
+		models = append(models, r...)
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v regularized models\n", len(r))
+		}
 	}
 	return
 }
@@ -154,27 +189,38 @@ func trainSvmModels(dc data.Container) (models ml.ModelContainers) {
 	if *verbose {
 		fmt.Println("training svm models")
 	}
+
 	if *trainSpecific {
 		if *verbose {
 			fmt.Println("\ttraining specific")
 		}
-		models = append(models, specificSvmModels(dc)...)
+		s := specificSvmModels(dc)
+		models = append(models, s...)
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v specific models\n", len(s))
+		}
 	}
 
 	if *combinations > 0 {
 		if *verbose {
 			fmt.Println("\ttraining combinations")
 		}
-		svmCombinationModels := trainSvmModelsByFeatureCombination(dc)
-		models = append(models, svmCombinationModels...)
+		c := trainSvmModelsByFeatureCombination(dc)
+		models = append(models, c...)
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v combination models\n", len(c))
+		}
 	}
 
 	if *trainTransforms {
 		if *verbose {
 			fmt.Println("\ttraining transforms")
 		}
-		svmTransformModels := trainSvmModelsWithTransform(models, dc)
-		models = append(models, svmTransformModels...)
+		t := trainSvmModelsWithTransform(models, dc)
+		models = append(models, t...)
+		if *verbose {
+			fmt.Printf("\n\tDone, trained %v transformation models\n", len(t))
+		}
 	}
 
 	return
@@ -439,7 +485,6 @@ func trainLinregModelsRegularized(models ml.ModelContainers) (regModels ml.Model
 			log.Printf("cannot regularized model: %v, %v", m.Name, err)
 		}
 	}
-	fmt.Println()
 	return
 }
 
@@ -482,7 +527,6 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 			regModels = append(regModels, mc)
 		}
 	}
-	fmt.Println()
 	return
 }
 

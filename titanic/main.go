@@ -62,22 +62,12 @@ func main() {
 
 	testModels(models)
 
-	models = filterTop(*topN, models)
-
-	rank(models)
+	models = rank(models)
 
 	exportModels(models, *exportPath)
 }
 
-func filterTop(top int, models ml.ModelContainers) ml.ModelContainers {
-	n := top
-	if top >= len(models) {
-		n = len(models)
-	}
-	return models[:n]
-}
-
-func rank(models ml.ModelContainers) {
+func rank(models ml.ModelContainers) ml.ModelContainers {
 	if *verbose {
 		fmt.Println("Start ranking models")
 	}
@@ -85,8 +75,8 @@ func rank(models ml.ModelContainers) {
 		if *verbose {
 			fmt.Println("Start ranking models by Ein")
 		}
+		models.TopEin(*topN)
 		writeEinRanking(models, "ranking.ein.md")
-		models.TopEin(25)
 		if *verbose {
 			fmt.Println("Done ranking models by Ein")
 		}
@@ -96,8 +86,8 @@ func rank(models ml.ModelContainers) {
 		if *verbose {
 			fmt.Println("Start ranking models by Ecv")
 		}
+		models.TopEcv(*topN)
 		writeEcvRanking(models, "ranking.ecv.md")
-		models.TopEcv(25)
 		if *verbose {
 			fmt.Println("Done ranking models by Ecv")
 		}
@@ -105,4 +95,13 @@ func rank(models ml.ModelContainers) {
 	if *verbose {
 		fmt.Println("Done ranking models")
 	}
+	return filterTop(*topN, models)
+}
+
+func filterTop(top int, models ml.ModelContainers) ml.ModelContainers {
+	n := top
+	if top >= len(models) {
+		n = len(models)
+	}
+	return models[:n]
 }
