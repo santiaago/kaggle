@@ -340,6 +340,7 @@ func trainLinregModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Co
 			}
 		}
 	}
+	fmt.Printf("size of transModel %v", len(transModels))
 	return
 }
 

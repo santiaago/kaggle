@@ -68,3 +68,24 @@ EIn = 0.212121  linreg 1D [2 4 5 7 9 11]
 EIn = 0.289562  linreg 1D [2 5 6 7 9 11]
 ~~~
 
+##### using `-trans` and `-dim`
+Training and testing linear regression with feature combination of size **5** and
+transforming the vectors with **5D** transformations rank by in sample error and getting the top **10** results.
+**Note**:
+If you get errors, it is usally because the feautre vector size does not match the size expected by the transformation size.
+See [github.com/santiaago/ml/transform.go](github.com/santiaago/ml/transform.go) for more details.
+~~~
+> .\titanic.exe -test -linreg -comb=5 -trans -dim=5 -ran
+kEin -top=10
+[7 8 9 10 11]/126
+size of transModel 160EIn = 0.193042    linreg 5D [2 4 6 7 11] transformed 2
+EIn = 0.193042  linreg 5D [2 4 6 7 11] transformed 4
+EIn = 0.198653  linreg 5D [2 4 6 7 11] transformed 6
+EIn = 0.199776  linreg 5D [2 4 5 7 9] transformed 3
+EIn = 0.200898  linreg 5D [2 4 5 6 11] transformed 4
+EIn = 0.200898  linreg 5D [2 4 5 6 9] transformed 4
+EIn = 0.200898  linreg 5D [2 4 5 6 9] transformed 2
+EIn = 0.203143  linreg 5D [2 4 5 6 9] transformed 6
+EIn = 0.203143  linreg 5D [2 4 5 6 9] transformed 1
+EIn = 0.203143  linreg 5D [2 4 5 6 11] transformed 6
+~~~
