@@ -181,3 +181,30 @@ Use this flag to export the models that you have trained.
     }
 ]
 ~~~
+
+#### using the `-epath` flag
+If you wish to change the path use the `-epath` flag.
+~~~
+> .\titanic.exe -linreg -comb=7 -e -epath="example.json"
+> cat .\example.json
+[
+    {
+        "Model": 0,
+        "TransformDimension": 0,
+        "TransformID": 0,
+        "Features": [
+            2,
+            4,
+            5,
+            6,
+            7,
+            9,
+            11
+        ],
+        "Regularized": false,
+        "K": 0,
+        "T": 0,
+        "L": 0
+    }
+]
+~~~
