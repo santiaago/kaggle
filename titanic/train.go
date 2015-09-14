@@ -333,6 +333,10 @@ func trainLinregModelsWithNDTransformFuncs(models ml.ModelContainers, dc data.Co
 				mc.TransformID = i
 				transModels = append(transModels, mc)
 				index++
+			} else {
+				if *verbose {
+					fmt.Printf("trainLinregModels With %vD TransformFuncs - %v %v\n", dimension, i, err)
+				}
 			}
 		}
 	}

@@ -54,3 +54,17 @@ Ecv = 0.213244  linreg Sex Age
 Ecv = 0.213244  linreg PClass Sex
 Ecv = 0.298541  linreg PClass Age
 ~~~
+
+##### training and testing linear regression with feature combination of size 6 rank by in sample error
+~~~
+> .\titanic.exe -test -linreg -comb=6 -rankEin
+[6 7 8 9 10 11]/84
+EIn = 0.203143  linreg 1D [2 4 5 6 7 9]
+EIn = 0.206510  linreg 1D [2 4 6 7 9 11]
+EIn = 0.208754  linreg 1D [2 4 5 6 7 11]
+EIn = 0.208754  linreg 1D [2 4 5 6 9 11]
+EIn = 0.210999  linreg 1D [4 5 6 7 9 11]
+EIn = 0.212121  linreg 1D [2 4 5 7 9 11]
+EIn = 0.289562  linreg 1D [2 5 6 7 9 11]
+~~~
+
