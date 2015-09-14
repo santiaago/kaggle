@@ -46,7 +46,19 @@ EIn = 0.213244  linreg PClass Sex
 EIn = 0.298541  linreg PClass Age
 ~~~
 
-##### training and testing linear regression ranking by cross validation error
+the `-rankEin` will create a `ranking.ein.md` in `\data\temp`
+
+~~~
+> ls .\data\temp
+> .\titanic.exe -specific -linreg -rankEin
+EIn = 0.212121  linreg Sex Age PClass
+EIn = 0.213244  linreg Sex Age
+EIn = 0.213244  linreg PClass Sex
+EIn = 0.298541  linreg PClass Age
+> ls .\data\temp
+-a---        14/09/2015     16:35        203 ranking.ein.md
+~~~
+
 ##### using `-rankEcv`
 training and testing linear regression ranking by cross validation error.
 ~~~
