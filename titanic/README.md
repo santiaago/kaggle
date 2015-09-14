@@ -208,3 +208,17 @@ If you wish to change the path use the `-epath` flag.
     }
 ]
 ~~~
+
+#### using `-i` and `-ipath`
+
+Similarly use the `-i` and `-ipath` to import models and test them or generate the test files.
+
+~~~
+> .\titanic.exe -linreg -comb=7 -i -ipath="example.json" -rankEin
+
+EIn = 0.207632  linreg [2 4 5 6 7 9 11]
+> .\titanic.exe -linreg -comb=7 -i -ipath="example.json" -test
+> ls .\data\temp\
+-a---        14/09/2015     16:58       2839 linreg [2 4 5 6 7 9 11]
+-a---        14/09/2015     16:57         79 ranking.ein.md
+~~~
