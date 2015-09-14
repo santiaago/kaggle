@@ -45,3 +45,12 @@ EIn = 0.213244  linreg PClass Sex
 EIn = 0.298541  linreg PClass Age
 ~~~
 
+##### training and testing linear regression ranking by cross validation error
+~~~
+> .\titanic.exe -test -linreg -specific -rankEcv
+Leave 890 out of 891
+Ecv = 0.212121  linreg Sex Age PClass
+Ecv = 0.213244  linreg Sex Age
+Ecv = 0.213244  linreg PClass Sex
+Ecv = 0.298541  linreg PClass Age
+~~~
