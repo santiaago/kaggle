@@ -39,7 +39,7 @@ examples:
 ##### using `-rankEin`
 training and testing linear regression ranking by in sample error.
 ~~~
-> .\titanic.exe -test -linreg -specific -rankEin
+> .\titanic.exe -linreg -specific -rankEin
 EIn = 0.212121  linreg Sex Age PClass
 EIn = 0.213244  linreg Sex Age
 EIn = 0.213244  linreg PClass Sex
@@ -50,7 +50,7 @@ EIn = 0.298541  linreg PClass Age
 ##### using `-rankEcv`
 training and testing linear regression ranking by cross validation error.
 ~~~
-> .\titanic.exe -test -linreg -specific -rankEcv
+> .\titanic.exe -linreg -specific -rankEcv
 Leave 890 out of 891
 Ecv = 0.212121  linreg Sex Age PClass
 Ecv = 0.213244  linreg Sex Age
@@ -61,7 +61,7 @@ Ecv = 0.298541  linreg PClass Age
 ##### using `-comb`
 training and testing linear regression with feature combination of size 6 rank by in sample error
 ~~~
-> .\titanic.exe -test -linreg -comb=6 -rankEin
+> .\titanic.exe -linreg -comb=6 -rankEin
 [6 7 8 9 10 11]/84
 EIn = 0.203143  linreg 1D [2 4 5 6 7 9]
 EIn = 0.206510  linreg 1D [2 4 6 7 9 11]
@@ -79,7 +79,7 @@ transforming the vectors with **5D** transformations rank by in sample error and
 If you get errors, it is usally because the feautre vector size does not match the size expected by the transformation size.
 See [github.com/santiaago/ml/transform.go](github.com/santiaago/ml/transform.go) for more details.
 ~~~
-> .\titanic.exe -test -linreg -comb=5 -trans -dim=5 -ran
+> .\titanic.exe -linreg -comb=5 -trans -dim=5 -ran
 kEin -top=10
 [7 8 9 10 11]/126
 size of transModel 160EIn = 0.193042    linreg 5D [2 4 6 7 11] transformed 2
