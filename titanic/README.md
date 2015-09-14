@@ -89,3 +89,24 @@ EIn = 0.203143  linreg 5D [2 4 5 6 9] transformed 6
 EIn = 0.203143  linreg 5D [2 4 5 6 9] transformed 1
 EIn = 0.203143  linreg 5D [2 4 5 6 11] transformed 6
 ~~~
+
+
+#### using `-reg` flag
+training linear regression on 6 feature combinations with and without regularization.
+~~~
+> .\titanic.exe -linreg -comb=6 -reg -rankEin -top=25
+[6 7 8 9 10 11]/84
+EIn = 0.203143  linreg 1D [2 4 5 6 7 9]
+EIn = 0.206510  linreg 1D [2 4 6 7 9 11] regularized k 2
+EIn = 0.206510  linreg 1D [2 4 6 7 9 11]
+EIn = 0.208754  linreg 1D [2 4 5 6 7 11] regularized k 2
+EIn = 0.208754  linreg 1D [2 4 5 6 7 11]
+EIn = 0.208754  linreg 1D [2 4 5 6 9 11]
+EIn = 0.208754  linreg 1D [2 4 5 6 9 11] regularized k 2
+EIn = 0.210999  linreg 1D [4 5 6 7 9 11]
+EIn = 0.210999  linreg 1D [4 5 6 7 9 11] regularized k 2
+EIn = 0.212121  linreg 1D [2 4 5 7 9 11] regularized k 2
+EIn = 0.212121  linreg 1D [2 4 5 7 9 11]
+EIn = 0.289562  linreg 1D [2 5 6 7 9 11]
+~~~
+
