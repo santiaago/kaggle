@@ -36,7 +36,8 @@ ll values from 1 to k
 
 examples:
 
-##### training and testing linear regression ranking by in sample error
+##### using `-rankEin`
+training and testing linear regression ranking by in sample error.
 ~~~
 > .\titanic.exe -test -linreg -specific -rankEin
 EIn = 0.212121  linreg Sex Age PClass
@@ -46,6 +47,8 @@ EIn = 0.298541  linreg PClass Age
 ~~~
 
 ##### training and testing linear regression ranking by cross validation error
+##### using `-rankEcv`
+training and testing linear regression ranking by cross validation error.
 ~~~
 > .\titanic.exe -test -linreg -specific -rankEcv
 Leave 890 out of 891
@@ -55,7 +58,8 @@ Ecv = 0.213244  linreg PClass Sex
 Ecv = 0.298541  linreg PClass Age
 ~~~
 
-##### training and testing linear regression with feature combination of size 6 rank by in sample error
+##### using `-comb`
+training and testing linear regression with feature combination of size 6 rank by in sample error
 ~~~
 > .\titanic.exe -test -linreg -comb=6 -rankEin
 [6 7 8 9 10 11]/84
