@@ -1,0 +1,20 @@
+[
+    {
+        "Model": 0,
+        "TransformDimension": 0,
+        "TransformID": 0,
+        "Features": [
+            2,
+            4,
+            5,
+            6,
+            7,
+            9,
+            11
+        ],
+        "Regularized": false,
+        "K": 0,
+        "T": 0,
+        "L": 0
+    }
+]

@@ -153,3 +153,31 @@ See [here](https://www.kaggle.com/c/titanic/details/submission-instructions) for
 1308,0
 1309,0
 ~~~
+
+#### using `-e` flag
+Use this flag to export the models that you have trained.
+
+~~~
+> .\titanic.exe -linreg -comb=7 -e
+> cat .\usedModels.json
+[
+    {
+        "Model": 0,
+        "TransformDimension": 0,
+        "TransformID": 0,
+        "Features": [
+            2,
+            4,
+            5,
+            6,
+            7,
+            9,
+            11
+        ],
+        "Regularized": false,
+        "K": 0,
+        "T": 0,
+        "L": 0
+    }
+]
+~~~
