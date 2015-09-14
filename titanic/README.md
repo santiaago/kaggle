@@ -110,3 +110,30 @@ EIn = 0.212121  linreg 1D [2 4 5 7 9 11]
 EIn = 0.289562  linreg 1D [2 5 6 7 9 11]
 ~~~
 
+### using `-test` flag
+
+`-test` flag creates the test files to be submited to **kaggle** in the format expected by kaggle.
+See [here](https://www.kaggle.com/c/titanic/details/submission-instructions) for more details.
+
+~~~
+> ls .\data\temp
+> .\titanic.exe -specific -linreg
+> ls .\data\temp
+> .\titanic.exe -specific -linreg -test
+> ls .\data\temp
+-a---        14/09/2015     16:36       2839 linreg PClass Age
+-a---        14/09/2015     16:36       2839 linreg PClass Sex
+-a---        14/09/2015     16:36       2839 linreg Sex Age
+-a---        14/09/2015     16:36       2839 linreg Sex Age PClass
+> tail '.\data\temp\linreg Sex Age'
+1300,1
+1301,1
+1302,1
+1303,1
+1304,1
+1305,0
+1306,1
+1307,0
+1308,0
+1309,0
+~~~
