@@ -34,3 +34,14 @@ ll values from 1 to k
 ~~~
 
 
+examples:
+
+##### training and testing linear regression ranking by in sample error
+~~~
+> .\titanic.exe -test -linreg -specific -rankEin
+EIn = 0.212121  linreg Sex Age PClass
+EIn = 0.213244  linreg Sex Age
+EIn = 0.213244  linreg PClass Sex
+EIn = 0.298541  linreg PClass Age
+~~~
+
