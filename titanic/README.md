@@ -222,3 +222,23 @@ EIn = 0.207632  linreg [2 4 5 6 7 9 11]
 -a---        14/09/2015     16:58       2839 linreg [2 4 5 6 7 9 11]
 -a---        14/09/2015     16:57         79 ranking.ein.md
 ~~~
+
+
+#### use the verbose mode `-v` to see what is going on under the hood
+
+~~~
+> .\titanic.exe -linreg -comb=7 -rankEin -v
+Starting training models
+training linreg models
+
+        training combinations
+[5 6 7 8 9 10 11]/36
+
+        Done, trained 1 combination models
+Done. Trained 1 models
+Start ranking models
+Start ranking models by Ein
+EIn = 0.207632  linreg 1D [2 4 5 6 7 9 11]
+Done ranking models by Ein
+Done ranking models
+~~~
