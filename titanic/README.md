@@ -242,3 +242,36 @@ EIn = 0.207632  linreg 1D [2 4 5 6 7 9 11]
 Done ranking models by Ein
 Done ranking models
 ~~~
+
+#### use logistic regression flag `-logreg`
+
+~~~
+> .\titanic.exe -logreg -comb=6 -rankEin
+[6 7 8 9 10 11]/84
+EIn = 0.196409  Logreg 1D [2 4 6 8 10 11] epochs-22
+EIn = 0.199776  Logreg 1D [2 4 6 7 8 10] epochs-18
+EIn = 0.199776  Logreg 1D [2 4 6 7 10 11] epochs-22
+EIn = 0.199776  Logreg 1D [2 4 6 7 8 11] epochs-22
+EIn = 0.200898  Logreg 1D [2 4 7 8 10 11] epochs-22
+EIn = 0.206510  Logreg 1D [4 6 7 8 10 11] epochs-17
+EIn = 0.208754  Logreg 1D [4 5 6 8 10 11] epochs-63
+EIn = 0.208754  Logreg 1D [4 5 6 7 8 11] epochs-58
+EIn = 0.208754  Logreg 1D [4 5 6 7 10 11] epochs-58
+EIn = 0.209877  Logreg 1D [4 5 6 7 8 10] epochs-59
+~~~
+
+with regularization:
+~~~
+> .\titanic.exe -logreg -reg -comb=7 -rankEin
+[5 6 7 8 9 10 11]/36
+EIn = 0.187430  Logreg 1D [2 4 6 7 8 10 11] epochs-22 regularized k -2 epochs 1001
+EIn = 0.198653  Logreg 1D [2 4 6 7 8 10 11] epochs-22 regularized k -3 epochs 1001
+EIn = 0.199776  Logreg 1D [2 4 6 7 8 10 11] epochs-22 regularized k -4 epochs 22
+EIn = 0.199776  Logreg 1D [2 4 6 7 8 10 11] epochs-22
+EIn = 0.199776  Logreg 1D [2 4 6 7 8 10 11] epochs-22 regularized k -5 epochs 22
+EIn = 0.205387  Logreg 1D [4 5 6 7 8 10 11] epochs-58 regularized k -4 epochs 1001
+EIn = 0.208754  Logreg 1D [4 5 6 7 8 10 11] epochs-58 regularized k -5 epochs 1001
+EIn = 0.208754  Logreg 1D [4 5 6 7 8 10 11] epochs-58
+EIn = 0.212121  Logreg 1D [2 4 6 7 8 9 11] epochs-26
+EIn = 0.212121  Logreg 1D [2 4 6 7 9 10 11] epochs-26 regularized k -5 epochs 28
+~~~
