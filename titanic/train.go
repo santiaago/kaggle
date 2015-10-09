@@ -563,9 +563,14 @@ func logregFromK(k int, fd [][]float64, lr *logreg.LogisticRegression) *logreg.L
 // updateModels re-trains all the models passed in.
 //
 func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels ml.ModelContainers) {
-
+	if *verbose {
+		fmt.Printf("updating models")
+	}
 	for _, mc := range models {
 		if lr, ok := mc.Model.(*linreg.LinearRegression); ok {
+			if *verbose {
+				fmt.Printf("\tlinear regression model")
+			}
 			fd := dc.FilterWithPredict(mc.Features)
 			lr.InitializeFromData(fd)
 			if lr.HasTransform {
@@ -586,6 +591,9 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 				trainedModels = append(trainedModels, mc)
 			}
 		} else if lr, ok := mc.Model.(*logreg.LogisticRegression); ok {
+			if *verbose {
+				fmt.Printf("\tlogistic regression model")
+			}
 			fd := dc.FilterWithPredict(mc.Features)
 			lr.InitializeFromData(fd)
 			if lr.HasTransform {
@@ -611,7 +619,11 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 			if svm.HasTransform {
 				svm.TransformFunction = transformArray(mc.TransformDimension)[mc.TransformID]
 				svm.ApplyTransformation()
+			if *verbose {
+				fmt.Printf("\tSVM model %+v\n", svm)
+				fmt.Printf("\tfeatures %v", mc.Features)
 			}
+			fd := dc.FilterWithPredict(mc.Features)
 			if *svmKOverride {
 				svm.K = *svmK
 			}
