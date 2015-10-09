@@ -14,7 +14,10 @@ import (
 // with respect to the prediction set by the svm 'svm' passed as argument.
 //
 func svmTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) {
-
+	if *verbose {
+		fmt.Printf("\ttesting svm model:%v\n", model.Name)
+		fmt.Printf("\t%+v\n", model)
+	}
 	fd := dc.Filter(model.Features)
 	svm, ok := model.Model.(*svm.SVM)
 	if !ok {
@@ -29,7 +32,9 @@ func svmTest(model *ml.ModelContainer, dc data.Container) ([]float64, error) {
 // todo(santiaago): move to ml
 //
 func svmCombinations(dc data.Container, size int) (models ml.ModelContainers) {
-
+	if *verbose {
+		fmt.Printf("\truning svm %v combinations\n", size)
+	}
 	combs := itertools.Combinations(dc.Features, size)
 
 	for _, c := range combs {
