@@ -614,11 +614,6 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 				trainedModels = append(trainedModels, mc)
 			}
 		} else if svm, ok := mc.Model.(*svm.SVM); ok {
-			fd := dc.FilterWithPredict(mc.Features)
-			svm.InitializeFromData(fd)
-			if svm.HasTransform {
-				svm.TransformFunction = transformArray(mc.TransformDimension)[mc.TransformID]
-				svm.ApplyTransformation()
 			if *verbose {
 				fmt.Printf("\tSVM model %+v\n", svm)
 				fmt.Printf("\tfeatures %v", mc.Features)
@@ -632,6 +627,11 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 			}
 			if *svmLambdaOverride {
 				svm.Lambda = *svmLambda
+			}
+			svm.InitializeFromData(fd)
+			if svm.HasTransform {
+				svm.TransformFunction = transformArray(mc.TransformDimension)[mc.TransformID]
+				svm.ApplyTransformation()
 			}
 			if err := svm.Learn(); err != nil {
 				log.Printf("unable to train model %v\n", mc.Name)
