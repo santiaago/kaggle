@@ -240,7 +240,7 @@ func (mi modelInfo) GetModel(dc data.Container) *ml.Model {
 
 func importModels(path string) (models ml.ModelContainers) {
 	if *verbose {
-		fmt.Printf("importing models to %v\n", path)
+		fmt.Printf("importing models from %v\n", path)
 	}
 	var b []byte
 	var err error
