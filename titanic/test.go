@@ -35,7 +35,7 @@ func testModels(models ml.ModelContainers) {
 
 	for i, m := range models {
 		if *verbose {
-			fmt.Printf("\r\ttesting model:%v/%v", i, len(models))
+			fmt.Printf("\r\ttesting model:%v/%v\n", i, len(models))
 		}
 		if m == nil {
 			continue
