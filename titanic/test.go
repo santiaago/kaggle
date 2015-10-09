@@ -11,10 +11,10 @@ import (
 	"github.com/santiaago/ml/svm"
 )
 
-// testModels runs a linear regression model on the data passed in the reader.
+// testModels runs a model on the data passed in the reader.
 // Then makes the predictions and write the predicted data to file using the
-// linear regression model name.
-// testModels run a test file for each linear regression model passed in the linreg array.
+// model name.
+// testModels run a test file for each model passed in the array.
 //
 func testModels(models ml.ModelContainers) {
 	if !*test {
