@@ -275,3 +275,19 @@ EIn = 0.208754  Logreg 1D [4 5 6 7 8 10 11] epochs-58
 EIn = 0.212121  Logreg 1D [2 4 6 7 8 9 11] epochs-26
 EIn = 0.212121  Logreg 1D [2 4 6 7 9 10 11] epochs-26 regularized k -5 epochs 28
 ~~~
+
+with svm:
+~~~
+> .\titanic.exe -svm -comb=7 -rankEin
+[5 6 7 8 9 10 11]/36
+EIn = 0.200898  svm 1D [2 4 6 7 8 10 11] k 1 T 1000
+EIn = 0.305275  svm 1D [2 4 6 7 8 9 10] k 1 T 1000
+EIn = 0.338945  svm 1D [4 6 7 8 9 10 11] k 1 T 1000
+EIn = 0.356902  svm 1D [2 4 5 6 8 9 11] k 1 T 1000
+EIn = 0.358025  svm 1D [2 4 5 6 8 9 10] k 1 T 1000
+EIn = 0.358025  svm 1D [2 5 6 7 9 10 11] k 1 T 1000
+EIn = 0.359147  svm 1D [4 5 6 7 8 9 10] k 1 T 1000
+EIn = 0.362514  svm 1D [2 5 6 8 9 10 11] k 1 T 1000
+EIn = 0.369248  svm 1D [2 5 6 7 8 9 11] k 1 T 1000
+EIn = 0.370370  svm 1D [5 6 7 8 9 10 11] k 1 T 1000
+~~~
