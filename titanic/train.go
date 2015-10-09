@@ -486,13 +486,13 @@ func trainLinregModelsRegularized(models ml.ModelContainers) (regModels ml.Model
 			continue
 		}
 		if *verbose {
-			fmt.Printf("\rtraining regularized model %v %v/%v", m.Name, i, len(models))
+			fmt.Printf("\rtraining regularized model %v %v/%v\n", m.Name, i, len(models))
 		}
 		if nlr, err := linregWithRegularization(lr); err == nil && nlr != nil {
 			name := fmt.Sprintf("%v regularized k %v", m.Name, nlr.K)
 			regModels = append(regModels, ml.NewModelContainer(nlr, name, m.Features))
 		} else if err != nil {
-			log.Printf("cannot regularized model: %v, %v", m.Name, err)
+			log.Printf("cannot regularized model: %v, %v\n", m.Name, err)
 		}
 	}
 	return
@@ -514,13 +514,13 @@ func trainLogregModelsRegularized(models ml.ModelContainers, dc data.Container) 
 			continue
 		}
 		if *verbose {
-			fmt.Printf("\rtraining regularized model %v %v/%v", m.Name, i, len(models))
+			fmt.Printf("\rtraining regularized model %v %v/%v\n", m.Name, i, len(models))
 		}
 		fd := dc.FilterWithPredict(m.Features)
 
 		for k := -5; k < 5; k++ {
 			if *verbose {
-				fmt.Printf("\rregularizing model %v/%v with k:%v", i, len(models), k)
+				fmt.Printf("\rregularizing model %v/%v with k:%v\n", i, len(models), k)
 			}
 			var nlr *logreg.LogisticRegression
 			if nlr = logregFromK(k, fd, lr); nlr == nil {

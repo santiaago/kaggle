@@ -65,6 +65,7 @@ func svmCombinations(dc data.Container, size int) (models ml.ModelContainers) {
 			}
 		}
 	}
+	fmt.Println()
 	return
 }
 
