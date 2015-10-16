@@ -637,6 +637,17 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 				log.Printf("unable to train model %v\n", mc.Name)
 				continue
 			}
+			if *verbose {
+				fmt.Println("DEBUG")
+				fmt.Printf("SVM Wn %v\n", svm.Wn)
+				fmt.Printf("SVM Vector Size %v\n", svm.VectorSize)
+				fmt.Printf("SVM Has transform %v\n", svm.HasTransform)
+				fmt.Printf("SVM Training points %v\n", svm.TrainingPoints)
+				fmt.Printf("SVM Lambda %v\n", svm.Lambda)
+				fmt.Printf("SVM Eta %v\n", svm.Eta)
+				fmt.Printf("SVM K %v\n", svm.K)
+				fmt.Printf("SVM T %v\n", svm.T)
+			}
 			trainedModels = append(trainedModels, mc)
 		}
 	}
