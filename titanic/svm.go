@@ -48,7 +48,7 @@ func svmCombinations(dc data.Container, size int) (models ml.ModelContainers) {
 				svm.T = *svmT
 				svm.InitializeFromData(fd)
 
-				name := fmt.Sprintf("svm 1D %v k %v T %v", c, k, *svmT)
+				name := fmt.Sprintf("svm 1D %v k %v T %v L %v", c, k, *svmT, *svmLambda)
 
 				if err := svm.Learn(); err == nil {
 					models = append(models, ml.NewModelContainer(svm, name, c))
@@ -63,7 +63,7 @@ func svmCombinations(dc data.Container, size int) (models ml.ModelContainers) {
 			svm.T = *svmT
 			svm.InitializeFromData(fd)
 
-			name := fmt.Sprintf("svm 1D %v k %v T %v", c, *svmK, *svmT)
+			name := fmt.Sprintf("svm 1D %v k %v T %v L %v", c, *svmK, *svmT, *svmLambda)
 
 			if err := svm.Learn(); err == nil {
 				models = append(models, ml.NewModelContainer(svm, name, c))
