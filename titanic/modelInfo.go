@@ -294,7 +294,7 @@ func exportModels(models ml.ModelContainers, path string) {
 	var err error
 
 	if b, err = json.MarshalIndent(modelInfos, "", "    "); err != nil {
-		log.Printf("unable to marshal array of modelInfo objects ", err)
+		log.Printf("unable to marshal array of modelInfo objects %v ", err)
 	}
 
 	err = ioutil.WriteFile(path, b, 0644)
