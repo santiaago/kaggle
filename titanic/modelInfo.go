@@ -174,6 +174,9 @@ func (mi modelInfo) newModel() (m ml.Model) {
 		m.(*svm.SVM).K = mi.K
 		m.(*svm.SVM).T = mi.T
 		m.(*svm.SVM).Lambda = mi.L
+		if *verbose {
+			fmt.Printf("setting svm with k: %v T: %v L: %v\n", mi.K, mi.T, mi.L)
+		}
 	}
 	return
 }
