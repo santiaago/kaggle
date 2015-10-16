@@ -68,6 +68,18 @@ func svmCombinations(dc data.Container, size int) (models ml.ModelContainers) {
 			if err := svm.Learn(); err == nil {
 				models = append(models, ml.NewModelContainer(svm, name, c))
 			}
+			if *verbose {
+				fmt.Println("DEBUG")
+				fmt.Printf("SVM features %v\n", c)
+				fmt.Printf("SVM Wn %v\n", svm.Wn)
+				fmt.Printf("SVM Vector Size %v\n", svm.VectorSize)
+				fmt.Printf("SVM Has transform %v\n", svm.HasTransform)
+				fmt.Printf("SVM Training points %v\n", svm.TrainingPoints)
+				fmt.Printf("SVM Lambda %v\n", svm.Lambda)
+				fmt.Printf("SVM Eta %v\n", svm.Eta)
+				fmt.Printf("SVM K %v\n", svm.K)
+				fmt.Printf("SVM T %v\n", svm.T)
+			}
 		}
 	}
 	fmt.Println()
