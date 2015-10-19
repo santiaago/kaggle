@@ -564,12 +564,12 @@ func logregFromK(k int, fd [][]float64, lr *logreg.LogisticRegression) *logreg.L
 //
 func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels ml.ModelContainers) {
 	if *verbose {
-		fmt.Printf("updating models")
+		fmt.Printf("updating models\n")
 	}
 	for _, mc := range models {
 		if lr, ok := mc.Model.(*linreg.LinearRegression); ok {
 			if *verbose {
-				fmt.Printf("\tlinear regression model")
+				fmt.Printf("\tlinear regression model\n")
 			}
 			fd := dc.FilterWithPredict(mc.Features)
 			lr.InitializeFromData(fd)
@@ -616,16 +616,25 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 		} else if svm, ok := mc.Model.(*svm.SVM); ok {
 			if *verbose {
 				fmt.Printf("\tSVM model %+v\n", svm)
-				fmt.Printf("\tfeatures %v", mc.Features)
+				fmt.Printf("\tfeatures %v\n", mc.Features)
 			}
 			fd := dc.FilterWithPredict(mc.Features)
 			if *svmKOverride {
+				if *verbose {
+					fmt.Printf("\toverriding K %v\n", *svmK)
+				}
 				svm.K = *svmK
 			}
 			if *svmTOverride {
+				if *verbose {
+					fmt.Printf("\toverriding T %v\n", *svmTOverride)
+				}
 				svm.T = *svmT
 			}
 			if *svmLambdaOverride {
+				if *verbose {
+					fmt.Printf("\toverriding L %v\n", *svmLambda)
+				}
 				svm.Lambda = *svmLambda
 			}
 			svm.InitializeFromData(fd)
@@ -633,12 +642,16 @@ func updateModels(dc data.Container, models ml.ModelContainers) (trainedModels m
 				svm.TransformFunction = transformArray(mc.TransformDimension)[mc.TransformID]
 				svm.ApplyTransformation()
 			}
+			if *verbose {
+				fmt.Printf("\tSVM model after import %+v\n", svm)
+			}
+			fmt.Printf("SVM before Wn %v\n", svm.Wn)
 			if err := svm.Learn(); err != nil {
 				log.Printf("unable to train model %v\n", mc.Name)
 				continue
 			}
+			fmt.Printf("SVM after Wn %v\n", svm.Wn)
 			if *verbose {
-				fmt.Println("DEBUG")
 				fmt.Printf("SVM Wn %v\n", svm.Wn)
 				fmt.Printf("SVM Vector Size %v\n", svm.VectorSize)
 				fmt.Printf("SVM Has transform %v\n", svm.HasTransform)
