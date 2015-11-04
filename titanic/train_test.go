@@ -18,7 +18,7 @@ func TestSVMImportModels(t *testing.T) {
 	checkSVMs(t, msvm, isvm)
 }
 
-func TestSVMIsConsistent(t *testing.T) {
+func TestSVMAreConsistent(t *testing.T) {
 
 	var dc data.Container
 	var err error
@@ -58,10 +58,8 @@ func createSVM(t *testing.T, dc data.Container) *svm.SVM {
 	svm.T = 1000
 
 	features := []int{2, 4, 6, 7, 8, 9, 10}
-	t.Logf("imported features: %v", features)
 	fd := dc.FilterWithPredict(features)
 	svm.InitializeFromData(fd)
-
 	if err := svm.Learn(); err != nil {
 		t.Error(err)
 	}
@@ -71,7 +69,6 @@ func createSVM(t *testing.T, dc data.Container) *svm.SVM {
 func importSVM(t *testing.T, dc data.Container) *svm.SVM {
 	models := importModels("svm.json")
 	svm := models[0].Model.(*svm.SVM)
-	t.Logf("imported features: %v", models[0].Features)
 	fd := dc.FilterWithPredict(models[0].Features)
 	svm.InitializeFromData(fd)
 	if err := svm.Learn(); err != nil {
@@ -80,6 +77,10 @@ func importSVM(t *testing.T, dc data.Container) *svm.SVM {
 	return svm
 }
 
+// checkSVMs checks that fields of SVMs are equal
+// except for Wn that is computed through the Pegasos algorithm that
+// involves random selection of indexes.
+//
 func checkSVMs(t *testing.T, a, b *svm.SVM) {
 	if a.K != b.K {
 		t.Errorf("K param are different svmA.K:%v svmB.K:%v", a.K, b.K)
@@ -97,8 +98,6 @@ func checkSVMs(t *testing.T, a, b *svm.SVM) {
 		t.Errorf("svm.Yn is different between svmA and svmB")
 	} else if !equal2D(a.Xn, b.Xn) {
 		t.Errorf("svm.Xn is different between svmA and svmB")
-	} else if !equal(a.Wn, b.Wn) {
-		t.Errorf("Wn is different \n\t\tsvmA.Wn:%v \n\t svmB.Wn:%v", a.Wn, b.Wn)
 	}
 }
 
