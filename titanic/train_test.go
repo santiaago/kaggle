@@ -7,6 +7,45 @@ import (
 	"github.com/santiaago/ml/svm"
 )
 
+func TestSVMImportModels(t *testing.T) {
+
+	msvm := svm.NewSVM()
+	msvm.K = 20
+	msvm.Lambda = 0.001
+	msvm.T = 1000
+	models := importModels("svm.json")
+	isvm := models[0].Model.(*svm.SVM)
+	checkSVMs(t, msvm, isvm)
+}
+
+func TestSVMIsConsistent(t *testing.T) {
+
+	var dc data.Container
+	var err error
+	if dc, err = buildContainer(); err != nil {
+		t.Error(err)
+	}
+
+	svm1 := createSVM(t, dc)
+	svm2 := createSVM(t, dc)
+
+	checkSVMs(t, svm1, svm2)
+}
+
+func TestSVMImportLearn(t *testing.T) {
+
+	var dc data.Container
+	var err error
+	if dc, err = buildContainer(); err != nil {
+		t.Error(err)
+	}
+
+	svm := createSVM(t, dc)
+	isvm := importSVM(t, dc)
+
+	checkSVMs(t, svm, isvm)
+}
+
 func buildContainer() (data.Container, error) {
 	reader := NewPassengerReader("data/train.csv", NewPassengerTrainExtractor())
 	return reader.Read()
@@ -31,43 +70,14 @@ func createSVM(t *testing.T, dc data.Container) *svm.SVM {
 
 func importSVM(t *testing.T, dc data.Container) *svm.SVM {
 	models := importModels("svm.json")
-	//return updateModels(dc, models)[0].Model.(*svm.SVM)
-	svm := models[0].Model.(*svm.SVM) //updateModels(dc, models)[0].Model.(*svm.SVM)
+	svm := models[0].Model.(*svm.SVM)
 	t.Logf("imported features: %v", models[0].Features)
 	fd := dc.FilterWithPredict(models[0].Features)
 	svm.InitializeFromData(fd)
-
 	if err := svm.Learn(); err != nil {
 		t.Error(err)
 	}
 	return svm
-}
-
-func TestSVMImportModels(t *testing.T) {
-
-	msvm := svm.NewSVM()
-	msvm.K = 20
-	msvm.Lambda = 0.001
-	msvm.T = 1000
-
-	models := importModels("svm.json")
-	isvm := models[0].Model.(*svm.SVM)
-
-	checkSVMs(t, msvm, isvm)
-}
-
-func TestSVMImportLearn(t *testing.T) {
-
-	var dc data.Container
-	var err error
-	if dc, err = buildContainer(); err != nil {
-		t.Error(err)
-	}
-
-	svm := createSVM(t, dc)
-	isvm := importSVM(t, dc)
-
-	checkSVMs(t, svm, isvm)
 }
 
 func checkSVMs(t *testing.T, a, b *svm.SVM) {
