@@ -67,7 +67,6 @@ func TestSVMImportLearn(t *testing.T) {
 	svm := createSVM(t, dc)
 	isvm := importSVM(t, dc)
 
-
 	checkSVMs(t, svm, isvm)
 }
 
